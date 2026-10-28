@@ -1,0 +1,43 @@
+name: Deploy to GitHub Pages
+
+on:
+  # main 브랜치에 코드가 push될 때마다 자동으로 배포 실행
+  push:
+    branches:
+      - main
+  # GitHub 웹 화면에서 수동으로 배포를 실행할 수 있는 버튼 추가
+  workflow_dispatch:
+
+# GitHub Pages 배포에 필요한 권한 설정
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# 동시 배포 방지 설정
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          # 저장소 루트(최상위)의 모든 파일(index.html, 이미지 등)을 업로드
+          path: '.'
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
