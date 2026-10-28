@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>삼산여객주 채용 홈페이지</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Supabase JS CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        samsanBlue: '#2b4bb7',
+                        samsanDarkBg: '#8c9cbe',
+                        cardOrange: '#e66b27',
+                        cardBlue: '#1e3a8a',
+                        cardYellow: '#f59e0b',
+                        cardGreen: '#10b981',
+                        cardDarkGreen: '#15803d'
+                    },
+                    fontFamily: {
+                        sans: ['"Noto Sans KR"', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+            background-color: #f1f3f7;
+            margin: 0;
+            padding: 0;
+        }
+
+        /* 메인 배경 (background.png 사용 + 픽셀 단위 일치) */
+        .hero-banner-container {
+            position: relative;
+            background: url('background.png') no-repeat center center;
+            background-size: cover;
+            min-height: 850px;
+            width: 100%;
+        }
+
+        /* 레퍼런스 이미지 카드 정확한 스타일 */
+        .exact-job-card {
+            background-color: #ffffff;
+            border-radius: 0px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            height: 210px;
+            padding: 24px 22px;
+            display: flex;
+            flex-col;
+            justify-content: space-between;
+        }
+
+        .exact-job-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        /* 햄버거 메뉴 버튼 */
+        .hamburger-btn {
+            background-color: #25408f;
+            width: 64px;
+            height: 64px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+    </style>
+</head>
+<body class="flex flex-col min-h-screen">
+
+    <!-- 상단 헤더 (이미지 레이아웃과 100% 동일) -->
+    <header class="bg-white border-b border-gray-200 h-20 sticky top-0 z-50">
+        <div class="max-w-[1400px] mx-auto h-full flex items-center justify-between px-4 lg:px-8">
+            
+            <!-- 로고 (Logo.png 경로 지정) -->
+            <a href="#" onclick="switchTab('home')" class="flex items-center">
+                <img src="Logo.png" alt="삼산여객주 채용" class="h-10 sm:h-12 w-auto object-contain" onerror="this.onerror=null; this.src='https://via.placeholder.com/260x50?text=SAMSAN+LOGO';">
+            </a>
+
+            <!-- 메뉴 우측 레이아웃 -->
+            <div class="flex items-center space-x-8 sm:space-x-12">
+                <!-- 네비게이션 메인 메뉴 -->
+                <nav class="hidden md:flex items-center space-x-10 text-xl font-bold text-gray-800 tracking-tight">
+                    <button onclick="switchTab('my')" class="hover:text-blue-700 transition">나의채용</button>
+                    <button onclick="switchTab('inquiry')" class="hover:text-blue-700 transition">채용문의</button>
+                    <button onclick="switchTab('jobs')" class="hover:text-blue-700 transition">채용공고</button>
+                    <button onclick="switchTab('notice')" class="hover:text-blue-700 transition">공지사항</button>
+                </nav>
+
+                <!-- 우측 상단 햄버거 버튼 -->
+                <button onclick="toggleMobileNav()" class="hamburger-btn text-white text-2xl hover:bg-blue-900 transition">
+                    <i class="fas fa-bars"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- 모바일 드롭다운 메뉴 -->
+        <div id="mobile-nav" class="hidden bg-white w-full border-b border-gray-300 shadow-xl py-4 px-6 md:hidden">
+            <div class="flex flex-col space-y-3 font-bold text-gray-800 text-lg">
+                <button onclick="switchTab('home'); toggleMobileNav();" class="text-left py-2 border-b">홈</button>
+                <button onclick="switchTab('my'); toggleMobileNav();" class="text-left py-2 border-b">나의채용</button>
+                <button onclick="switchTab('inquiry'); toggleMobileNav();" class="text-left py-2 border-b">채용문의</button>
+                <button onclick="switchTab('jobs'); toggleMobileNav();" class="text-left py-2 border-b">채용공고</button>
+                <button onclick="switchTab('notice'); toggleMobileNav();" class="text-left py-2 border-b">공지사항</button>
+            </div>
+        </div>
+    </header>
+
+    <!-- 메인 상단 히어로 & 채용 카드 영역 -->
+    <main class="flex-grow">
+
+        <!-- 1. 메인 홈 화면 (image_2e65fb.png 화면과 100% 동일 구현) -->
+        <div id="view-home" class="view-section">
+            <section class="hero-banner-container px-4 sm:px-8 lg:px-12 py-6">
+                <div class="max-w-[1360px] mx-auto relative">
+
+                    <!-- 로그인 | 회원가입 캡슐 버튼 (우측 상단 위치) -->
+                    <div class="flex justify-end mb-8">
+                        <div class="bg-white/95 backdrop-blur border border-blue-600 rounded-full px-6 py-1.5 shadow-md flex items-center space-x-3 text-sm font-bold text-gray-900">
+                            <button onclick="openModal('loginModal')" class="hover:text-blue-700 transition">로그인</button>
+                            <span class="text-gray-300">|</span>
+                            <button onclick="openModal('signupModal')" class="hover:text-blue-700 transition">회원가입</button>
+                        </div>
+                    </div>
+
+                    <!-- 중앙 문구 (제목 / 부제목) -->
+                    <div class="text-center text-white mt-4 mb-6">
+                        <h1 class="text-4xl sm:text-6xl font-black tracking-tight mb-4 drop-shadow-md">진행중인 채용</h1>
+                        <p class="text-xl sm:text-2xl font-medium tracking-tight text-white/95 drop-shadow">마을과 사람을 잇는 길, 당신과 함께 만들어가겠습니다.</p>
+                    </div>
+
+                    <!-- 더보기 > 버튼 (오른쪽 배치) -->
+                    <div class="flex justify-end mb-6">
+                        <button onclick="switchTab('jobs')" class="bg-[#2a4ec2] hover:bg-blue-800 text-white font-bold px-6 py-2 rounded-none text-base shadow-md transition flex items-center space-x-2">
+                            <span>더보기</span>
+                            <span>&gt;</span>
+                        </button>
+                    </div>
+
+                    <!-- 5개 채용 카드 그리드 (이미지 배치 그대로 구현) -->
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                        
+                        <!-- 카드 1: 신입사원 -->
+                        <div onclick="openApplyModal('신입사원', '2026년도 제2차 신입사원 선발')" class="exact-job-card cursor-pointer">
+                            <div>
+                                <span class="text-[#e65c00] font-extrabold text-xl tracking-tight block mb-2">신입사원</span>
+                                <h3 class="text-xl font-bold text-gray-900 leading-snug tracking-tight">2026년도 제2차 신입사원 선발</h3>
+                            </div>
+                            <div class="text-xs font-semibold text-gray-400">
+                                선발예정인원 : 5명
+                            </div>
+                        </div>
+
+                        <!-- 카드 2: 고위직 -->
+                        <div onclick="openApplyModal('고위직', '2026년도 제1차 신입사원(고위직) 선발')" class="exact-job-card cursor-pointer">
+                            <div>
+                                <span class="text-[#1a365d] font-extrabold text-xl tracking-tight block mb-2">고위직</span>
+                                <h3 class="text-xl font-bold text-gray-900 leading-snug tracking-tight">2026년도 제1차 신입사원<br>(고위직) 선발</h3>
+                            </div>
+                            <div class="text-xs font-semibold text-gray-400">
+                                선발예정인원 : 1명
+                            </div>
+                        </div>
+
+                        <!-- 카드 3: 공무직 근로자 -->
+                        <div onclick="openApplyModal('공무직 근로자', '2026년도 제3차 경력사원(공무직근로자) 선발')" class="exact-job-card cursor-pointer">
+                            <div>
+                                <span class="text-[#f59e0b] font-extrabold text-xl tracking-tight block mb-2">공무직 근로자</span>
+                                <h3 class="text-xl font-bold text-gray-900 leading-snug tracking-tight">2026년도 제3차 경력사원<br>(공무직근로자) 선발</h3>
+                            </div>
+                            <div class="text-xs font-semibold text-gray-400">
+                                선발예정인원 : 5명
+                            </div>
+                        </div>
+
+                        <!-- 카드 4: 경력직채용 -->
+                        <div onclick="openApplyModal('경력직채용', '2026년도 제1차 경력사원(동일업종근로경력자) 선발')" class="exact-job-card cursor-pointer">
+                            <div>
+                                <span class="text-[#059669] font-extrabold text-xl tracking-tight block mb-2">경력직채용</span>
+                                <h3 class="text-xl font-bold text-gray-900 leading-snug tracking-tight">2026년도 제1차 경력사원<br>(동일업종근로경력자) 선발</h3>
+                            </div>
+                            <div class="text-xs font-semibold text-gray-400">
+                                선발예정인원 : 15명
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <!-- 두 번째 줄: 전문경력직 -->
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mt-6">
+                        <!-- 카드 5: 전문경력직 -->
+                        <div onclick="openApplyModal('전문경력직', '2026년도 제1차 경력사원(전문원, 경력직원) 선발')" class="exact-job-card cursor-pointer">
+                            <div>
+                                <span class="text-[#15803d] font-extrabold text-xl tracking-tight block mb-2">전문경력직</span>
+                                <h3 class="text-xl font-bold text-gray-900 leading-snug tracking-tight">2026년도 제1차 경력사원<br>(전문원, 경력직원) 선발</h3>
+                            </div>
+                            <div class="text-xs font-semibold text-gray-400">
+                                선발예정인원 : 1명
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </section>
+        </div>
+
+        <!-- 2. 채용공고 탭 -->
+        <div id="view-jobs" class="view-section hidden max-w-7xl mx-auto px-4 py-12">
+            <h2 class="text-3xl font-extrabold text-gray-900 mb-6">채용공고 전체보기</h2>
+            <div id="jobs-container" class="space-y-4">
+                <!-- JS 로딩 -->
+            </div>
+        </div>
+
+        <!-- 3. 나의채용 (합격확인) 탭 -->
+        <div id="view-my" class="view-section hidden max-w-3xl mx-auto px-4 py-12">
+            <div class="bg-white p-8 border border-gray-200 shadow-md">
+                <h2 class="text-2xl font-bold text-gray-900 mb-4 text-center">나의 채용 / 합격확인</h2>
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-bold text-gray-700 mb-1">성명</label>
+                        <input type="text" id="check-name" class="w-full border p-3 rounded" placeholder="홍길동">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-bold text-gray-700 mb-1">연락처 또는 수험번호</label>
+                        <input type="text" id="check-phone" class="w-full border p-3 rounded" placeholder="010-1234-5678">
+                    </div>
+                    <button onclick="checkPassStatus()" class="w-full bg-blue-700 text-white font-bold py-3 hover:bg-blue-800">조회하기</button>
+                </div>
+                <div id="pass-result" class="mt-6"></div>
+            </div>
+        </div>
+
+        <!-- 4. 공지사항 탭 -->
+        <div id="view-notice" class="view-section hidden max-w-5xl mx-auto px-4 py-12">
+            <h2 class="text-3xl font-extrabold text-gray-900 mb-6">공지사항</h2>
+            <div class="bg-white border border-gray-200">
+                <table class="w-full text-left">
+                    <thead class="bg-gray-100 border-b">
+                        <tr>
+                            <th class="p-4 text-center">번호</th>
+                            <th class="p-4">제목</th>
+                            <th class="p-4 text-center">작성일</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="border-b hover:bg-gray-50">
+                            <td class="p-4 text-center">1</td>
+                            <td class="p-4 font-bold">2026년도 신입사원 선발 채용 서류접수 안내</td>
+                            <td class="p-4 text-center text-gray-500 text-sm">2026.06.01</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- 5. 채용문의 탭 -->
+        <div id="view-inquiry" class="view-section hidden max-w-4xl mx-auto px-4 py-12">
+            <h2 class="text-3xl font-extrabold text-gray-900 mb-6">채용문의 Q&A</h2>
+            <div class="bg-white p-6 border border-gray-200 shadow-sm mb-6">
+                <h3 class="font-bold text-lg mb-2">Q. 자격증 증명서 제출은 필수인가요?</h3>
+                <p class="text-gray-600 text-sm">A. 지원서 작성 시 관련 자격증 등록 시 원본 스캔본 제출이 필수입니다.</p>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- 푸터 -->
+    <footer class="bg-gray-900 text-gray-400 py-8 px-4 text-center text-sm border-t border-gray-800">
+        <p class="mb-2"><strong>삼산여객주 주식회사</strong> | 채용 문의전화: 02-555-8282</p>
+        <p class="text-xs text-gray-500">&copy; 2026 SAMSAN PASSENGER CORP. ALL RIGHTS RESERVED.</p>
+    </footer>
+
+    <!-- 모달: 로그인 -->
+    <div id="loginModal" class="fixed inset-0 bg-black/50 hidden flex items-center justify-center p-4 z-50">
+        <div class="bg-white p-8 max-w-sm w-full relative">
+            <button onclick="closeModal('loginModal')" class="absolute top-4 right-4 text-gray-400"><i class="fas fa-times"></i></button>
+            <h3 class="text-2xl font-bold mb-4">로그인</h3>
+            <input type="email" placeholder="이메일" class="w-full border p-3 mb-3">
+            <input type="password" placeholder="비밀번호" class="w-full border p-3 mb-4">
+            <button onclick="alert('로그인 되었습니다.'); closeModal('loginModal');" class="w-full bg-blue-700 text-white font-bold py-3">로그인</button>
+        </div>
+    </div>
+
+    <!-- 모달: 회원가입 -->
+    <div id="signupModal" class="fixed inset-0 bg-black/50 hidden flex items-center justify-center p-4 z-50">
+        <div class="bg-white p-8 max-w-sm w-full relative">
+            <button onclick="closeModal('signupModal')" class="absolute top-4 right-4 text-gray-400"><i class="fas fa-times"></i></button>
+            <h3 class="text-2xl font-bold mb-4">회원가입</h3>
+            <input type="text" placeholder="이름" class="w-full border p-3 mb-3">
+            <input type="email" placeholder="이메일" class="w-full border p-3 mb-3">
+            <input type="password" placeholder="비밀번호" class="w-full border p-3 mb-4">
+            <button onclick="alert('회원가입이 완료되었습니다.'); closeModal('signupModal');" class="w-full bg-blue-700 text-white font-bold py-3">가입완료</button>
+        </div>
+    </div>
+
+    <!-- 모달: 입사지원서 작성 -->
+    <div id="applyModal" class="fixed inset-0 bg-black/50 hidden flex items-center justify-center p-4 z-50">
+        <div class="bg-white p-8 max-w-xl w-full relative max-h-[90vh] overflow-y-auto">
+            <button onclick="closeModal('applyModal')" class="absolute top-4 right-4 text-gray-400"><i class="fas fa-times"></i></button>
+            <h3 id="apply-title" class="text-2xl font-bold mb-4 text-blue-900">입사지원서 작성</h3>
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-xs font-bold mb-1">지원자 성명</label>
+                    <input type="text" id="app-name" class="w-full border p-2.5">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold mb-1">연락처</label>
+                    <input type="text" id="app-phone" class="w-full border p-2.5" placeholder="010-0000-0000">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold mb-1">자기소개 및 지원동기</label>
+                    <textarea rows="4" class="w-full border p-2.5"></textarea>
+                </div>
+                <button onclick="submitApplication()" class="w-full bg-blue-700 text-white font-bold py-3">제출하기</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 탭 전환 함수
+        function switchTab(tabId) {
+            document.querySelectorAll('.view-section').forEach(el => el.classList.add('hidden'));
+            const target = document.getElementById(`view-${tabId}`);
+            if(target) target.classList.remove('hidden');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // 모바일 메뉴 토글
+        function toggleMobileNav() {
+            document.getElementById('mobile-nav').classList.toggle('hidden');
+        }
+
+        // 모달 제어
+        function openModal(id) { document.getElementById(id).classList.remove('hidden'); }
+        function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
+
+        function openApplyModal(cat, title) {
+            document.getElementById('apply-title').innerText = `${title} 지원`;
+            openModal('applyModal');
+        }
+
+        function submitApplication() {
+            alert('지원서가 성공적으로 접수되었습니다!');
+            closeModal('applyModal');
+        }
+
+        function checkPassStatus() {
+            const name = document.getElementById('check-name').value;
+            const res = document.getElementById('pass-result');
+            if(!name) {
+                alert('성명을 입력하세요.');
+                return;
+            }
+            res.innerHTML = `
+                <div class="bg-blue-50 border border-blue-200 p-4 text-center">
+                    <p class="font-bold text-blue-900 text-lg">${name} 지원자님</p>
+                    <p class="text-sm text-gray-700 mt-1">현재 <strong>서류 심사 중</strong> 입니다.</p>
+                </div>
+            `;
+        }
+    </script>
+</body>
+</html>
