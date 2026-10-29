@@ -35,21 +35,21 @@
 
         <!-- 메뉴 -->
         <nav class="hidden md:flex items-center space-x-12 text-lg font-bold">
-            <a href="#" class="hover:text-blue-200 transition">나의채용</a>
-            <a href="#" class="hover:text-blue-200 transition">채용문의</a>
-            <a href="#" class="hover:text-blue-200 transition">채용공고</a>
-            <a href="#" class="hover:text-blue-200 transition">공지사항</a>
+            <a href="#" onclick="alert('로그인 후 이용 가능합니다.')" class="hover:text-blue-200 transition">나의채용</a>
+            <a href="#" onclick="openModal('inquiry')" class="hover:text-blue-200 transition">채용문의</a>
+            <a href="#" onclick="openModal('jobs')" class="hover:text-blue-200 transition">채용공고</a>
+            <a href="#" onclick="openModal('notice')" class="hover:text-blue-200 transition">공지사항</a>
         </nav>
 
         <!-- 우측 상단 메뉴 (로그인 / 회원가입) 및 햄버거 -->
         <div class="flex items-center space-x-6">
             <div class="hidden md:flex items-center bg-white/90 text-blue-900 px-5 py-1.5 rounded-full shadow-md font-semibold text-sm">
-                <a href="#" class="hover:text-blue-600 transition">로그인</a>
+                <a href="#" onclick="openModal('login')" class="hover:text-blue-600 transition">로그인</a>
                 <span class="mx-2 text-gray-400">|</span>
-                <a href="#" class="hover:text-blue-600 transition">회원가입</a>
+                <a href="#" onclick="openModal('signup')" class="hover:text-blue-600 transition">회원가입</a>
             </div>
             <!-- 햄버거 버튼 -->
-            <button class="text-white focus:outline-none">
+            <button class="text-white focus:outline-none" onclick="alert('메뉴 열기')">
                 <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
                 </svg>
@@ -72,14 +72,14 @@
 
         <!-- 더보기 버튼 -->
         <div class="flex justify-end max-w-6xl mx-auto mb-4">
-            <a href="#" class="bg-indigo-900/80 hover:bg-indigo-800 text-white text-sm px-4 py-2 rounded shadow flex items-center transition">
+            <a href="#" onclick="openModal('jobs')" class="bg-indigo-900/80 hover:bg-indigo-800 text-white text-sm px-4 py-2 rounded shadow flex items-center transition">
                 더보기 <span class="ml-1 font-bold">></span>
             </a>
         </div>
 
         <!-- 채용 공고 카드 그리드 (Supabase에서 데이터 연동) -->
         <div id="job-cards-container" class="grid grid-cols-1 md:grid-cols-4 gap-4 max-w-6xl mx-auto">
-            <!-- 데이터 로딩 전 기본 안내 카드 (JS가 Supabase 데이터로 교체함) -->
+            <!-- 데이터 로딩 전 기본 안내 카드 -->
             <div class="bg-white/95 text-gray-900 p-6 rounded shadow-md text-left flex flex-col justify-between">
                 <div>
                     <span class="text-orange-600 font-bold text-lg block mb-2">로딩중...</span>
@@ -91,13 +91,22 @@
 
     </main>
 
-    <!-- Supabase 연동 및 렌더링 스크립트 -->
+    <!-- 모달 팝업 영역 -->
+    <div id="modal" class="fixed inset-0 bg-black/60 hidden flex items-center justify-center z-50 p-4">
+        <div class="bg-white text-gray-900 rounded-lg max-w-lg w-full p-6 relative shadow-2xl">
+            <button onclick="closeModal()" class="absolute top-4 right-4 text-gray-500 hover:text-gray-800 font-bold text-xl">&times;</button>
+            <div id="modal-content">
+                <!-- 동적 컨텐츠 -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Supabase 연동 및 기능 스크립트 -->
     <script>
-        // TODO: 본인의 Supabase 프로젝트 정보로 아래 값을 변경하세요.
+        // TODO: 본인의 Supabase 프로젝트 정보 입력
         const SUPABASE_URL = 'https://ufxyjmrdevqjcmnzbiug.supabase.co';
         const SUPABASE_ANON_KEY = 'sb_publishable_151wbWxnhngrFIpjQp3m4Q_K_JMQ9Jd';
 
-        // Supabase 클라이언트 초기화
         const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
         async function fetchJobs() {
@@ -111,7 +120,7 @@
 
                 if (error) {
                     console.error('데이터 조회 오류:', error);
-                    container.innerHTML = `<div class="col-span-4 text-white bg-red-600/80 p-4 rounded">데이터베이스 연결 오류 또는 설정이 필요합니다.</div>`;
+                    container.innerHTML = `<div class="col-span-4 text-white bg-red-600/80 p-4 rounded">데이터베이스 연결 설정(URL 및 Key)을 확인해주세요.</div>`;
                     return;
                 }
 
@@ -120,11 +129,11 @@
                     return;
                 }
 
-                // 데이터 렌더링 (최대 5개 배치)
                 container.innerHTML = '';
                 jobs.forEach((job) => {
                     const card = document.createElement('div');
-                    card.className = "bg-white/95 text-gray-900 p-6 rounded shadow-md text-left flex flex-col justify-between hover:shadow-xl transition transform hover:-translate-y-1";
+                    card.className = "bg-white/95 text-gray-900 p-6 rounded shadow-md text-left flex flex-col justify-between hover:shadow-xl transition transform hover:-translate-y-1 cursor-pointer";
+                    card.onclick = () => alert(`[${job.category}] ${job.title}\n${job.headcount}`);
                     card.innerHTML = `
                         <div>
                             <span class="text-orange-600 font-bold text-lg block mb-2">${job.category}</span>
@@ -140,7 +149,50 @@
             }
         }
 
-        // 페이지 로드 시 실행
+        function openModal(type) {
+            const modal = document.getElementById('modal');
+            const content = document.getElementById('modal-content');
+            modal.classList.remove('hidden');
+
+            if (type === 'login') {
+                content.innerHTML = `
+                    <h2 class="text-2xl font-bold mb-4 text-blue-900">로그인</h2>
+                    <input type="text" placeholder="아이디" class="w-full border p-2 mb-3 rounded">
+                    <input type="password" placeholder="비밀번호" class="w-full border p-2 mb-4 rounded">
+                    <button onclick="alert('로그인 기능 준비중'); closeModal();" class="w-full bg-blue-900 text-white p-2 rounded font-bold">로그인</button>
+                `;
+            } else if (type === 'signup') {
+                content.innerHTML = `
+                    <h2 class="text-2xl font-bold mb-4 text-blue-900">회원가입</h2>
+                    <input type="text" placeholder="이름" class="w-full border p-2 mb-3 rounded">
+                    <input type="text" placeholder="아이디" class="w-full border p-2 mb-3 rounded">
+                    <input type="password" placeholder="비밀번호" class="w-full border p-2 mb-4 rounded">
+                    <button onclick="alert('회원가입 기능 준비중'); closeModal();" class="w-full bg-blue-900 text-white p-2 rounded font-bold">가입하기</button>
+                `;
+            } else if (type === 'notice') {
+                content.innerHTML = `
+                    <h2 class="text-2xl font-bold mb-4 text-blue-900">공지사항</h2>
+                    <p class="text-gray-600">등록된 공지사항이 없습니다.</p>
+                `;
+            } else if (type === 'inquiry') {
+                content.innerHTML = `
+                    <h2 class="text-2xl font-bold mb-4 text-blue-900">채용문의</h2>
+                    <input type="text" placeholder="문의 제목" class="w-full border p-2 mb-3 rounded">
+                    <textarea placeholder="문의 내용을 입력하세요" class="w-full border p-2 mb-3 rounded h-32"></textarea>
+                    <button onclick="alert('문의가 등록되었습니다.'); closeModal();" class="w-full bg-blue-900 text-white p-2 rounded font-bold">문의 등록</button>
+                `;
+            } else if (type === 'jobs') {
+                content.innerHTML = `
+                    <h2 class="text-2xl font-bold mb-4 text-blue-900">채용공고 전체보기</h2>
+                    <p class="text-gray-600">메인 화면에서 공고를 확인하실 수 있습니다.</p>
+                `;
+            }
+        }
+
+        function closeModal() {
+            document.getElementById('modal').classList.add('hidden');
+        }
+
         window.addEventListener('DOMContentLoaded', fetchJobs);
     </script>
 </body>
