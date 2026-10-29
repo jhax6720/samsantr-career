@@ -261,7 +261,7 @@
             </div>
         </div>
 
-        <!-- ================= 5. 마이페이지 (회원정보 수정 / 계정 탈퇴) ================= -->
+        <!-- ================= 5. 마이페이지 ================= -->
         <div id="view-mypage" class="view-section max-w-3xl mx-auto px-6 py-12">
             <h1 class="text-4xl font-black text-gray-900 mb-8 border-b pb-4">마이페이지 / 회원정보 수정</h1>
             
@@ -369,7 +369,7 @@
                 <div id="detail-notice-content" class="text-gray-800 text-lg whitespace-pre-wrap leading-relaxed min-h-[200px] mb-8"></div>
                 
                 <div id="admin-delete-notice-wrap" class="border-t pt-6 hidden">
-                    <button onclick="deleteCurrentNotice()" class="bg-red-600 text-white px-4 py-2 font-bold hover:bg-red-700">공고 삭제 (관리자)</button>
+                    <button onclick="deleteCurrentNotice()" class="bg-red-600 text-white px-4 py-2 font-bold hover:bg-red-700">공지 삭제 (관리자)</button>
                 </div>
             </div>
         </div>
@@ -504,7 +504,6 @@
             await loadInquiries();
         }
 
-        // 세션 체크 및 UI 노출 설정
         function checkSession() {
             const savedUser = localStorage.getItem('samsan_user');
             const container = document.getElementById('auth-status-container');
@@ -554,7 +553,6 @@
             }
         }
 
-        // 로그인
         async function handleLoginSubmit() {
             const inputId = document.getElementById('login-id').value.trim();
             const inputPw = document.getElementById('login-pw').value.trim();
@@ -564,7 +562,6 @@
                 return;
             }
 
-            // 어드민 하드코딩 예외 (admin 계정은 기기 회원가입 제한에 절대 영향을 주지 않음)
             if (inputId === 'admin' && inputPw === 'HycpHpwEQN') {
                 currentUser = { username: 'admin', role: 'admin' };
                 localStorage.setItem('samsan_user', JSON.stringify(currentUser));
@@ -603,11 +600,8 @@
             switchTab('home');
         }
 
-        // 1PC 1계정 제한 검증 포함 회원가입 (admin 예외)
         function goToSignupStep2() {
             const registeredAcc = localStorage.getItem('samsan_pc_registered_account');
-            
-            // 일반 회원 계정이 이미 존재할 때만 회원가입 차단 (admin 제외)
             if (registeredAcc && registeredAcc !== 'admin') {
                 alert(`이미 이 컴퓨터에서 생성된 계정(${registeredAcc})이 존재합니다.\n한 컴퓨터당 1개의 계정만 만들 수 있습니다.`);
                 return;
@@ -648,7 +642,7 @@
 
             if (error) {
                 console.error(error);
-                alert('회원가입 실패: 이미 가입된 아이디이거나 데이터베이스 오류입니다.');
+                alert('회원가입 실패: 이미 가입된 아이디이거나 RLS 보안 설정 문제입니다.');
             } else {
                 localStorage.setItem('samsan_pc_registered_account', username);
                 alert('회원가입이 정상 완료되었습니다! 로그인해 주십시오.');
@@ -656,7 +650,6 @@
             }
         }
 
-        // 마이페이지 데이터 로드 & 수정 & 탈퇴
         async function loadMyPageData() {
             if (!currentUser) return;
             document.getElementById('my-username').value = currentUser.username;
@@ -709,7 +702,6 @@
             switchTab('home');
         }
 
-        // 채용공고 게시판 불러오기
         async function loadJobs() {
             const { data: jobs, error } = await supabaseClient.from('jobs').select('*').order('created_at', { ascending: false });
             const homeGrid = document.getElementById('home-jobs-grid');
@@ -767,7 +759,6 @@
             switchTab('job-detail');
         }
 
-        // 공지사항 불러오기
         async function loadNotices() {
             const { data: notices, error } = await supabaseClient.from('notices').select('*').order('created_at', { ascending: false });
             const body = document.getElementById('notice-list-body');
@@ -804,7 +795,6 @@
             switchTab('notice-detail');
         }
 
-        // 나의 채용
         async function renderMyRecruitment() {
             const container = document.getElementById('my-recruitment-container');
             
@@ -881,7 +871,6 @@
             }
         }
 
-        // 2. 관리자 채용공고/공지사항 등록 및 실시간 동기화
         function openJobWriteModal() { openModal('jobWriteModal'); }
         function openNoticeWriteModal() { openModal('noticeWriteModal'); }
 
@@ -890,40 +879,29 @@
             const title = document.getElementById('admin-job-title').value.trim();
             const headcount = document.getElementById('admin-job-count').value.trim();
             const content = document.getElementById('admin-job-content').value.trim();
-        
+
             if (!category || !title || !headcount) {
                 alert('구분, 제목, 선발인원은 필수 입력사항입니다.');
                 return;
             }
-        
-            // Supabase에 데이터 전송
-            const { data, error } = await supabaseClient
-                .from('jobs')
-                .insert([{ 
-                    category: category, 
-                    title: title, 
-                    headcount: headcount, 
-                    content: content 
-                }])
-                .select();
-        
+
+            const { error } = await supabaseClient.from('jobs').insert([{ category, title, headcount, content }]);
+
             if (error) {
-                console.error('Supabase Error Detail:', error);
-                // 디버깅용 정확한 오류 출력
-                alert(`채용공고 등록 실패!\n오류 메시지: ${error.message}\n상세: ${error.details || '없음'}`);
+                console.error(error);
+                alert(`채용공고 등록 실패: ${error.message}`);
             } else {
-                alert('새 채용공고가 정상 등록되었습니다.');
+                alert('새 채용공고가 게시되었습니다.');
                 closeModal('jobWriteModal');
                 
-                // 입력 필드 초기화
                 document.getElementById('admin-job-cat').value = '';
                 document.getElementById('admin-job-title').value = '';
                 document.getElementById('admin-job-count').value = '';
                 document.getElementById('admin-job-content').value = '';
-        
+
                 await loadJobs();
                 switchTab('jobs');
-                    }
+            }
         }
 
         async function deleteCurrentJob() {
@@ -944,7 +922,7 @@
 
             if (error) {
                 console.error(error);
-                alert('공지사항 등록 실패');
+                alert(`공지사항 등록 실패: ${error.message}`);
             } else {
                 alert('새 공지사항이 작성되었습니다.');
                 closeModal('noticeWriteModal');
@@ -998,7 +976,6 @@
             loadAdminApplications();
         }
 
-        // Q&A
         async function loadInquiries() {
             const { data: list } = await supabaseClient.from('inquiries').select('*').order('created_at', { ascending: false });
             const container = document.getElementById('inquiry-list');
@@ -1029,7 +1006,6 @@
             loadInquiries();
         }
 
-        // 탭 전환 제어
         function switchTab(tabId) {
             const sections = document.querySelectorAll('.view-section');
             sections.forEach(el => el.classList.remove('active'));
