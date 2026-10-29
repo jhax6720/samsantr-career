@@ -299,8 +299,7 @@
             </div>
         </div>
 
-        <!-- ================= 6. 입사지원서 작성 단계 (이미지 1 & 2 기반 신규 UI) ================= -->
-        <!-- 입사지원 Page 1 -->
+        <!-- ================= 6. 입사지원서 작성 Page 1/2 ================= -->
         <div id="view-apply-page1" class="view-section max-w-5xl mx-auto px-6 py-12">
             <h1 class="text-5xl font-black text-gray-900 mb-4 tracking-tight">입사지원서 작성</h1>
             <p class="text-xl font-bold text-gray-800 mb-8">
@@ -308,7 +307,6 @@
             </p>
 
             <div class="space-y-8 mb-12">
-                <!-- 1. 파일 첨부 -->
                 <div>
                     <p class="text-lg font-bold text-gray-900 mb-2">1. 입사지원서 첨부 (필수)<span class="text-red-500">*</span></p>
                     <div class="flex items-center space-x-3">
@@ -320,13 +318,11 @@
                     </div>
                 </div>
 
-                <!-- 2. 약관 동의 -->
                 <div class="flex items-center justify-between text-lg font-bold text-gray-900">
                     <p>2. 귀사에서 게시한 채용공고의 모집요강을 모두 확인하셨으며, 당사의 개인정보처리방침에 동의하십니까? <a href="#" onclick="alert('개인정보처리방침 안내')" class="text-blue-800 underline text-base font-normal">개인정보처리방침</a></p>
                     <input type="checkbox" id="apply-check-1" class="w-6 h-6 border-2 border-black rounded-none cursor-pointer">
                 </div>
 
-                <!-- 3. 채용 확인 -->
                 <div class="flex items-center justify-between text-lg font-bold text-gray-900">
                     <p>3. 현재 지원하고 있는 채용을 확인하셨습니까?</p>
                     <input type="checkbox" id="apply-check-2" class="w-6 h-6 border-2 border-black rounded-none cursor-pointer">
@@ -340,7 +336,7 @@
             </div>
         </div>
 
-        <!-- 입사지원 Page 2 -->
+        <!-- ================= 6-1. 입사지원서 작성 Page 2/2 ================= -->
         <div id="view-apply-page2" class="view-section max-w-5xl mx-auto px-6 py-12">
             <h1 class="text-5xl font-black text-gray-900 mb-4 tracking-tight">입사지원서 작성</h1>
             <p class="text-xl font-bold text-gray-800 mb-2">
@@ -349,9 +345,7 @@
             <p class="text-red-600 font-bold text-lg mb-8">입력된 정보를 모두 확인하시고 다음 단계로 진행해주시기 바랍니다.</p>
 
             <div class="mb-12">
-                <p class="text-lg font-bold text-gray-900 mb-3" id="pledge-target-text">
-                    나는 해당 입사지원서를 제출하며, 수정&취소할 수 없음을 확인하였기에 이 입사지원서를 귀사에 제출하겠습니다.
-                </p>
+                <p class="text-lg font-bold text-gray-900 mb-3" id="pledge-target-text">나는 해당 입사지원서를 제출하며, 수정&취소할 수 없음을 확인하였기에 이 입사지원서를 귀사에 제출하겠습니다.</p>
                 <input type="text" id="pledge-input" class="std-input" placeholder="따라 써 주시기 바랍니다." oninput="validatePledgeInput()">
             </div>
 
@@ -392,7 +386,6 @@
                 <h1 id="detail-job-title" class="text-3xl font-bold text-gray-900 mb-4"></h1>
                 <p id="detail-job-count" class="text-gray-500 mb-4 font-semibold"></p>
                 
-                <!-- 모집요강 파일 첨부 보이기 -->
                 <div id="detail-job-file-wrap" class="mb-6 pb-4 border-b hidden">
                     <span class="font-bold text-sm text-gray-700">📌 첨부 모집요강 파일: </span>
                     <span id="detail-job-file-name" class="text-blue-700 font-bold text-sm"></span>
@@ -438,7 +431,7 @@
                 <div id="detail-notice-content" class="text-gray-800 text-lg whitespace-pre-wrap leading-relaxed min-h-[200px] mb-8"></div>
                 
                 <div id="admin-delete-notice-wrap" class="border-t pt-6 hidden">
-                    <button onclick="deleteCurrentNotice()" class="bg-red-600 text-white px-4 py-2 font-bold hover:bg-red-700">공고 삭제 (관리자)</button>
+                    <button onclick="deleteCurrentNotice()" class="bg-red-600 text-white px-4 py-2 font-bold hover:bg-red-700">공지 삭제 (관리자)</button>
                 </div>
             </div>
         </div>
@@ -494,10 +487,10 @@
         <p class="text-xs text-gray-500">&copy; 2026 SAMSAN PASSENGER CORP. ALL RIGHTS RESERVED.</p>
     </footer>
 
-    <!-- 관리자 채용공고 작성 모달 (파일 첨부 지원) -->
-    <div id="jobWriteModal" class="fixed inset-0 bg-black/50 hidden flex items-center justify-center p-4 z-50">
+    <!-- 모달 레이어 (채용공고 작성) -->
+    <div id="jobWriteModal" class="fixed inset-0 bg-black/50 hidden items-center justify-center p-4 z-50">
         <div class="bg-white p-8 max-w-xl w-full relative">
-            <button onclick="closeModal('jobWriteModal')" class="absolute top-4 right-4 text-gray-400"><i class="fas fa-times"></i></button>
+            <button onclick="closeModal('jobWriteModal')" class="absolute top-4 right-4 text-gray-400 text-xl"><i class="fas fa-times"></i></button>
             <h3 class="text-2xl font-bold mb-4 text-gray-900">📢 새 채용공고 등록</h3>
             <div class="space-y-3">
                 <input type="text" id="admin-job-cat" class="std-input" placeholder="구분 (예: 신입사원, 고위직)">
@@ -513,10 +506,10 @@
         </div>
     </div>
 
-    <!-- 기타 모달 -->
-    <div id="noticeWriteModal" class="fixed inset-0 bg-black/50 hidden flex items-center justify-center p-4 z-50">
+    <!-- 모달 레이어 (공지사항 작성) -->
+    <div id="noticeWriteModal" class="fixed inset-0 bg-black/50 hidden items-center justify-center p-4 z-50">
         <div class="bg-white p-8 max-w-xl w-full relative">
-            <button onclick="closeModal('noticeWriteModal')" class="absolute top-4 right-4 text-gray-400"><i class="fas fa-times"></i></button>
+            <button onclick="closeModal('noticeWriteModal')" class="absolute top-4 right-4 text-gray-400 text-xl"><i class="fas fa-times"></i></button>
             <h3 class="text-2xl font-bold mb-4 text-gray-900">📌 새 공지사항 작성</h3>
             <div class="space-y-3">
                 <input type="text" id="admin-notice-title" class="std-input" placeholder="공지사항 제목">
@@ -526,9 +519,10 @@
         </div>
     </div>
 
-    <div id="inquiryModal" class="fixed inset-0 bg-black/50 hidden flex items-center justify-center p-4 z-50">
+    <!-- 모달 레이어 (채용문의) -->
+    <div id="inquiryModal" class="fixed inset-0 bg-black/50 hidden items-center justify-center p-4 z-50">
         <div class="bg-white p-8 max-w-lg w-full relative">
-            <button onclick="closeModal('inquiryModal')" class="absolute top-4 right-4 text-gray-400"><i class="fas fa-times"></i></button>
+            <button onclick="closeModal('inquiryModal')" class="absolute top-4 right-4 text-gray-400 text-xl"><i class="fas fa-times"></i></button>
             <h3 class="text-2xl font-bold mb-4 text-gray-900">채용문의 작성</h3>
             <div class="space-y-3">
                 <input type="text" id="inq-title" placeholder="문의 제목" class="std-input">
@@ -555,6 +549,26 @@
             await loadNotices();
             await loadInquiries();
         }
+
+        // 모달 열기/닫기 전용 보완 함수 (flex 속성 부여로 화면 중앙 정렬 보장)
+        function openModal(id) { 
+            const m = document.getElementById(id);
+            if(m) {
+                m.classList.remove('hidden'); 
+                m.classList.add('flex');
+            }
+        }
+
+        function closeModal(id) { 
+            const m = document.getElementById(id);
+            if(m) {
+                m.classList.add('hidden'); 
+                m.classList.remove('flex');
+            }
+        }
+
+        function openJobWriteModal() { openModal('jobWriteModal'); }
+        function openNoticeWriteModal() { openModal('noticeWriteModal'); }
 
         function checkSession() {
             const savedUser = localStorage.getItem('samsan_user');
@@ -702,7 +716,6 @@
         }
 
         // ================= 입사지원 프로세스 제어 =================
-        // 1계정 1개 채용만 지원 가능 검증
         async function startApplyProcess() {
             if (!currentUser) {
                 alert('로그인 후 입사지원이 가능합니다.');
@@ -710,7 +723,6 @@
                 return;
             }
 
-            // DB에서 해당 유저의 서류 심사 진행 중 지원 내역 확인
             const { data: existingApps } = await supabaseClient
                 .from('applications')
                 .select('*')
@@ -725,7 +737,6 @@
             document.getElementById('apply-job-title-display').innerText = `[${currentJob.category}] ${currentJob.title}`;
             document.getElementById('apply-job-title-display-2').innerText = `[${currentJob.category}] ${currentJob.title}`;
             
-            // 폼 초기화
             selectedApplyFileName = '';
             document.getElementById('apply-file-input').value = '';
             document.getElementById('apply-file-name-display').innerText = '선택된 파일: 없음';
@@ -756,7 +767,6 @@
             switchTab('apply-page2');
         }
 
-        // 문장 완벽 일치 실시간 검증
         function validatePledgeInput() {
             const targetText = document.getElementById('pledge-target-text').innerText.trim();
             const inputText = document.getElementById('pledge-input').value.trim();
@@ -771,7 +781,6 @@
             }
         }
 
-        // 최종 제출하기 (DB 저장 및 관리자 목록 반영)
         async function finalSubmitApplication() {
             const { error } = await supabaseClient.from('applications').insert([
                 { 
@@ -792,7 +801,6 @@
             }
         }
 
-        // 관리자 새 채용공고 등록 (파일 업로드 명시)
         async function adminAddJob() {
             const category = document.getElementById('admin-job-cat').value.trim();
             const title = document.getElementById('admin-job-title').value.trim();
@@ -822,7 +830,24 @@
             }
         }
 
-        // 관리자 지원자 현황 목록 조회
+        async function adminAddNotice() {
+            const title = document.getElementById('admin-notice-title').value.trim();
+            const content = document.getElementById('admin-notice-content').value.trim();
+
+            if (!title) { alert('제목을 입력하세요.'); return; }
+
+            const { error } = await supabaseClient.from('notices').insert([{ title, content }]);
+
+            if (error) {
+                alert(`공지사항 등록 실패: ${error.message}`);
+            } else {
+                alert('새 공지사항이 작성되었습니다.');
+                closeModal('noticeWriteModal');
+                await loadNotices();
+                switchTab('notice');
+            }
+        }
+
         async function loadAdminApplications() {
             const { data, error } = await supabaseClient.from('applications').select('*').order('created_at', { ascending: false });
             const body = document.getElementById('admin-apps-body');
@@ -855,7 +880,6 @@
             loadAdminApplications();
         }
 
-        // 공고/공지/문의 조회 함수들
         async function loadJobs() {
             const { data: jobs } = await supabaseClient.from('jobs').select('*').order('created_at', { ascending: false });
             const homeGrid = document.getElementById('home-jobs-grid');
@@ -951,6 +975,36 @@
             switchTab('notice-detail');
         }
 
+        async function loadInquiries() {
+            const { data: list } = await supabaseClient.from('inquiries').select('*').order('created_at', { ascending: false });
+            const container = document.getElementById('inquiry-list');
+
+            if (!list || list.length === 0) {
+                container.innerHTML = `<div class="bg-white p-6 border text-gray-500 text-center">등록된 문의사항이 없습니다.</div>`;
+                return;
+            }
+
+            container.innerHTML = '';
+            list.forEach((item) => {
+                container.innerHTML += `
+                    <div class="bg-white p-6 border border-gray-200 shadow-sm">
+                        <h3 class="font-bold text-lg mb-2 text-gray-900">Q. ${item.title}</h3>
+                        <p class="text-gray-600 text-sm">${item.content}</p>
+                    </div>
+                `;
+            });
+        }
+
+        async function submitInquiry() {
+            const title = document.getElementById('inq-title').value.trim();
+            const content = document.getElementById('inq-content').value.trim();
+            if (!title || !content) { alert('제목과 내용을 입력하세요.'); return; }
+            await supabaseClient.from('inquiries').insert([{ title, content }]);
+            alert('문의가 등록되었습니다.');
+            closeModal('inquiryModal');
+            loadInquiries();
+        }
+
         async function renderMyRecruitment() {
             const container = document.getElementById('my-recruitment-container');
             if (!currentUser) {
@@ -977,7 +1031,6 @@
             });
         }
 
-        // 탭 제어
         function switchTab(tabId) {
             const sections = document.querySelectorAll('.view-section');
             sections.forEach(el => el.classList.remove('active'));
@@ -998,8 +1051,6 @@
         }
 
         function toggleMobileNav() { document.getElementById('mobile-nav').classList.toggle('hidden'); }
-        function openModal(id) { document.getElementById(id).classList.remove('hidden'); }
-        function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
 
         window.addEventListener('DOMContentLoaded', initData);
     </script>
