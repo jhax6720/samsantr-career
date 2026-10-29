@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>삼산여객주 채용 홈페이지</title>
+    <title>삼산여객 채용 홈페이지</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Supabase JS CDN -->
@@ -16,6 +16,10 @@
         tailwind.config = {
             theme: {
                 extend: {
+                    colors: {
+                        samsanBlue: '#25408f',
+                        skyBorder: '#2b4bb7'
+                    },
                     fontFamily: {
                         sans: ['"Noto Sans KR"', 'sans-serif']
                     }
@@ -26,11 +30,12 @@
     <style>
         body {
             font-family: 'Noto Sans KR', sans-serif;
-            background-color: #f1f3f7;
+            background-color: #ffffff;
             margin: 0;
             padding: 0;
         }
 
+        /* 메인 배경 이미지 */
         .hero-banner-container {
             position: relative;
             background: url('background.png') no-repeat center center;
@@ -39,6 +44,16 @@
             width: 100%;
         }
 
+        /* 서브 페이지 상단 하늘 배경 (sky.png) */
+        .sky-sub-header {
+            background: url('sky.png') no-repeat center center;
+            background-size: cover;
+            height: 120px;
+            width: 100%;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        /* 메인 채용 카드 */
         .exact-job-card {
             background-color: #ffffff;
             border-radius: 0px;
@@ -64,6 +79,21 @@
             align-items: center;
             justify-content: center;
         }
+
+        /* 첨부하신 서브페이지 커스텀 Input 스타일 */
+        .custom-input {
+            border: 2px solid #2b4bb7;
+            padding: 12px 16px;
+            font-size: 18px;
+            outline: none;
+            width: 100%;
+            color: #111827;
+        }
+
+        .custom-input::placeholder {
+            color: #111827;
+            font-weight: 500;
+        }
     </style>
 </head>
 <body class="flex flex-col min-h-screen">
@@ -71,19 +101,19 @@
     <!-- 상단 헤더 -->
     <header class="bg-white border-b border-gray-200 h-20 sticky top-0 z-50">
         <div class="max-w-[1400px] mx-auto h-full flex items-center justify-between px-4 lg:px-8">
-            
             <!-- 로고 -->
             <a href="#" onclick="switchTab('home')" class="flex items-center">
-                <img src="Logo.png" alt="삼산여객주 채용" class="h-10 sm:h-12 w-auto object-contain" onerror="this.onerror=null; this.src='https://via.placeholder.com/260x50?text=SAMSAN+LOGO';">
+                <img src="Logo.png" alt="삼산여객 채용" class="h-10 sm:h-12 w-auto object-contain" onerror="this.onerror=null; this.src='https://via.placeholder.com/260x50?text=SAMSAN+LOGO';">
             </a>
 
-            <!-- 메뉴 우측 레이아웃 -->
+            <!-- 메뉴 -->
             <div class="flex items-center space-x-8 sm:space-x-12">
                 <nav class="hidden md:flex items-center space-x-10 text-xl font-bold text-gray-800 tracking-tight">
                     <button onclick="switchTab('my')" class="hover:text-blue-700 transition">나의채용</button>
                     <button onclick="switchTab('inquiry')" class="hover:text-blue-700 transition">채용문의</button>
                     <button onclick="switchTab('jobs')" class="hover:text-blue-700 transition">채용공고</button>
                     <button onclick="switchTab('notice')" class="hover:text-blue-700 transition">공지사항</button>
+                    <button id="admin-nav-btn" onclick="switchTab('admin')" class="hidden text-red-600 hover:text-red-800 font-extrabold transition">[관리자 전용]</button>
                 </nav>
 
                 <button onclick="toggleMobileNav()" class="hamburger-btn text-white text-2xl hover:bg-blue-900 transition">
@@ -92,7 +122,7 @@
             </div>
         </div>
 
-        <!-- 모바일 메뉴 -->
+        <!-- 모바일 드롭다운 -->
         <div id="mobile-nav" class="hidden bg-white w-full border-b border-gray-300 shadow-xl py-4 px-6 md:hidden">
             <div class="flex flex-col space-y-3 font-bold text-gray-800 text-lg">
                 <button onclick="switchTab('home'); toggleMobileNav();" class="text-left py-2 border-b">홈</button>
@@ -100,34 +130,36 @@
                 <button onclick="switchTab('inquiry'); toggleMobileNav();" class="text-left py-2 border-b">채용문의</button>
                 <button onclick="switchTab('jobs'); toggleMobileNav();" class="text-left py-2 border-b">채용공고</button>
                 <button onclick="switchTab('notice'); toggleMobileNav();" class="text-left py-2 border-b">공지사항</button>
+                <button id="mobile-admin-btn" onclick="switchTab('admin'); toggleMobileNav();" class="hidden text-left py-2 border-b text-red-600 font-bold">[관리자 전용]</button>
             </div>
         </div>
     </header>
 
-    <!-- 메인 영역 -->
+    <!-- 서브 페이지 공통 sky.png 헤더 (메인화면 외 영역에 노출) -->
+    <div id="sky-header-banner" class="sky-sub-header hidden"></div>
+
     <main class="flex-grow">
 
-        <!-- 1. 메인 홈 화면 -->
+        <!-- ================= 1. 메인 홈 화면 ================= -->
         <div id="view-home" class="view-section">
             <section class="hero-banner-container px-4 sm:px-8 lg:px-12 py-6">
                 <div class="max-w-[1360px] mx-auto relative">
 
-                    <!-- 로그인 / 회원가입 상태 바 -->
+                    <!-- 상단 우측 로그인/회원가입 바 -->
                     <div class="flex justify-end mb-8">
                         <div id="auth-status-container" class="bg-white/95 backdrop-blur border border-blue-600 rounded-full px-6 py-1.5 shadow-md flex items-center space-x-3 text-sm font-bold text-gray-900">
-                            <button onclick="openModal('loginModal')" class="hover:text-blue-700 transition">로그인</button>
+                            <button onclick="switchTab('login')" class="hover:text-blue-700 transition">로그인</button>
                             <span class="text-gray-300">|</span>
-                            <button onclick="openModal('signupModal')" class="hover:text-blue-700 transition">회원가입</button>
+                            <button onclick="switchTab('signup-1')" class="hover:text-blue-700 transition">회원가입</button>
                         </div>
                     </div>
 
-                    <!-- 메인 타이틀 -->
+                    <!-- 타이틀 -->
                     <div class="text-center text-white mt-4 mb-6">
                         <h1 class="text-4xl sm:text-6xl font-black tracking-tight mb-4 drop-shadow-md">진행중인 채용</h1>
                         <p class="text-xl sm:text-2xl font-medium tracking-tight text-white/95 drop-shadow">마을과 사람을 잇는 길, 당신과 함께 만들어가겠습니다.</p>
                     </div>
 
-                    <!-- 더보기 버튼 -->
                     <div class="flex justify-end mb-6">
                         <button onclick="switchTab('jobs')" class="bg-[#2a4ec2] hover:bg-blue-800 text-white font-bold px-6 py-2 rounded-none text-base shadow-md transition flex items-center space-x-2">
                             <span>더보기</span>
@@ -135,7 +167,7 @@
                         </button>
                     </div>
 
-                    <!-- 동적 채용공고 카드 그리드 (Supabase 데이터 불러오기) -->
+                    <!-- 채용 카드 렌더링 영역 -->
                     <div id="home-jobs-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                         <div class="col-span-4 text-center text-white text-lg py-12">채용 공고를 불러오는 중입니다...</div>
                     </div>
@@ -144,60 +176,187 @@
             </section>
         </div>
 
-        <!-- 2. 채용공고 전체보기 탭 -->
-        <div id="view-jobs" class="view-section hidden max-w-7xl mx-auto px-4 py-12">
-            <h2 class="text-3xl font-extrabold text-gray-900 mb-6">채용공고 전체보기</h2>
-            <div id="full-jobs-list" class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <!-- JS 생성 -->
+        <!-- ================= 2. 로그인 화면 (image_e4c99f.png 디자인 반영) ================= -->
+        <div id="view-login" class="view-section hidden max-w-5xl mx-auto px-6 py-12">
+            <h1 class="text-5xl font-black text-gray-900 mb-10 tracking-tight">로그인</h1>
+            
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 items-stretch mb-8">
+                <!-- 입력 필드 (아이디, 비밀번호) -->
+                <div class="lg:col-span-7 space-y-3">
+                    <input type="text" id="login-id" class="custom-input" placeholder="아이디">
+                    <input type="password" id="login-pw" class="custom-input" placeholder="비밀번호">
+                </div>
+
+                <!-- 로그인하기 버튼 -->
+                <div class="lg:col-span-2">
+                    <button onclick="handleLoginSubmit()" class="w-full h-full bg-[#25408f] hover:bg-blue-900 text-white font-bold py-4 rounded-none transition flex flex-col items-center justify-center min-h-[105px]">
+                        <span class="text-xl font-bold">로그인하기</span>
+                        <span class="text-sm font-normal">(Enter)</span>
+                    </button>
+                </div>
+
+                <!-- 회원가입 버튼 -->
+                <div class="lg:col-span-3">
+                    <button onclick="switchTab('signup-1')" class="w-full h-full bg-[#9da3a8] hover:bg-gray-500 text-white font-bold py-4 rounded-none transition flex flex-col items-center justify-center min-h-[105px]">
+                        <span class="text-base font-normal mb-1">계정이 없다.</span>
+                        <span class="text-2xl font-black">회원가입</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- 하단 링크 -->
+            <div class="space-y-2 text-lg font-bold text-gray-900">
+                <p>계정을 잊어버리셨습니까? &gt; <a href="#" onclick="alert('관리자에게 문의하세요.')" class="text-gray-400 font-normal underline">아이디 찾기</a></p>
+                <p>비밀번호를 잊어버리셨습니까? &gt; <a href="#" onclick="alert('관리자에게 문의하세요.')" class="text-gray-400 font-normal underline">비밀번호 찾기</a></p>
             </div>
         </div>
 
-        <!-- 3. 나의채용 (합격확인) 탭 -->
-        <div id="view-my" class="view-section hidden max-w-3xl mx-auto px-4 py-12">
-            <div class="bg-white p-8 border border-gray-200 shadow-md">
-                <h2 class="text-2xl font-bold text-gray-900 mb-4 text-center">나의 채용 / 합격확인</h2>
+        <!-- ================= 3. 회원가입 1단계 (image_e4c943.png 디자인 반영) ================= -->
+        <div id="view-signup-1" class="view-section hidden max-w-5xl mx-auto px-6 py-12">
+            <h1 class="text-5xl font-black text-gray-900 mb-10 tracking-tight">회원가입</h1>
+            
+            <div class="flex items-center space-x-3 text-xl font-bold text-gray-900 mb-16">
+                <span>■ 당사의 개인정보처리방침에 동의하십니까?</span>
+                <input type="checkbox" id="agree-check" class="w-6 h-6 border-2 border-black rounded-none cursor-pointer">
+                <a href="#" onclick="alert('개인정보처리방침 안내 내용입니다.')" class="text-blue-800 underline text-base font-normal">개인정보처리방침</a>
+            </div>
+
+            <div class="flex justify-center space-x-4">
+                <button onclick="switchTab('login')" class="bg-[#9da3a8] hover:bg-gray-500 text-white text-lg font-bold px-10 py-3 rounded-none">&lt; Prev</button>
+                <button onclick="goToSignupStep2()" class="bg-[#25408f] hover:bg-blue-900 text-white text-lg font-bold px-10 py-3 rounded-none">Next Page &gt;</button>
+            </div>
+        </div>
+
+        <!-- ================= 4. 회원가입 2단계 (image_e4c93b.png 디자인 반영) ================= -->
+        <div id="view-signup-2" class="view-section hidden max-w-5xl mx-auto px-6 py-12">
+            <h1 class="text-5xl font-black text-gray-900 mb-10 tracking-tight">회원가입</h1>
+            
+            <!-- 로블록스 정보 입력 -->
+            <div class="mb-8">
+                <p class="text-xl font-bold text-gray-900 mb-3">■ 로블록스 계정정보를 입력하여 주십시오.</p>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <input type="text" id="roblox-id" class="custom-input" placeholder="로블록스 ID">
+                    <input type="text" id="roblox-link" class="custom-input" placeholder="로블록스 프로필 링크">
+                </div>
+            </div>
+
+            <!-- 회원 정보 입력 -->
+            <div class="mb-12">
+                <p class="text-xl font-bold text-gray-900 mb-3">■ 회원정보를 입력하여 주십시오.</p>
+                <div class="space-y-3">
+                    <div class="flex items-center space-x-3">
+                        <input type="text" id="reg-id" class="custom-input" placeholder="아이디">
+                        <button onclick="checkIdDup()" class="bg-[#9da3a8] hover:bg-gray-500 text-white font-bold px-6 py-3.5 text-base whitespace-nowrap rounded-none">ID 중복확인</button>
+                    </div>
+                    <input type="password" id="reg-pw" class="custom-input" placeholder="비밀번호">
+                    <input type="email" id="reg-email" class="custom-input" placeholder="이메일">
+                </div>
+            </div>
+
+            <div class="flex justify-center space-x-4">
+                <button onclick="switchTab('signup-1')" class="bg-[#9da3a8] hover:bg-gray-500 text-white text-lg font-bold px-10 py-3 rounded-none">&lt; Prev</button>
+                <button onclick="handleCompleteSignup()" class="bg-[#25408f] hover:bg-blue-900 text-white text-lg font-bold px-10 py-3 rounded-none">회원가입하기</button>
+            </div>
+        </div>
+
+        <!-- ================= 5. 채용공고 탭 ================= -->
+        <div id="view-jobs" class="view-section hidden max-w-7xl mx-auto px-6 py-12">
+            <h2 class="text-4xl font-extrabold text-gray-900 mb-8">채용공고 전체보기</h2>
+            <div id="full-jobs-list" class="grid grid-cols-1 md:grid-cols-2 gap-6"></div>
+        </div>
+
+        <!-- ================= 6. 나의채용 (합격확인) 탭 ================= -->
+        <div id="view-my" class="view-section hidden max-w-3xl mx-auto px-6 py-12">
+            <div class="bg-white p-8 border border-gray-300 shadow-md">
+                <h2 class="text-3xl font-bold text-gray-900 mb-6 text-center">나의 채용 / 합격확인</h2>
                 <div class="space-y-4">
                     <div>
-                        <label class="block text-sm font-bold text-gray-700 mb-1">성명</label>
-                        <input type="text" id="check-name" class="w-full border p-3 rounded" placeholder="성명을 입력하세요">
+                        <label class="block text-base font-bold text-gray-700 mb-1">성명</label>
+                        <input type="text" id="check-name" class="custom-input" placeholder="성명을 입력하세요">
                     </div>
                     <div>
-                        <label class="block text-sm font-bold text-gray-700 mb-1">연락처</label>
-                        <input type="text" id="check-phone" class="w-full border p-3 rounded" placeholder="010-0000-0000">
+                        <label class="block text-base font-bold text-gray-700 mb-1">연락처</label>
+                        <input type="text" id="check-phone" class="custom-input" placeholder="010-0000-0000">
                     </div>
-                    <button onclick="checkPassStatus()" class="w-full bg-blue-700 text-white font-bold py-3 hover:bg-blue-800">조회하기</button>
+                    <button onclick="checkPassStatus()" class="w-full bg-[#25408f] text-white font-bold py-4 text-xl hover:bg-blue-900 transition">조회하기</button>
                 </div>
                 <div id="pass-result" class="mt-6"></div>
             </div>
         </div>
 
-        <!-- 4. 공지사항 탭 -->
-        <div id="view-notice" class="view-section hidden max-w-5xl mx-auto px-4 py-12">
-            <h2 class="text-3xl font-extrabold text-gray-900 mb-6">공지사항</h2>
-            <div class="bg-white border border-gray-200 shadow-sm">
+        <!-- ================= 7. 공지사항 탭 ================= -->
+        <div id="view-notice" class="view-section hidden max-w-5xl mx-auto px-6 py-12">
+            <h2 class="text-4xl font-extrabold text-gray-900 mb-8">공지사항</h2>
+            <div class="bg-white border border-gray-300">
                 <table class="w-full text-left">
                     <thead class="bg-gray-100 border-b">
                         <tr>
-                            <th class="p-4 text-center w-20">번호</th>
-                            <th class="p-4">제목</th>
-                            <th class="p-4 text-center w-32">작성일</th>
+                            <th class="p-4 text-center w-20 text-lg">번호</th>
+                            <th class="p-4 text-lg">제목</th>
+                            <th class="p-4 text-center w-36 text-lg">작성일</th>
                         </tr>
                     </thead>
-                    <tbody id="notice-list-body">
-                        <!-- JS 생성 -->
-                    </tbody>
+                    <tbody id="notice-list-body"></tbody>
                 </table>
             </div>
         </div>
 
-        <!-- 5. 채용문의 Q&A 탭 -->
-        <div id="view-inquiry" class="view-section hidden max-w-4xl mx-auto px-4 py-12">
-            <div class="flex justify-between items-center mb-6">
-                <h2 class="text-3xl font-extrabold text-gray-900">채용문의 Q&A</h2>
-                <button onclick="openModal('inquiryModal')" class="bg-blue-700 text-white px-5 py-2 font-bold shadow hover:bg-blue-800">문의하기</button>
+        <!-- ================= 8. 채용문의 탭 ================= -->
+        <div id="view-inquiry" class="view-section hidden max-w-4xl mx-auto px-6 py-12">
+            <div class="flex justify-between items-center mb-8">
+                <h2 class="text-4xl font-extrabold text-gray-900">채용문의 Q&A</h2>
+                <button onclick="openModal('inquiryModal')" class="bg-[#25408f] text-white px-6 py-3 font-bold shadow hover:bg-blue-900 transition">문의 등록하기</button>
             </div>
-            <div id="inquiry-list" class="space-y-4">
-                <!-- JS 생성 -->
+            <div id="inquiry-list" class="space-y-4"></div>
+        </div>
+
+        <!-- ================= 9. 관리자 전용 관리 페이지 ================= -->
+        <div id="view-admin" class="view-section hidden max-w-7xl mx-auto px-6 py-12">
+            <div class="bg-red-50 border border-red-300 p-6 mb-8 rounded">
+                <h2 class="text-3xl font-black text-red-700">⚙️ 관리자 전용 관리 시스템 (admin)</h2>
+                <p class="text-gray-700 mt-1">공고 등록, 공지사항 등록, 입사 지원자 현황 조회 및 합격 여부를 관리합니다.</p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
+                <!-- 새 채용 공고 등록 -->
+                <div class="bg-white p-6 border border-gray-300 shadow-sm">
+                    <h3 class="text-2xl font-bold mb-4 text-gray-900">📢 새 채용공고 등록</h3>
+                    <div class="space-y-3">
+                        <input type="text" id="admin-job-cat" class="w-full border p-3" placeholder="구분 (예: 신입사원, 고위직, 경력직채용)">
+                        <input type="text" id="admin-job-title" class="w-full border p-3" placeholder="채용 공고 제목">
+                        <input type="text" id="admin-job-count" class="w-full border p-3" placeholder="선발예정인원 (예: 선발예정인원 : 5명)">
+                        <button onclick="adminAddJob()" class="w-full bg-blue-800 text-white font-bold py-3 hover:bg-blue-900">공고 등록하기</button>
+                    </div>
+                </div>
+
+                <!-- 새 공지사항 등록 -->
+                <div class="bg-white p-6 border border-gray-300 shadow-sm">
+                    <h3 class="text-2xl font-bold mb-4 text-gray-900">📌 새 공지사항 작성</h3>
+                    <div class="space-y-3">
+                        <input type="text" id="admin-notice-title" class="w-full border p-3" placeholder="공지사항 제목">
+                        <textarea id="admin-notice-content" rows="3" class="w-full border p-3" placeholder="공지 내용"></textarea>
+                        <button onclick="adminAddNotice()" class="w-full bg-green-700 text-white font-bold py-3 hover:bg-green-800">공지사항 등록</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 지원자 목록 및 상태 관리 -->
+            <div class="bg-white p-6 border border-gray-300 shadow-sm">
+                <h3 class="text-2xl font-bold mb-4 text-gray-900">📋 전체 입사지원자 현황 및 합격 관리</h3>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border">
+                        <thead class="bg-gray-100 border-b">
+                            <tr>
+                                <th class="p-3">지원 공고</th>
+                                <th class="p-3">성명</th>
+                                <th class="p-3">연락처</th>
+                                <th class="p-3">현재 상태</th>
+                                <th class="p-3">상태 변경</th>
+                            </tr>
+                        </thead>
+                        <tbody id="admin-apps-body"></tbody>
+                    </table>
+                </div>
             </div>
         </div>
 
@@ -205,31 +364,9 @@
 
     <!-- 푸터 -->
     <footer class="bg-gray-900 text-gray-400 py-8 px-4 text-center text-sm border-t border-gray-800">
-        <p class="mb-2"><strong>삼산여객주 주식회사</strong> | 채용 문의전화: 02-555-8282</p>
-        <p class="text-xs text-gray-500">&copy; 2026 SAMSAN PASSENGER CORP. ALL RIGHTS RESERVED.</p>
+        <p class="mb-2"><strong>삼산여객 주식회사</strong> | 채용 문의: ffhhgogbv, this0833</p>
+        <p class="text-xs text-gray-500">&copy; 2026 삼산여객주식회사. ALL RIGHTS RESERVED.</p>
     </footer>
-
-    <!-- 모달: 로그인 -->
-    <div id="loginModal" class="fixed inset-0 bg-black/50 hidden flex items-center justify-center p-4 z-50">
-        <div class="bg-white p-8 max-w-sm w-full relative">
-            <button onclick="closeModal('loginModal')" class="absolute top-4 right-4 text-gray-400"><i class="fas fa-times"></i></button>
-            <h3 class="text-2xl font-bold mb-4 text-gray-900">로그인</h3>
-            <input type="email" id="login-email" placeholder="이메일 주소" class="w-full border p-3 mb-3 rounded">
-            <input type="password" id="login-password" placeholder="비밀번호" class="w-full border p-3 mb-4 rounded">
-            <button onclick="handleLogin()" class="w-full bg-blue-700 text-white font-bold py-3 hover:bg-blue-800 rounded">로그인</button>
-        </div>
-    </div>
-
-    <!-- 모달: 회원가입 -->
-    <div id="signupModal" class="fixed inset-0 bg-black/50 hidden flex items-center justify-center p-4 z-50">
-        <div class="bg-white p-8 max-w-sm w-full relative">
-            <button onclick="closeModal('signupModal')" class="absolute top-4 right-4 text-gray-400"><i class="fas fa-times"></i></button>
-            <h3 class="text-2xl font-bold mb-4 text-gray-900">회원가입</h3>
-            <input type="email" id="signup-email" placeholder="이메일 주소" class="w-full border p-3 mb-3 rounded">
-            <input type="password" id="signup-password" placeholder="비밀번호" class="w-full border p-3 mb-4 rounded">
-            <button onclick="handleSignup()" class="w-full bg-blue-700 text-white font-bold py-3 hover:bg-blue-800 rounded">가입하기</button>
-        </div>
-    </div>
 
     <!-- 모달: 입사지원서 작성 -->
     <div id="applyModal" class="fixed inset-0 bg-black/50 hidden flex items-center justify-center p-4 z-50">
@@ -238,18 +375,18 @@
             <h3 id="apply-title" class="text-2xl font-bold mb-4 text-blue-900">입사지원서 작성</h3>
             <div class="space-y-4">
                 <div>
-                    <label class="block text-xs font-bold mb-1 text-gray-700">지원자 성명</label>
-                    <input type="text" id="app-name" class="w-full border p-2.5 rounded" placeholder="홍길동">
+                    <label class="block text-sm font-bold mb-1 text-gray-700">지원자 성명</label>
+                    <input type="text" id="app-name" class="w-full border p-3 rounded" placeholder="홍길동">
                 </div>
                 <div>
-                    <label class="block text-xs font-bold mb-1 text-gray-700">연락처</label>
-                    <input type="text" id="app-phone" class="w-full border p-2.5 rounded" placeholder="010-0000-0000">
+                    <label class="block text-sm font-bold mb-1 text-gray-700">연락처</label>
+                    <input type="text" id="app-phone" class="w-full border p-3 rounded" placeholder="010-0000-0000">
                 </div>
                 <div>
-                    <label class="block text-xs font-bold mb-1 text-gray-700">자기소개 및 지원동기</label>
-                    <textarea id="app-letter" rows="4" class="w-full border p-2.5 rounded" placeholder="내용을 작성해주세요."></textarea>
+                    <label class="block text-sm font-bold mb-1 text-gray-700">자기소개 및 지원동기</label>
+                    <textarea id="app-letter" rows="4" class="w-full border p-3 rounded" placeholder="내용을 작성해주세요."></textarea>
                 </div>
-                <button onclick="submitApplication()" class="w-full bg-blue-700 text-white font-bold py-3 hover:bg-blue-800 rounded">제출하기</button>
+                <button onclick="submitApplication()" class="w-full bg-[#25408f] text-white font-bold py-3 hover:bg-blue-900">제출하기</button>
             </div>
         </div>
     </div>
@@ -261,39 +398,124 @@
             <h3 class="text-2xl font-bold mb-4 text-gray-900">채용문의 작성</h3>
             <input type="text" id="inq-title" placeholder="문의 제목" class="w-full border p-3 mb-3 rounded">
             <textarea id="inq-content" rows="4" placeholder="문의 내용을 입력하세요" class="w-full border p-3 mb-4 rounded"></textarea>
-            <button onclick="submitInquiry()" class="w-full bg-blue-700 text-white font-bold py-3 hover:bg-blue-800 rounded">문의 등록</button>
+            <button onclick="submitInquiry()" class="w-full bg-[#25408f] text-white font-bold py-3 hover:bg-blue-900">문의 등록</button>
         </div>
     </div>
 
-    <!-- Supabase 연동 JS Script -->
+    <!-- 스크립트 -->
     <script>
-        // Supabase 설정 (본인 정보 입력)
+        // Supabase 설정
         const SUPABASE_URL = 'https://ufxyjmrdevqjcmnzbiug.supabase.co';
         const SUPABASE_ANON_KEY = 'sb_publishable_151wbWxnhngrFIpjQp3m4Q_K_JMQ9Jd';
 
         const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
         let selectedJobTitle = '';
+        let currentUser = null;
 
-        // 1. 초기 데이터 불러오기
         async function initData() {
             await loadJobs();
             await loadNotices();
             await loadInquiries();
-            checkUserSession();
+            checkSession();
         }
 
-        // 채용 공고 불러오기 (홈 화면 & 전체보기)
-        async function loadJobs() {
-            const { data: jobs, error } = await supabaseClient
-                .from('jobs')
-                .select('*')
-                .order('created_at', { ascending: true });
+        // 로그인 세션 확인 (관리자 판별)
+        function checkSession() {
+            const savedUser = localStorage.getItem('samsan_user');
+            const container = document.getElementById('auth-status-container');
+            const adminNav = document.getElementById('admin-nav-btn');
+            const mobileAdminNav = document.getElementById('mobile-admin-btn');
 
-            if (error) {
-                console.error('채용공고 불러오기 실패:', error);
+            if (savedUser) {
+                currentUser = JSON.parse(savedUser);
+                if (currentUser.id === 'admin') {
+                    adminNav.classList.remove('hidden');
+                    mobileAdminNav.classList.remove('hidden');
+                }
+                container.innerHTML = `
+                    <span class="text-blue-900 font-bold">${currentUser.id} 님</span>
+                    <span class="text-gray-300">|</span>
+                    <button onclick="handleLogout()" class="hover:text-blue-700">로그아웃</button>
+                `;
+            } else {
+                adminNav.classList.add('hidden');
+                mobileAdminNav.classList.add('hidden');
+                container.innerHTML = `
+                    <button onclick="switchTab('login')" class="hover:text-blue-700 transition">로그인</button>
+                    <span class="text-gray-300">|</span>
+                    <button onclick="switchTab('signup-1')" class="hover:text-blue-700 transition">회원가입</button>
+                `;
+            }
+        }
+
+        // 로그인 처리 (admin : HycpHpwEQN 확인)
+        function handleLoginSubmit() {
+            const id = document.getElementById('login-id').value;
+            const pw = document.getElementById('login-pw').value;
+
+            if (!id || !pw) {
+                alert('아이디와 비밀번호를 입력해주세요.');
                 return;
             }
 
+            // 관리자 계정 체크
+            if (id === 'admin' && pw === 'HycpHpwEQN') {
+                currentUser = { id: 'admin', role: 'administrator' };
+                localStorage.setItem('samsan_user', JSON.stringify(currentUser));
+                alert('관리자로 로그인되었습니다.');
+                checkSession();
+                switchTab('admin');
+                loadAdminApplications();
+                return;
+            }
+
+            // 일반 사용자 로그인 예시
+            currentUser = { id: id, role: 'user' };
+            localStorage.setItem('samsan_user', JSON.stringify(currentUser));
+            alert(`${id}님 환영합니다.`);
+            checkSession();
+            switchTab('home');
+        }
+
+        function handleLogout() {
+            localStorage.removeItem('samsan_user');
+            currentUser = null;
+            alert('로그아웃 되었습니다.');
+            checkSession();
+            switchTab('home');
+        }
+
+        // 회원가입 1단계 -> 2단계 이동
+        function goToSignupStep2() {
+            const check = document.getElementById('agree-check').checked;
+            if (!check) {
+                alert('개인정보처리방침에 동의하셔야 다음 단계로 이동할 수 있습니다.');
+                return;
+            }
+            switchTab('signup-2');
+        }
+
+        function checkIdDup() {
+            const id = document.getElementById('reg-id').value;
+            if (!id) alert('아이디를 입력하세요.');
+            else if (id === 'admin') alert('사용할 수 없는 아이디입니다.');
+            else alert('사용 가능한 아이디입니다.');
+        }
+
+        function handleCompleteSignup() {
+            const id = document.getElementById('reg-id').value;
+            const pw = document.getElementById('reg-pw').value;
+            if (!id || !pw) {
+                alert('회원정보를 정확히 입력해주세요.');
+                return;
+            }
+            alert('회원가입이 완료되었습니다. 로그인해 주십시오.');
+            switchTab('login');
+        }
+
+        // 채용 공고 불러오기
+        async function loadJobs() {
+            const { data: jobs } = await supabaseClient.from('jobs').select('*').order('created_at', { ascending: true });
             const homeGrid = document.getElementById('home-jobs-grid');
             const fullList = document.getElementById('full-jobs-list');
 
@@ -303,7 +525,6 @@
                 return;
             }
 
-            // 메인 홈 화면 카드 렌더링
             homeGrid.innerHTML = '';
             jobs.forEach((job) => {
                 const card = document.createElement('div');
@@ -321,7 +542,6 @@
                 homeGrid.appendChild(card);
             });
 
-            // 전체보기 탭 렌더링
             fullList.innerHTML = '';
             jobs.forEach((job) => {
                 const card = document.createElement('div');
@@ -332,7 +552,7 @@
                         <h3 class="text-2xl font-bold text-gray-900 mb-2">${job.title}</h3>
                         <p class="text-gray-600 text-sm mb-4">${job.headcount}</p>
                     </div>
-                    <button onclick="openApplyModal('${job.title}')" class="bg-blue-700 text-white font-bold py-2 px-4 w-full hover:bg-blue-800">입사지원하기</button>
+                    <button onclick="openApplyModal('${job.title}')" class="bg-[#25408f] text-white font-bold py-2 px-4 hover:bg-blue-900">입사지원하기</button>
                 `;
                 fullList.appendChild(card);
             });
@@ -340,7 +560,7 @@
 
         // 공지사항 불러오기
         async function loadNotices() {
-            const { data: notices, error } = await supabaseClient.from('notices').select('*').order('created_at', { ascending: false });
+            const { data: notices } = await supabaseClient.from('notices').select('*').order('created_at', { ascending: false });
             const body = document.getElementById('notice-list-body');
 
             if (!notices || notices.length === 0) {
@@ -361,9 +581,9 @@
             });
         }
 
-        // 채용문의 불러오기
+        // 채용 문의 불러오기
         async function loadInquiries() {
-            const { data: list, error } = await supabaseClient.from('inquiries').select('*').order('created_at', { ascending: false });
+            const { data: list } = await supabaseClient.from('inquiries').select('*').order('created_at', { ascending: false });
             const container = document.getElementById('inquiry-list');
 
             if (!list || list.length === 0) {
@@ -382,7 +602,7 @@
             });
         }
 
-        // 2. 입사지원 제출 (Supabase DB 저장)
+        // 입사지원 제출
         async function submitApplication() {
             const name = document.getElementById('app-name').value;
             const phone = document.getElementById('app-phone').value;
@@ -398,121 +618,126 @@
             ]);
 
             if (error) {
-                alert('지원서 접수에 실패했습니다.');
-                console.error(error);
+                alert('지원서 접수 실패');
             } else {
                 alert('지원서가 성공적으로 접수되었습니다!');
                 closeModal('applyModal');
-                document.getElementById('app-name').value = '';
-                document.getElementById('app-phone').value = '';
-                document.getElementById('app-letter').value = '';
             }
         }
 
-        // 3. 합격 / 지원 상태 조회
+        // 합격조회
         async function checkPassStatus() {
             const name = document.getElementById('check-name').value;
             const phone = document.getElementById('check-phone').value;
             const res = document.getElementById('pass-result');
 
             if (!name || !phone) {
-                alert('성명과 연락처를 모두 입력해 주세요.');
+                alert('성명과 연락처를 입력하세요.');
                 return;
             }
 
-            const { data, error } = await supabaseClient
-                .from('applications')
-                .select('*')
-                .eq('applicant_name', name)
-                .eq('phone', phone);
+            const { data } = await supabaseClient.from('applications').select('*').eq('applicant_name', name).eq('phone', phone);
 
-            if (error || !data || data.length === 0) {
-                res.innerHTML = `
-                    <div class="bg-red-50 border border-red-200 p-4 text-center rounded">
-                        <p class="font-bold text-red-900">일치하는 입사지원 내역이 없습니다.</p>
-                    </div>
-                `;
+            if (!data || data.length === 0) {
+                res.innerHTML = `<div class="bg-red-50 border p-4 text-center text-red-800 font-bold">일치하는 지원 내역이 없습니다.</div>`;
                 return;
             }
 
             res.innerHTML = '';
             data.forEach((app) => {
                 res.innerHTML += `
-                    <div class="bg-blue-50 border border-blue-200 p-4 text-center rounded mb-3">
-                        <p class="font-bold text-blue-900 text-lg">${app.applicant_name} 지원자님 (${app.job_title})</p>
-                        <p class="text-sm text-gray-700 mt-1">현재 상태: <strong class="text-blue-700">${app.status}</strong></p>
+                    <div class="bg-blue-50 border border-blue-200 p-4 text-center mb-2">
+                        <p class="font-bold text-blue-900 text-lg">${app.applicant_name} 님 (${app.job_title})</p>
+                        <p class="text-sm text-gray-700 mt-1">심사 상태: <strong class="text-blue-700">${app.status}</strong></p>
                     </div>
                 `;
             });
         }
 
-        // 4. 채용문의 등록
-        async function submitInquiry() {
-            const title = document.getElementById('inq-title').value;
-            const content = document.getElementById('inq-content').value;
+        // 관리자 전용 기능 (공고 추가, 공지 추가, 지원자 관리)
+        async function adminAddJob() {
+            const category = document.getElementById('admin-job-cat').value;
+            const title = document.getElementById('admin-job-title').value;
+            const headcount = document.getElementById('admin-job-count').value;
 
-            if (!title || !content) {
-                alert('제목과 내용을 입력해주세요.');
+            if (!category || !title || !headcount) {
+                alert('모든 입력란을 입력해 주세요.');
                 return;
             }
 
-            const { error } = await supabaseClient.from('inquiries').insert([{ title, content }]);
-
-            if (error) {
-                alert('문의 등록 실패');
-            } else {
-                alert('문의가 등록되었습니다.');
-                closeModal('inquiryModal');
-                loadInquiries();
-            }
+            await supabaseClient.from('jobs').insert([{ category, title, headcount }]);
+            alert('채용공고가 등록되었습니다.');
+            loadJobs();
         }
 
-        // 5. 회원가입 및 로그인 처리
-        async function handleSignup() {
-            const email = document.getElementById('signup-email').value;
-            const password = document.getElementById('signup-password').value;
+        async function adminAddNotice() {
+            const title = document.getElementById('admin-notice-title').value;
+            const content = document.getElementById('admin-notice-content').value;
 
-            const { data, error } = await supabaseClient.auth.signUp({ email, password });
-            if (error) alert('회원가입 실패: ' + error.message);
-            else {
-                alert('회원가입 완료!');
-                closeModal('signupModal');
+            if (!title) {
+                alert('제목을 입력하세요.');
+                return;
             }
+
+            await supabaseClient.from('notices').insert([{ title, content }]);
+            alert('공지사항이 등록되었습니다.');
+            loadNotices();
         }
 
-        async function handleLogin() {
-            const email = document.getElementById('login-email').value;
-            const password = document.getElementById('login-password').value;
+        async function loadAdminApplications() {
+            const { data } = await supabaseClient.from('applications').select('*').order('created_at', { ascending: false });
+            const body = document.getElementById('admin-apps-body');
 
-            const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
-            if (error) alert('로그인 실패: ' + error.message);
-            else {
-                alert('로그인 성공!');
-                closeModal('loginModal');
-                checkUserSession();
+            if (!data || data.length === 0) {
+                body.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-gray-500">지원 내역이 없습니다.</td></tr>`;
+                return;
             }
-        }
 
-        async function checkUserSession() {
-            const { data: { session } } = await supabaseClient.auth.getSession();
-            const container = document.getElementById('auth-status-container');
-            if (session) {
-                container.innerHTML = `
-                    <span class="text-blue-900">${session.user.email}</span>
-                    <span class="text-gray-300">|</span>
-                    <button onclick="handleLogout()" class="hover:text-blue-700">로그아웃</button>
+            body.innerHTML = '';
+            data.forEach((app) => {
+                body.innerHTML += `
+                    <tr class="border-b">
+                        <td class="p-3">${app.job_title}</td>
+                        <td class="p-3 font-bold">${app.applicant_name}</td>
+                        <td class="p-3">${app.phone}</td>
+                        <td class="p-3 text-blue-700 font-bold">${app.status}</td>
+                        <td class="p-3 space-x-1">
+                            <button onclick="updateAppStatus('${app.id}', '서류 합격')" class="bg-blue-600 text-white text-xs px-2 py-1">합격</button>
+                            <button onclick="updateAppStatus('${app.id}', '불합격')" class="bg-red-600 text-white text-xs px-2 py-1">불합격</button>
+                        </td>
+                    </tr>
                 `;
-            }
+            });
         }
 
-        async function handleLogout() {
-            await supabaseClient.auth.signOut();
-            location.reload();
+        async function updateAppStatus(id, status) {
+            await supabaseClient.from('applications').update({ status }).eq('id', id);
+            alert(`상태가 [${status}](으)로 변경되었습니다.`);
+            loadAdminApplications();
+        }
+
+        async function submitInquiry() {
+            const title = document.getElementById('inq-title').value;
+            const content = document.getElementById('inq-content').value;
+            if (!title || !content) {
+                alert('제목과 내용을 입력하세요.');
+                return;
+            }
+            await supabaseClient.from('inquiries').insert([{ title, content }]);
+            alert('문의가 등록되었습니다.');
+            closeModal('inquiryModal');
+            loadInquiries();
         }
 
         // UI 탭 제어
         function switchTab(tabId) {
             document.querySelectorAll('.view-section').forEach(el => el.classList.add('hidden'));
+            
+            // 서브페이지일 경우 하늘색 이미지 띠(sky.png) 노출
+            const skyBanner = document.getElementById('sky-header-banner');
+            if (tabId === 'home') skyBanner.classList.add('hidden');
+            else skyBanner.classList.remove('hidden');
+
             const target = document.getElementById(`view-${tabId}`);
             if (target) target.classList.remove('hidden');
             window.scrollTo({ top: 0, behavior: 'smooth' });
