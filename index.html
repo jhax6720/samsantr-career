@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>삼산여객 채용 홈페이지</title>
+    <title>삼산여객주 채용 홈페이지</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Supabase JS CDN -->
@@ -76,7 +76,6 @@
             justify-content: center;
         }
 
-        /* 표준 입출력창 스타일 지정 */
         .std-input {
             width: 100%;
             height: 48px;
@@ -100,7 +99,6 @@
             box-sizing: border-box;
         }
 
-        /* 페이드 효과 */
         .view-section {
             display: none;
             opacity: 0;
@@ -119,12 +117,13 @@
     <header class="bg-white border-b border-gray-200 h-20 sticky top-0 z-50">
         <div class="max-w-[1400px] mx-auto h-full flex items-center justify-between px-4 lg:px-8">
             <a href="#" onclick="switchTab('home')" class="flex items-center">
-                <img src="Logo.png" alt="삼산여객 채용" class="h-10 sm:h-12 w-auto object-contain" onerror="this.onerror=null; this.src='https://via.placeholder.com/260x50?text=SAMSAN+LOGO';">
+                <img src="Logo.png" alt="삼산여객주 채용" class="h-10 sm:h-12 w-auto object-contain" onerror="this.onerror=null; this.src='https://via.placeholder.com/260x50?text=SAMSAN+LOGO';">
             </a>
 
             <div class="flex items-center space-x-8 sm:space-x-12">
                 <nav class="hidden md:flex items-center space-x-10 text-xl font-bold text-gray-800 tracking-tight">
                     <button onclick="switchTab('my')" class="hover:text-blue-700 transition">나의채용</button>
+                    <button id="nav-mypage-btn" onclick="switchTab('mypage')" class="hidden hover:text-blue-700 transition">마이페이지</button>
                     <button onclick="switchTab('inquiry')" class="hover:text-blue-700 transition">채용문의</button>
                     <button onclick="switchTab('jobs')" class="hover:text-blue-700 transition">채용공고</button>
                     <button onclick="switchTab('notice')" class="hover:text-blue-700 transition">공지사항</button>
@@ -142,6 +141,7 @@
             <div class="max-w-[1400px] mx-auto flex flex-col space-y-3 font-bold text-gray-800 text-lg">
                 <button onclick="switchTab('home'); toggleMobileNav();" class="text-left py-2 border-b">홈</button>
                 <button onclick="switchTab('my'); toggleMobileNav();" class="text-left py-2 border-b">나의채용</button>
+                <button id="mobile-mypage-btn" onclick="switchTab('mypage'); toggleMobileNav();" class="hidden text-left py-2 border-b text-blue-700">마이페이지</button>
                 <button onclick="switchTab('inquiry'); toggleMobileNav();" class="text-left py-2 border-b">채용문의</button>
                 <button onclick="switchTab('jobs'); toggleMobileNav();" class="text-left py-2 border-b">채용공고</button>
                 <button onclick="switchTab('notice'); toggleMobileNav();" class="text-left py-2 border-b">공지사항</button>
@@ -161,7 +161,6 @@
 
                     <div class="flex justify-end mb-8">
                         <div id="auth-status-container" class="bg-white/95 backdrop-blur border border-blue-600 rounded-full px-6 py-1.5 shadow-md flex items-center space-x-3 text-sm font-bold text-gray-900">
-                            <!-- JS 생성 -->
                         </div>
                     </div>
 
@@ -262,7 +261,45 @@
             </div>
         </div>
 
-        <!-- ================= 5. 채용공고 게시판 목록 탭 ================= -->
+        <!-- ================= 5. 마이페이지 (회원정보 수정 / 계정 탈퇴) ================= -->
+        <div id="view-mypage" class="view-section max-w-3xl mx-auto px-6 py-12">
+            <h1 class="text-4xl font-black text-gray-900 mb-8 border-b pb-4">마이페이지 / 회원정보 수정</h1>
+            
+            <div class="bg-white border border-gray-300 p-8 shadow-sm space-y-6">
+                <div>
+                    <label class="block text-sm font-bold text-gray-700 mb-1">아이디 (수정 불가)</label>
+                    <input type="text" id="my-username" class="std-input bg-gray-100 cursor-not-allowed" readonly>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-bold text-gray-700 mb-1">비밀번호 변경</label>
+                    <input type="password" id="my-password" class="std-input" placeholder="새 비밀번호 입력">
+                </div>
+
+                <div>
+                    <label class="block text-sm font-bold text-gray-700 mb-1">이메일</label>
+                    <input type="email" id="my-email" class="std-input" placeholder="이메일 주소">
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-bold text-gray-700 mb-1">로블록스 ID</label>
+                        <input type="text" id="my-roblox-id" class="std-input" placeholder="로블록스 ID">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-bold text-gray-700 mb-1">로블록스 프로필 링크</label>
+                        <input type="text" id="my-roblox-link" class="std-input" placeholder="프로필 링크">
+                    </div>
+                </div>
+
+                <div class="flex justify-between items-center pt-6 border-t">
+                    <button type="button" onclick="handleDeleteAccount()" class="bg-red-600 hover:bg-red-700 text-white font-bold px-6 py-3">계정 탈퇴</button>
+                    <button type="button" onclick="handleUpdateUserInfo()" class="bg-[#25408f] hover:bg-blue-900 text-white font-bold px-8 py-3">정보 수정 저장</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ================= 6. 채용공고 게시판 목록 ================= -->
         <div id="view-jobs" class="view-section max-w-6xl mx-auto px-6 py-12">
             <div class="flex justify-between items-center mb-6 border-b pb-4">
                 <h2 class="text-4xl font-extrabold text-gray-900">채용공고 게시판</h2>
@@ -284,7 +321,7 @@
             </div>
         </div>
 
-        <!-- ================= 5-1. 채용공고 상세 페이지 ================= -->
+        <!-- ================= 6-1. 채용공고 상세 페이지 ================= -->
         <div id="view-job-detail" class="view-section max-w-5xl mx-auto px-6 py-12">
             <button onclick="switchTab('jobs')" class="mb-6 text-gray-600 font-bold hover:text-black">&lt; 목록으로 돌아가기</button>
             <div class="bg-white border p-8 shadow-sm">
@@ -301,7 +338,7 @@
             </div>
         </div>
 
-        <!-- ================= 6. 공지사항 게시판 목록 탭 ================= -->
+        <!-- ================= 7. 공지사항 게시판 ================= -->
         <div id="view-notice" class="view-section max-w-6xl mx-auto px-6 py-12">
             <div class="flex justify-between items-center mb-6 border-b pb-4">
                 <h2 class="text-4xl font-extrabold text-gray-900">공지사항 게시판</h2>
@@ -322,7 +359,7 @@
             </div>
         </div>
 
-        <!-- ================= 6-1. 공지사항 상세 페이지 ================= -->
+        <!-- ================= 7-1. 공지사항 상세 ================= -->
         <div id="view-notice-detail" class="view-section max-w-5xl mx-auto px-6 py-12">
             <button onclick="switchTab('notice')" class="mb-6 text-gray-600 font-bold hover:text-black">&lt; 목록으로 돌아가기</button>
             <div class="bg-white border p-8 shadow-sm">
@@ -332,12 +369,12 @@
                 <div id="detail-notice-content" class="text-gray-800 text-lg whitespace-pre-wrap leading-relaxed min-h-[200px] mb-8"></div>
                 
                 <div id="admin-delete-notice-wrap" class="border-t pt-6 hidden">
-                    <button onclick="deleteCurrentNotice()" class="bg-red-600 text-white px-4 py-2 font-bold hover:bg-red-700">공지 삭제 (관리자)</button>
+                    <button onclick="deleteCurrentNotice()" class="bg-red-600 text-white px-4 py-2 font-bold hover:bg-red-700">공고 삭제 (관리자)</button>
                 </div>
             </div>
         </div>
 
-        <!-- ================= 7. 나의채용 (자동 로그인 연동) ================= -->
+        <!-- ================= 8. 나의채용 ================= -->
         <div id="view-my" class="view-section max-w-4xl mx-auto px-6 py-12">
             <div class="bg-white p-8 border border-gray-300 shadow-md">
                 <h2 class="text-3xl font-bold text-gray-900 mb-6 text-center">나의 채용 / 지원 내역 확인</h2>
@@ -345,7 +382,7 @@
             </div>
         </div>
 
-        <!-- ================= 8. 채용문의 Q&A 탭 ================= -->
+        <!-- ================= 9. 채용문의 Q&A ================= -->
         <div id="view-inquiry" class="view-section max-w-4xl mx-auto px-6 py-12">
             <div class="flex justify-between items-center mb-8">
                 <h2 class="text-4xl font-extrabold text-gray-900">채용문의 Q&A</h2>
@@ -354,7 +391,7 @@
             <div id="inquiry-list" class="space-y-4"></div>
         </div>
 
-        <!-- ================= 9. 관리자 전용: 지원자 현황 관리 ================= -->
+        <!-- ================= 10. 관리자 전용: 지원자 현황 관리 ================= -->
         <div id="view-admin" class="view-section max-w-7xl mx-auto px-6 py-12">
             <div class="bg-red-50 border border-red-300 p-6 mb-8 rounded">
                 <h2 class="text-3xl font-black text-red-700">⚙️ 관리자 전용 지원자 관리 시스템 (admin)</h2>
@@ -385,11 +422,11 @@
 
     <!-- 푸터 -->
     <footer class="bg-gray-900 text-gray-400 py-8 px-4 text-center text-sm border-t border-gray-800">
-        <p class="mb-2"><strong>삼산여객 주식회사</strong> | 채용 문의전화: this0833, fhhgogbv</p>
+        <p class="mb-2"><strong>삼산여객주 주식회사</strong> | 채용 문의전화: 02-555-8282</p>
         <p class="text-xs text-gray-500">&copy; 2026 SAMSAN PASSENGER CORP. ALL RIGHTS RESERVED.</p>
     </footer>
 
-    <!-- 모달: 관리자 새 채용공고 등록 -->
+    <!-- 모달들 -->
     <div id="jobWriteModal" class="fixed inset-0 bg-black/50 hidden flex items-center justify-center p-4 z-50">
         <div class="bg-white p-8 max-w-xl w-full relative">
             <button onclick="closeModal('jobWriteModal')" class="absolute top-4 right-4 text-gray-400"><i class="fas fa-times"></i></button>
@@ -398,26 +435,24 @@
                 <input type="text" id="admin-job-cat" class="std-input" placeholder="구분 (예: 신입사원, 고위직)">
                 <input type="text" id="admin-job-title" class="std-input" placeholder="채용 공고 제목">
                 <input type="text" id="admin-job-count" class="std-input" placeholder="선발예정인원 (예: 선발예정인원 : 5명)">
-                <textarea id="admin-job-content" rows="6" class="std-textarea" placeholder="채용 공고 본문 내용을 상세히 작성하세요."></textarea>
+                <textarea id="admin-job-content" rows="6" class="std-textarea" placeholder="채용 공고 본문 내용"></textarea>
                 <button onclick="adminAddJob()" class="w-full bg-blue-800 text-white font-bold py-3 hover:bg-blue-900">등록하기</button>
             </div>
         </div>
     </div>
 
-    <!-- 모달: 관리자 새 공지사항 작성 -->
     <div id="noticeWriteModal" class="fixed inset-0 bg-black/50 hidden flex items-center justify-center p-4 z-50">
         <div class="bg-white p-8 max-w-xl w-full relative">
             <button onclick="closeModal('noticeWriteModal')" class="absolute top-4 right-4 text-gray-400"><i class="fas fa-times"></i></button>
             <h3 class="text-2xl font-bold mb-4 text-gray-900">📌 새 공지사항 작성</h3>
             <div class="space-y-3">
                 <input type="text" id="admin-notice-title" class="std-input" placeholder="공지사항 제목">
-                <textarea id="admin-notice-content" rows="6" class="std-textarea" placeholder="공지 내용을 작성하세요."></textarea>
+                <textarea id="admin-notice-content" rows="6" class="std-textarea" placeholder="공지 내용"></textarea>
                 <button onclick="adminAddNotice()" class="w-full bg-green-700 text-white font-bold py-3 hover:bg-green-800">등록하기</button>
             </div>
         </div>
     </div>
 
-    <!-- 모달: 입사지원서 작성 -->
     <div id="applyModal" class="fixed inset-0 bg-black/50 hidden flex items-center justify-center p-4 z-50">
         <div class="bg-white p-8 max-w-xl w-full relative max-h-[90vh] overflow-y-auto">
             <button onclick="closeModal('applyModal')" class="absolute top-4 right-4 text-gray-400"><i class="fas fa-times"></i></button>
@@ -440,7 +475,6 @@
         </div>
     </div>
 
-    <!-- 모달: 문의 등록 -->
     <div id="inquiryModal" class="fixed inset-0 bg-black/50 hidden flex items-center justify-center p-4 z-50">
         <div class="bg-white p-8 max-w-lg w-full relative">
             <button onclick="closeModal('inquiryModal')" class="absolute top-4 right-4 text-gray-400"><i class="fas fa-times"></i></button>
@@ -454,7 +488,6 @@
     </div>
 
     <script>
-        // Supabase 설정
         const SUPABASE_URL = 'https://ufxyjmrdevqjcmnzbiug.supabase.co';
         const SUPABASE_ANON_KEY = 'sb_publishable_151wbWxnhngrFIpjQp3m4Q_K_JMQ9Jd';
 
@@ -471,17 +504,22 @@
             await loadInquiries();
         }
 
-        // 로그인 세션 확인
+        // 세션 체크 및 UI 노출 설정
         function checkSession() {
             const savedUser = localStorage.getItem('samsan_user');
             const container = document.getElementById('auth-status-container');
             const adminNav = document.getElementById('admin-nav-btn');
             const mobileAdminNav = document.getElementById('mobile-admin-btn');
+            const navMypage = document.getElementById('nav-mypage-btn');
+            const mobileMypage = document.getElementById('mobile-mypage-btn');
             const btnWriteJob = document.getElementById('btn-write-job');
             const btnWriteNotice = document.getElementById('btn-write-notice');
 
             if (savedUser) {
                 currentUser = JSON.parse(savedUser);
+                navMypage.classList.remove('hidden');
+                mobileMypage.classList.remove('hidden');
+
                 if (currentUser.role === 'admin') {
                     adminNav.classList.remove('hidden');
                     mobileAdminNav.classList.remove('hidden');
@@ -501,6 +539,8 @@
                 `;
             } else {
                 currentUser = null;
+                navMypage.classList.add('hidden');
+                mobileMypage.classList.add('hidden');
                 adminNav.classList.add('hidden');
                 mobileAdminNav.classList.add('hidden');
                 btnWriteJob.classList.add('hidden');
@@ -514,7 +554,7 @@
             }
         }
 
-        // 1. 진짜 DB 로그인 검증
+        // 로그인
         async function handleLoginSubmit() {
             const inputId = document.getElementById('login-id').value.trim();
             const inputPw = document.getElementById('login-pw').value.trim();
@@ -524,13 +564,23 @@
                 return;
             }
 
-            // Supabase users 테이블에서 직접 조회
+            // 어드민 예외
+            if (inputId === 'admin' && inputPw === 'HycpHpwEQN') {
+                currentUser = { username: 'admin', role: 'admin' };
+                localStorage.setItem('samsan_user', JSON.stringify(currentUser));
+                alert('관리자로 로그인되었습니다.');
+                checkSession();
+                switchTab('admin');
+                loadAdminApplications();
+                return;
+            }
+
             const { data: user, error } = await supabaseClient
                 .from('users')
                 .select('*')
                 .eq('username', inputId)
                 .eq('password', inputPw)
-                .single();
+                .maybeSingle();
 
             if (error || !user) {
                 alert('아이디 또는 비밀번호가 일치하지 않습니다.');
@@ -542,13 +592,7 @@
             alert(`${user.username}님 로그인되었습니다.`);
             
             checkSession();
-
-            if (user.role === 'admin') {
-                switchTab('admin');
-                loadAdminApplications();
-            } else {
-                switchTab('my');
-            }
+            switchTab('my');
         }
 
         function handleLogout() {
@@ -559,8 +603,15 @@
             switchTab('home');
         }
 
-        // 회원가입
+        // 1PC 1계정 제한 검증 포함 회원가입
         function goToSignupStep2() {
+            // 1PC 1계정 체크
+            const registeredAcc = localStorage.getItem('samsan_pc_registered_account');
+            if (registeredAcc) {
+                alert(`이미 이 컴퓨터에서 생성된 계정(${registeredAcc})이 존재합니다.\n한 컴퓨터당 1개의 계정만 만들 수 있습니다.`);
+                return;
+            }
+
             if (!document.getElementById('agree-check').checked) {
                 alert('개인정보처리방침에 동의하셔야 합니다.');
                 return;
@@ -596,12 +647,69 @@
             if (error) {
                 alert('회원가입 실패 (아이디 중복 등)');
             } else {
-                alert('회원가입이 정상 완료되었습니다. 로그인해 주십시오.');
+                // 이 컴퓨터에서 생성된 계정 정보 기록 (1PC 1계정 제약 설정)
+                localStorage.setItem('samsan_pc_registered_account', username);
+                alert('회원가입이 정상 완료되었습니다! 로그인해 주십시오.');
                 switchTab('login');
             }
         }
 
-        // 5. 채용공고 게시판 불러오기
+        // 마이페이지 데이터 로드 & 수정 & 탈퇴
+        async function loadMyPageData() {
+            if (!currentUser) return;
+            document.getElementById('my-username').value = currentUser.username;
+
+            const { data: user } = await supabaseClient
+                .from('users')
+                .select('*')
+                .eq('username', currentUser.username)
+                .maybeSingle();
+
+            if (user) {
+                document.getElementById('my-password').value = user.password || '';
+                document.getElementById('my-email').value = user.email || '';
+                document.getElementById('my-roblox-id').value = user.roblox_id || '';
+                document.getElementById('my-roblox-link').value = user.roblox_link || '';
+            }
+        }
+
+        async function handleUpdateUserInfo() {
+            const password = document.getElementById('my-password').value.trim();
+            const email = document.getElementById('my-email').value.trim();
+            const roblox_id = document.getElementById('my-roblox-id').value.trim();
+            const roblox_link = document.getElementById('my-roblox-link').value.trim();
+
+            if (!password) {
+                alert('비밀번호를 입력해주세요.');
+                return;
+            }
+
+            const { error } = await supabaseClient
+                .from('users')
+                .update({ password, email, roblox_id, roblox_link })
+                .eq('username', currentUser.username);
+
+            if (error) alert('회원정보 수정 실패');
+            else alert('회원정보가 성공적으로 수정되었습니다.');
+        }
+
+        async function handleDeleteAccount() {
+            if (!confirm('정말로 계정을 탈퇴하시겠습니까? 탈퇴 시 모든 지원 정보 및 회원 데이터가 삭제됩니다.')) return;
+
+            // Supabase 유저 삭제
+            await supabaseClient.from('users').delete().eq('username', currentUser.username);
+
+            // 1PC 제약 해제 및 세션 정단
+            localStorage.removeItem('samsan_pc_registered_account');
+            localStorage.removeItem('samsan_user');
+            currentUser = null;
+
+            alert('계정이 성공적으로 탈퇴되었습니다.');
+            checkSession();
+            switchTab('home');
+        }
+
+        // 채용공고 게시판
         async function loadJobs() {
             const { data: jobs } = await supabaseClient.from('jobs').select('*').order('created_at', { ascending: true });
             const homeGrid = document.getElementById('home-jobs-grid');
@@ -613,7 +721,6 @@
                 return;
             }
 
-            // 메인 화면 카드
             homeGrid.innerHTML = '';
             jobs.forEach((job) => {
                 const card = document.createElement('div');
@@ -631,7 +738,6 @@
                 homeGrid.appendChild(card);
             });
 
-            // 게시판 테이블
             jobsTable.innerHTML = '';
             jobs.forEach((job) => {
                 const tr = document.createElement('tr');
@@ -647,7 +753,6 @@
             });
         }
 
-        // 공고 상세페이지 이동
         function openJobDetail(job) {
             currentJob = job;
             document.getElementById('detail-job-cat').innerText = job.category;
@@ -662,7 +767,7 @@
             switchTab('job-detail');
         }
 
-        // 6. 공지사항 불러오기
+        // 공지사항
         async function loadNotices() {
             const { data: notices } = await supabaseClient.from('notices').select('*').order('created_at', { ascending: false });
             const body = document.getElementById('notice-list-body');
@@ -699,7 +804,7 @@
             switchTab('notice-detail');
         }
 
-        // 나의 채용 자동 연동
+        // 나의 채용
         async function renderMyRecruitment() {
             const container = document.getElementById('my-recruitment-container');
             
@@ -744,7 +849,6 @@
             });
         }
 
-        // 입사 지원서 제출
         function openApplyModalWithCurrent() {
             if (!currentUser) {
                 alert('로그인 후 입사지원이 가능합니다.');
@@ -777,7 +881,7 @@
             }
         }
 
-        // 3 & 4. 관리자 전용 등록/삭제 기능
+        // 관리자 전용
         function openJobWriteModal() { openModal('jobWriteModal'); }
         function openNoticeWriteModal() { openModal('noticeWriteModal'); }
 
@@ -788,7 +892,7 @@
             const content = document.getElementById('admin-job-content').value.trim();
 
             if (!category || !title || !headcount) {
-                alert('필수 정보(구분, 제목, 선발인원)를 입력하세요.');
+                alert('필수 정보를 입력하세요.');
                 return;
             }
 
@@ -828,7 +932,6 @@
             switchTab('notice');
         }
 
-        // 관리자 지원자 현황 조회 및 심사
         async function loadAdminApplications() {
             const { data } = await supabaseClient.from('applications').select('*').order('created_at', { ascending: false });
             const body = document.getElementById('admin-apps-body');
@@ -862,7 +965,7 @@
             loadAdminApplications();
         }
 
-        // Q&A 문의사항
+        // Q&A
         async function loadInquiries() {
             const { data: list } = await supabaseClient.from('inquiries').select('*').order('created_at', { ascending: false });
             const container = document.getElementById('inquiry-list');
@@ -893,7 +996,7 @@
             loadInquiries();
         }
 
-        // 탭 제어
+        // 탭 전환 제어
         function switchTab(tabId) {
             const sections = document.querySelectorAll('.view-section');
             sections.forEach(el => el.classList.remove('active'));
@@ -908,6 +1011,7 @@
             }
 
             if (tabId === 'my') renderMyRecruitment();
+            if (tabId === 'mypage') loadMyPageData();
 
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
