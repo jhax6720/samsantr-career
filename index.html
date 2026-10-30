@@ -342,7 +342,7 @@
             </div>
         </div>
 
-        <!-- 채용공고 상세 페이지 (다운로드 전용 버튼 적용) -->
+        <!-- 채용공고 상세 페이지 -->
         <div id="view-job-detail" class="view-section max-w-5xl mx-auto px-6 py-12">
             <button onclick="switchTab('jobs')" class="mb-6 text-gray-600 font-bold hover:text-black">&lt; 목록으로 돌아가기</button>
             <div class="bg-white border p-8 shadow-sm">
@@ -392,7 +392,7 @@
                 <p id="detail-notice-date" class="text-gray-400 text-sm mb-6 pb-4 border-b"></p>
                 <div id="detail-notice-content" class="text-gray-800 text-lg whitespace-pre-wrap leading-relaxed min-h-[200px] mb-8"></div>
                 <div id="admin-delete-notice-wrap" class="border-t pt-6 hidden">
-                    <button onclick="deleteCurrentNotice()" class="bg-red-600 text-white px-4 py-2 font-bold hover:bg-red-700">공고 삭제 (관리자)</button>
+                    <button onclick="deleteCurrentNotice()" class="bg-red-600 text-white px-4 py-2 font-bold hover:bg-red-700">공지 삭제 (관리자)</button>
                 </div>
             </div>
         </div>
@@ -414,14 +414,21 @@
             <div id="inquiry-list" class="space-y-4"></div>
         </div>
 
-        <!-- 관리자 지원자 관리 -->
+        <!-- 관리자 지원자 관리 (탭 분리: 진행중 / 지난 지원 내역 보관함) -->
         <div id="view-admin" class="view-section max-w-7xl mx-auto px-6 py-12">
             <div class="bg-red-50 border border-red-300 p-6 mb-8 rounded">
                 <h2 class="text-3xl font-black text-red-700">⚙️ 관리자 전용 지원자 관리 시스템 (admin)</h2>
-                <p class="text-gray-700 mt-1">접수된 전체 입사 지원자 목록을 확인하고 서류 합격/불합격 상태를 변경합니다.</p>
+                <p class="text-gray-700 mt-1">접수된 지원 내역을 관리하고, 합격/불합격 처리된 내역은 보관함으로 이동합니다.</p>
             </div>
+
+            <!-- 관리자 내부 탭 버튼 -->
+            <div class="flex space-x-4 mb-6 border-b pb-3">
+                <button onclick="switchAdminSubTab('active')" id="admin-tab-active-btn" class="font-bold text-lg text-blue-900 border-b-2 border-blue-900 pb-1">진행중인 지원 내역</button>
+                <button onclick="switchAdminSubTab('archived')" id="admin-tab-archived-btn" class="font-bold text-lg text-gray-500 pb-1">합격/불합격 보관함</button>
+            </div>
+
             <div class="bg-white p-6 border border-gray-300 shadow-sm">
-                <h3 class="text-2xl font-bold mb-4 text-gray-900">📋 전체 입사지원자 현황 및 합격 관리</h3>
+                <h3 id="admin-table-title" class="text-2xl font-bold mb-4 text-gray-900">📋 심사 진행 중인 지원자 목록</h3>
                 <div class="overflow-x-auto">
                     <table class="w-full text-left border">
                         <thead class="bg-gray-100 border-b">
@@ -466,7 +473,7 @@
         </div>
     </div>
 
-    <!-- 기타 모달들 -->
+    <!-- 공지사항 작성 모달 -->
     <div id="noticeWriteModal" class="fixed inset-0 bg-black/50 hidden items-center justify-center p-4 z-50">
         <div class="bg-white p-8 max-w-xl w-full relative">
             <button onclick="closeModal('noticeWriteModal')" class="absolute top-4 right-4 text-gray-400 text-xl"><i class="fas fa-times"></i></button>
@@ -501,6 +508,7 @@
         let currentJob = null;
         let currentNotice = null;
         let selectedApplyFileName = '';
+        let adminCurrentSubTab = 'active'; // 'active' or 'archived'
 
         async function initData() {
             checkSession();
@@ -522,7 +530,7 @@
         function openJobWriteModal() { openModal('jobWriteModal'); }
         function openNoticeWriteModal() { openModal('noticeWriteModal'); }
 
-        function checkSession() {
+        async function checkSession() {
             const savedUser = localStorage.getItem('samsan_user');
             const container = document.getElementById('auth-status-container');
             const adminNav = document.getElementById('admin-nav-btn');
@@ -554,6 +562,11 @@
                     <span class="text-gray-300">|</span>
                     <button onclick="handleLogout()" class="hover:text-blue-700">로그아웃</button>
                 `;
+
+                // 일반 유저 로그인 시 합격/불합격 결과 최초 알림 체크
+                if (currentUser.role !== 'admin') {
+                    checkApplicantNotification(currentUser.username);
+                }
             } else {
                 currentUser = null;
                 navMypage.classList.add('hidden');
@@ -568,6 +581,24 @@
                     <span class="text-gray-300">|</span>
                     <button onclick="switchTab('signup-1')" class="hover:text-blue-700 transition">회원가입</button>
                 `;
+            }
+        }
+
+        // 최초 로그인 시 합격/불합격 결과 팝업 알림 띄우고 상태 아카이브 처리
+        async function checkApplicantNotification(username) {
+            const { data: apps } = await supabaseClient
+                .from('applications')
+                .select('*')
+                .eq('applicant_username', username)
+                .in('status', ['서류 합격', '불합격'])
+                .eq('is_archived', false);
+
+            if (apps && apps.length > 0) {
+                for (const app of apps) {
+                    alert(`[지원 결과 안내]\n\n지원하신 '${app.job_title}' 건의 심사 결과가 확정되었습니다.\n\n결과: 【 ${app.status} 】`);
+                    // 알림을 확인했으므로 is_archived를 true로 전환하여 다음 로그인부터는 안 뜨게 처리 및 목록 분리
+                    await supabaseClient.from('applications').update({ is_archived: true }).eq('id', app.id);
+                }
             }
         }
 
@@ -718,7 +749,8 @@
                     job_title: currentJob.title, 
                     applicant_username: currentUser.username, 
                     file_name: selectedApplyFileName,
-                    status: '서류 심사 중'
+                    status: '서류 심사 중',
+                    is_archived: false
                 }
             ]);
 
@@ -729,7 +761,6 @@
             }
         }
 
-        // 실제 파일 Supabase Storage 업로드 및 JSON 배열 저장
         async function adminAddJob() {
             const category = document.getElementById('admin-job-cat').value.trim();
             const title = document.getElementById('admin-job-title').value.trim();
@@ -747,14 +778,12 @@
                     const fileExt = file.name.split('.').pop();
                     const filePath = `${Date.now()}_${Math.random().toString(36).substring(7)}.${fileExt}`;
 
-                    // Storage 업로드
                     const { data: uploadData, error: uploadError } = await supabaseClient
                         .storage
                         .from('recruitment-files')
                         .upload(filePath, file);
 
                     if (!uploadError) {
-                        // 공용 다운로드 URL 생성
                         const { data: urlData } = supabaseClient
                             .storage
                             .from('recruitment-files')
@@ -802,36 +831,104 @@
             }
         }
 
+        // ================= 1. 게시글(채용공고/공지사항) 삭제 버튼 기능 수정 =================
+        async function deleteCurrentJob() {
+            if (!currentJob || !currentJob.id) return;
+            if (!confirm(`'${currentJob.title}' 채용공고를 정말 삭제하시겠습니까?`)) return;
+
+            const { error } = await supabaseClient.from('jobs').delete().eq('id', currentJob.id);
+            if (error) {
+                alert(`삭제 실패: ${error.message}`);
+            } else {
+                alert('채용공고가 삭제되었습니다.');
+                await loadJobs();
+                switchTab('jobs');
+            }
+        }
+
+        async function deleteCurrentNotice() {
+            if (!currentNotice || !currentNotice.id) return;
+            if (!confirm(`'${currentNotice.title}' 공지사항을 정말 삭제하시겠습니까?`)) return;
+
+            const { error } = await supabaseClient.from('notices').delete().eq('id', currentNotice.id);
+            if (error) {
+                alert(`삭제 실패: ${error.message}`);
+            } else {
+                alert('공지사항이 삭제되었습니다.');
+                await loadNotices();
+                switchTab('notice');
+            }
+        }
+
+        // ================= 2. 관리자 지원자 관리 및 보관함 서브탭 제어 =================
+        function switchAdminSubTab(tab) {
+            adminCurrentSubTab = tab;
+            const btnActive = document.getElementById('admin-tab-active-btn');
+            const btnArchived = document.getElementById('admin-tab-archived-btn');
+            const title = document.getElementById('admin-table-title');
+
+            if (tab === 'active') {
+                btnActive.className = "font-bold text-lg text-blue-900 border-b-2 border-blue-900 pb-1";
+                btnArchived.className = "font-bold text-lg text-gray-500 pb-1";
+                title.innerText = "📋 심사 진행 중인 지원자 목록";
+            } else {
+                btnArchived.className = "font-bold text-lg text-blue-900 border-b-2 border-blue-900 pb-1";
+                btnActive.className = "font-bold text-lg text-gray-500 pb-1";
+                title.innerText = "📁 합격/불합격 처리된 지원 내역 보관함";
+            }
+            loadAdminApplications();
+        }
+
         async function loadAdminApplications() {
-            const { data, error } = await supabaseClient.from('applications').select('*').order('created_at', { ascending: false });
             const body = document.getElementById('admin-apps-body');
+            let query = supabaseClient.from('applications').select('*').order('created_at', { ascending: false });
+
+            if (adminCurrentSubTab === 'active') {
+                query = query.eq('status', '서류 심사 중');
+            } else {
+                query = query.neq('status', '서류 심사 중');
+            }
+
+            const { data, error } = await query;
 
             if (error || !data || data.length === 0) {
-                body.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-gray-500">접수된 지원 내역이 없습니다.</td></tr>`;
+                body.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-gray-500">내역이 없습니다.</td></tr>`;
                 return;
             }
 
             body.innerHTML = '';
             data.forEach((app) => {
+                let actionBtns = '';
+                if (app.status === '서류 심사 중') {
+                    actionBtns = `
+                        <button onclick="updateAppStatus('${app.id}', '서류 합격')" class="bg-blue-600 text-white text-xs px-2 py-1 font-bold">합격</button>
+                        <button onclick="updateAppStatus('${app.id}', '불합격')" class="bg-red-600 text-white text-xs px-2 py-1 font-bold">불합격</button>
+                    `;
+                } else {
+                    actionBtns = `<span class="text-xs text-gray-500 font-bold">처리완료 (보관함 이동됨)</span>`;
+                }
+
                 body.innerHTML += `
                     <tr class="border-b">
                         <td class="p-3 font-bold">${app.job_title}</td>
                         <td class="p-3 text-gray-800 font-bold">${app.applicant_username}</td>
                         <td class="p-3 text-blue-700 font-bold">${app.file_name || '첨부파일 없음'}</td>
-                        <td class="p-3 text-blue-700 font-bold">${app.status}</td>
-                        <td class="p-3 space-x-1">
-                            <button onclick="updateAppStatus('${app.id}', '서류 합격')" class="bg-blue-600 text-white text-xs px-2 py-1">합격</button>
-                            <button onclick="updateAppStatus('${app.id}', '불합격')" class="bg-red-600 text-white text-xs px-2 py-1">불합격</button>
-                        </td>
+                        <td class="p-3 font-bold ${app.status === '서류 합격' ? 'text-blue-600' : app.status === '불합격' ? 'text-red-600' : 'text-gray-800'}">${app.status}</td>
+                        <td class="p-3 space-x-1">${actionBtns}</td>
                     </tr>
                 `;
             });
         }
 
         async function updateAppStatus(id, status) {
-            await supabaseClient.from('applications').update({ status }).eq('id', id);
-            alert(`상태가 [${status}](으)로 변경되었습니다.`);
-            loadAdminApplications();
+            // 상태 변경 시 is_archived를 false로 두어 지원자가 다음에 로그인할 때 알림창이 뜰 수 있도록 함
+            const { error } = await supabaseClient.from('applications').update({ status, is_archived: false }).eq('id', id);
+            if (error) {
+                alert(`상태 변경 실패: ${error.message}`);
+            } else {
+                alert(`상태가 [${status}](으)로 변경되었습니다. (지원자가 로그인하면 알림이 전송됩니다.)`);
+                loadAdminApplications();
+            }
         }
 
         async function loadJobs() {
@@ -875,7 +972,6 @@
             });
         }
 
-        // 공고 상세에서 첨부 파일 자동 다운로드 링크 생성
         function openJobDetail(job) {
             currentJob = job;
             document.getElementById('detail-job-cat').innerText = job.category;
@@ -991,11 +1087,12 @@
             }
             container.innerHTML = '';
             data.forEach((app) => {
+                const statusColor = app.status === '서류 합격' ? 'bg-blue-600' : app.status === '불합격' ? 'bg-red-600' : 'bg-gray-600';
                 container.innerHTML += `
                     <div class="bg-blue-50 border border-blue-200 p-6 text-left rounded mb-4 shadow-sm">
                         <div class="flex justify-between items-center mb-2">
                             <h3 class="font-bold text-blue-900 text-xl">${app.job_title}</h3>
-                            <span class="bg-blue-600 text-white font-bold text-xs px-3 py-1 rounded-full">${app.status}</span>
+                            <span class="${statusColor} text-white font-bold text-xs px-3 py-1 rounded-full">${app.status}</span>
                         </div>
                         <p class="text-gray-700 text-sm">첨부 서류: <strong>${app.file_name || '없음'}</strong></p>
                         <p class="text-xs text-gray-400 mt-2">접수일시: ${new Date(app.created_at).toLocaleString()}</p>
