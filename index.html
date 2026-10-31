@@ -738,27 +738,28 @@
             }
         }
 
-        // 확실하고 정확하게 다운로드 가능한 Supabase Public URL 생성 및 저장
+        // 입사지원서 파일 업로드 (Bucket 없을 시 상세 안내)
         async function finalSubmitApplication() {
             let fileInfo = { name: selectedApplyFile.name, url: '#' };
             const fileExt = selectedApplyFile.name.split('.').pop();
-            const fileNameOnly = `${Date.now()}_${Math.random().toString(36).substring(7)}.${fileExt}`;
+            const fileNameOnly = `applicant_${Date.now()}_${Math.random().toString(36).substring(7)}.${fileExt}`;
 
             const { error: uploadError } = await supabaseClient
                 .storage
                 .from('recruitment-files')
                 .upload(fileNameOnly, selectedApplyFile);
 
-            if (!uploadError) {
-                const { data: urlData } = supabaseClient
-                    .storage
-                    .from('recruitment-files')
-                    .getPublicUrl(fileNameOnly);
-                fileInfo.url = urlData.publicUrl;
-            } else {
-                alert(`파일 업로드 실패: ${uploadError.message}`);
+            if (uploadError) {
+                alert(`파일 업로드 실패: ${uploadError.message}\n\n[해결 방법]\nSupabase 대시보드 -> Storage 메뉴에서 [recruitment-files] 버킷을 Public으로 생성했는지 확인해주세요!`);
                 return;
             }
+
+            const { data: urlData } = supabaseClient
+                .storage
+                .from('recruitment-files')
+                .getPublicUrl(fileNameOnly);
+            
+            fileInfo.url = urlData.publicUrl;
 
             const { error } = await supabaseClient.from('applications').insert([
                 { 
@@ -800,17 +801,20 @@
                         .from('recruitment-files')
                         .upload(fileNameOnly, file);
 
-                    if (!uploadError) {
-                        const { data: urlData } = supabaseClient
-                            .storage
-                            .from('recruitment-files')
-                            .getPublicUrl(fileNameOnly);
-
-                        fileDataArray.push({
-                            name: file.name,
-                            url: urlData.publicUrl
-                        });
+                    if (uploadError) {
+                        alert(`모집요강 파일 업로드 실패: ${uploadError.message}\nSupabase Storage에 [recruitment-files] 버킷이 있는지 확인하세요.`);
+                        return;
                     }
+
+                    const { data: urlData } = supabaseClient
+                        .storage
+                        .from('recruitment-files')
+                        .getPublicUrl(fileNameOnly);
+
+                    fileDataArray.push({
+                        name: file.name,
+                        url: urlData.publicUrl
+                    });
                 }
             }
 
@@ -892,7 +896,7 @@
             loadAdminApplications();
         }
 
-        // 지원서 파일 다운로드/새창 열기 버튼 개선
+        // 관리자 지원자 관리 목록 (다운로드 버튼 명확히 표시)
         async function loadAdminApplications() {
             const body = document.getElementById('admin-apps-body');
             let query = supabaseClient.from('applications').select('*').order('created_at', { ascending: false });
@@ -926,7 +930,7 @@
                 try {
                     const fObj = JSON.parse(app.file_name);
                     if (fObj && fObj.url) {
-                        fileDisplay = `<a href="${fObj.url}" target="_blank" rel="noopener noreferrer" class="bg-blue-600 text-white text-xs px-3 py-1.5 rounded font-bold hover:bg-blue-800 transition inline-block">📥 ${fObj.name || '지원서'} 다운로드/보기</a>`;
+                        fileDisplay = `<a href="${fObj.url}" target="_blank" rel="noopener noreferrer" class="bg-blue-600 text-white text-xs px-3 py-1.5 rounded font-bold hover:bg-blue-800 transition inline-block"><i class="fas fa-download mr-1"></i> ${fObj.name || '지원서'} 다운로드</a>`;
                     } else {
                         fileDisplay = app.file_name;
                     }
@@ -996,7 +1000,7 @@
             });
         }
 
-        // 공고 상세 페이지에서 모집요강 파일 안전하게 파싱하여 버튼 렌더링
+        // 채용공고 상세 페이지 파일 이름 및 다운로드 버튼 정상 렌더링
         function openJobDetail(job) {
             currentJob = job;
             document.getElementById('detail-job-cat').innerText = job.category;
@@ -1018,24 +1022,15 @@
                             fileBadge.className = "inline-flex items-center space-x-2 bg-blue-50 border border-blue-300 px-3 py-1.5 text-sm font-bold text-blue-800 rounded shadow-sm";
                             fileBadge.innerHTML = `
                                 <span>📄 ${f.name}</span>
-                                <a href="${f.url}" target="_blank" rel="noopener noreferrer" class="bg-blue-600 text-white px-3 py-1 text-xs rounded hover:bg-blue-800 transition">📥 다운로드/보기</a>
+                                <a href="${f.url}" target="_blank" rel="noopener noreferrer" class="bg-blue-600 text-white px-3 py-1 text-xs rounded hover:bg-blue-800 transition">📥 다운로드</a>
                             `;
                             fileListContainer.appendChild(fileBadge);
                         });
                     } else { 
-                        // JSON 배열이 아닐 경우 단일 문자열 처리
-                        fileListContainer.innerHTML = `
-                            <div class="inline-flex items-center space-x-2 bg-blue-50 border border-blue-300 px-3 py-1.5 text-sm font-bold text-blue-800 rounded shadow-sm">
-                                <span>📄 ${job.file_name}</span>
-                            </div>
-                        `;
+                        fileWrap.classList.add('hidden'); 
                     }
                 } catch(e) {
-                    fileListContainer.innerHTML = `
-                        <div class="inline-flex items-center space-x-2 bg-blue-50 border border-blue-300 px-3 py-1.5 text-sm font-bold text-blue-800 rounded shadow-sm">
-                            <span>📄 ${job.file_name}</span>
-                        </div>
-                    `;
+                    fileWrap.classList.add('hidden');
                 }
             } else {
                 fileWrap.classList.add('hidden');
