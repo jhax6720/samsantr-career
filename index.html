@@ -392,7 +392,7 @@
                 <p id="detail-notice-date" class="text-gray-400 text-sm mb-6 pb-4 border-b"></p>
                 <div id="detail-notice-content" class="text-gray-800 text-lg whitespace-pre-wrap leading-relaxed min-h-[200px] mb-8"></div>
                 <div id="admin-delete-notice-wrap" class="border-t pt-6 hidden">
-                    <button onclick="deleteCurrentNotice()" class="bg-red-600 text-white px-4 py-2 font-bold hover:bg-red-700">공지 삭제 (관리자)</button>
+                    <button onclick="deleteCurrentNotice()" class="bg-red-600 text-white px-4 py-2 font-bold hover:bg-red-700">공고 삭제 (관리자)</button>
                 </div>
             </div>
         </div>
@@ -414,14 +414,13 @@
             <div id="inquiry-list" class="space-y-4"></div>
         </div>
 
-        <!-- 관리자 지원자 관리 (탭 분리: 진행중 / 지난 지원 내역 보관함) -->
+        <!-- 관리자 지원자 관리 -->
         <div id="view-admin" class="view-section max-w-7xl mx-auto px-6 py-12">
             <div class="bg-red-50 border border-red-300 p-6 mb-8 rounded">
                 <h2 class="text-3xl font-black text-red-700">⚙️ 관리자 전용 지원자 관리 시스템 (admin)</h2>
                 <p class="text-gray-700 mt-1">접수된 지원 내역을 관리하고, 합격/불합격 처리된 내역은 보관함으로 이동합니다.</p>
             </div>
 
-            <!-- 관리자 내부 탭 버튼 -->
             <div class="flex space-x-4 mb-6 border-b pb-3">
                 <button onclick="switchAdminSubTab('active')" id="admin-tab-active-btn" class="font-bold text-lg text-blue-900 border-b-2 border-blue-900 pb-1">진행중인 지원 내역</button>
                 <button onclick="switchAdminSubTab('archived')" id="admin-tab-archived-btn" class="font-bold text-lg text-gray-500 pb-1">합격/불합격 보관함</button>
@@ -507,8 +506,8 @@
         let currentUser = null;
         let currentJob = null;
         let currentNotice = null;
-        let selectedApplyFileName = '';
-        let adminCurrentSubTab = 'active'; // 'active' or 'archived'
+        let selectedApplyFile = null;
+        let adminCurrentSubTab = 'active';
 
         async function initData() {
             checkSession();
@@ -563,7 +562,6 @@
                     <button onclick="handleLogout()" class="hover:text-blue-700">로그아웃</button>
                 `;
 
-                // 일반 유저 로그인 시 합격/불합격 결과 최초 알림 체크
                 if (currentUser.role !== 'admin') {
                     checkApplicantNotification(currentUser.username);
                 }
@@ -584,7 +582,6 @@
             }
         }
 
-        // 최초 로그인 시 합격/불합격 결과 팝업 알림 띄우고 상태 아카이브 처리
         async function checkApplicantNotification(username) {
             const { data: apps } = await supabaseClient
                 .from('applications')
@@ -595,41 +592,7 @@
 
             if (apps && apps.length > 0) {
                 for (const app of apps) {
-                    alert(`[지원 결과 안내]\n\n지원하신 '${app.job_title}' 건의 심사 결과가 확정되었습니다.\n\n결과: 【 ${app.status} 】`);
-                    // 알림을 확인했으므로 is_archived를 true로 전환하여 다음 로그인부터는 안 뜨게 처리 및 목록 분리
-                    await supabaseClient.from('applications').update({ is_archived: true }).eq('id', app.id);
-                }
-            }
-        }
-
-        async function handleLoginSubmit() {
-            const inputId = document.getElementById('login-id').value.trim();
-            const inputPw = document.getElementById('login-pw').value.trim();
-
-            if (!inputId || !inputPw) { alert('아이디와 비밀번호를 입력해주세요.'); return; }
-
-            if (inputId === 'admin' && inputPw === 'HycpHpwEQN') {
-                currentUser = { username: 'admin', role: 'admin' };
-                localStorage.setItem('samsan_user', JSON.stringify(currentUser));
-                alert('관리자로 로그인되었습니다.');
-                checkSession();
-                switchTab('admin');
-                loadAdminApplications();
-                return;
-            }
-
-            const { data: user, error } = await supabaseClient
-                .from('users')
-                .select('*')
-                .eq('username', inputId)
-                .eq('password', inputPw)
-                .maybeSingle();
-
-            if (error || !user) { alert('아이디 또는 비밀번호가 일치하지 않습니다.'); return; }
-
-            currentUser = { username: user.username, role: user.role };
-            localStorage.setItem('samsan_user', JSON.stringify(currentUser));
-            alert(`${user.username}님 로그인되었습니다.`);
+                    alert(`[지원 결과 안내]\n\n지원하신 '${app.job_title}' 건의 심사 결과가 확정되었습니다.\n\n결과: 【 ${app.status} 】`); await supabaseClient.from('applications').update({ is_archived: true }).eq('id', app.id); } } }  async function handleLoginSubmit() { const inputId = document.getElementById('login-id').value.trim(); const inputPw = document.getElementById('login-pw').value.trim();  if (!inputId \vert{}\vert{} !inputPw) { alert('아이디와 비밀번호를 입력해주세요.'); return; }  if (inputId === 'admin' && inputPw === 'HycpHpwEQN') { currentUser = { username: 'admin', role: 'admin' }; localStorage.setItem('samsan_user', JSON.stringify(currentUser)); alert('관리자로 로그인되었습니다.'); checkSession(); switchTab('admin'); loadAdminApplications(); return; }  const { data: user, error } = await supabaseClient .from('users') .select('*') .eq('username', inputId) .eq('password', inputPw) .maybeSingle();  if (error \vert{}\vert{} !user) { alert('아이디 또는 비밀번호가 일치하지 않습니다.'); return; }  currentUser = { username: user.username, role: user.role }; localStorage.setItem('samsan_user', JSON.stringify(currentUser)); alert(`${user.username}님 로그인되었습니다.`);
             
             checkSession();
             switchTab('my');
@@ -646,62 +609,14 @@
         function goToSignupStep2() {
             const registeredAcc = localStorage.getItem('samsan_pc_registered_account');
             if (registeredAcc && registeredAcc !== 'admin') {
-                alert(`이미 이 컴퓨터에서 생성된 계정(${registeredAcc})이 존재합니다.\n한 컴퓨터당 1개의 계정만 만들 수 있습니다.`);
-                return;
-            }
-            if (!document.getElementById('agree-check').checked) { alert('개인정보처리방침에 동의하셔야 합니다.'); return; }
-            switchTab('signup-2');
-        }
-
-        async function checkIdDup() {
-            const regId = document.getElementById('reg-id').value.trim();
-            if (!regId) { alert('아이디를 입력하세요.'); return; }
-            if (regId === 'admin') { alert('사용할 수 없는 아이디입니다.'); return; }
-
-            const { data } = await supabaseClient.from('users').select('username').eq('username', regId);
-            if (data && data.length > 0) alert('이미 존재하는 아이디입니다.');
-            else alert('사용 가능한 아이디입니다.');
-        }
-
-        async function handleCompleteSignup() {
-            const robloxId = document.getElementById('roblox-id').value.trim();
-            const robloxLink = document.getElementById('roblox-link').value.trim();
-            const username = document.getElementById('reg-id').value.trim();
-            const password = document.getElementById('reg-pw').value.trim();
-            const email = document.getElementById('reg-email').value.trim();
-
-            if (!username || !password) { alert('아이디와 비밀번호는 필수 입력 항목입니다.'); return; }
-
-            const { error } = await supabaseClient.from('users').insert([
-                { username, password, roblox_id: robloxId, roblox_link: robloxLink, email, role: 'user' }
-            ]);
-
-            if (error) alert('회원가입 실패: 이미 가입된 아이디입니다.');
-            else {
-                localStorage.setItem('samsan_pc_registered_account', username);
-                alert('회원가입이 정상 완료되었습니다! 로그인해 주십시오.');
-                switchTab('login');
-            }
-        }
-
-        async function startApplyProcess() {
-            if (!currentUser) { alert('로그인 후 입사지원이 가능합니다.'); switchTab('login'); return; }
-
-            const { data: existingApps } = await supabaseClient
-                .from('applications')
-                .select('*')
-                .eq('applicant_username', currentUser.username)
-                .eq('status', '서류 심사 중');
-
-            if (existingApps && existingApps.length > 0) {
-                alert(`이미 진행 중인 입사지원(${existingApps[0].job_title})이 있습니다.\n한 계정당 동시에 1개의 채용공고에만 지원할 수 있습니다.`);
+                alert(`이미 이 컴퓨터에서 생성된 계정(${registeredAcc})이 존재합니다.\n한 컴퓨터당 1개의 계정만 만들 수 있습니다.`); return; } if (!document.getElementById('agree-check').checked) { alert('개인정보처리방침에 동의하셔야 합니다.'); return; } switchTab('signup-2'); }  async function checkIdDup() { const regId = document.getElementById('reg-id').value.trim(); if (!regId) { alert('아이디를 입력하세요.'); return; } if (regId === 'admin') { alert('사용할 수 없는 아이디입니다.'); return; }  const { data } = await supabaseClient.from('users').select('username').eq('username', regId); if (data && data.length > 0) alert('이미 존재하는 아이디입니다.'); else alert('사용 가능한 아이디입니다.'); }  async function handleCompleteSignup() { const robloxId = document.getElementById('roblox-id').value.trim(); const robloxLink = document.getElementById('roblox-link').value.trim(); const username = document.getElementById('reg-id').value.trim(); const password = document.getElementById('reg-pw').value.trim(); const email = document.getElementById('reg-email').value.trim();  if (!username \vert{}\vert{} !password) { alert('아이디와 비밀번호는 필수 입력 항목입니다.'); return; }  const { error } = await supabaseClient.from('users').insert([ { username, password, roblox_id: robloxId, roblox_link: robloxLink, email, role: 'user' } ]);  if (error) alert('회원가입 실패: 이미 가입된 아이디입니다.'); else { localStorage.setItem('samsan_pc_registered_account', username); alert('회원가입이 정상 완료되었습니다! 로그인해 주십시오.'); switchTab('login'); } }  async function startApplyProcess() { if (!currentUser) { alert('로그인 후 입사지원이 가능합니다.'); switchTab('login'); return; }  const { data: existingApps } = await supabaseClient .from('applications') .select('*') .eq('applicant_username', currentUser.username) .eq('status', '서류 심사 중');  if (existingApps && existingApps.length > 0) { alert(`이미 진행 중인 입사지원(${existingApps[0].job_title})이 있습니다.\n한 계정당 동시에 1개의 채용공고에만 지원할 수 있습니다.`);
                 return;
             }
 
-            document.getElementById('apply-job-title-display').innerText = `[${currentJob.category}] ${currentJob.title}`;
-            document.getElementById('apply-job-title-display-2').innerText = `[${currentJob.category}] ${currentJob.title}`;
+            document.getElementById('apply-job-title-display').innerText = `[${currentJob.category}]${currentJob.title}`;
+            document.getElementById('apply-job-title-display-2').innerText = `[${currentJob.category}]${currentJob.title}`;
             
-            selectedApplyFileName = '';
+            selectedApplyFile = null;
             document.getElementById('apply-file-input').value = '';
             document.getElementById('apply-file-name-display').innerText = '선택된 파일: 없음';
             document.getElementById('apply-check-1').checked = false;
@@ -714,69 +629,39 @@
 
         function handleFileSelected(input) {
             if (input.files && input.files[0]) {
-                selectedApplyFileName = input.files[0].name;
-                document.getElementById('apply-file-name-display').innerText = `선택된 파일: ${selectedApplyFileName}`;
+                selectedApplyFile = input.files[0];
+                document.getElementById('apply-file-name-display').innerText = `선택된 파일: ${selectedApplyFile.name}`; } }  function goToApplyPage2() { if (!selectedApplyFile) { alert('입사지원서 파일을 첨부해 주세요.'); return; } if (!document.getElementById('apply-check-1').checked \vert{}\vert{} !document.getElementById('apply-check-2').checked) { alert('모든 동의 항목에 체크하셔야 다음 단계로 이동 가능합니다.'); return; } switchTab('apply-page2'); }  function validatePledgeInput() { const targetText = document.getElementById('pledge-target-text').innerText.trim(); const inputText = document.getElementById('pledge-input').value.trim(); const submitBtn = document.getElementById('final-submit-btn');  if (targetText === inputText) { submitBtn.disabled = false; submitBtn.className = "bg-[#25408f] hover:bg-blue-900 cursor-pointer text-white text-lg font-bold px-10 py-3 rounded-none transition"; } else { submitBtn.disabled = true; submitBtn.className = "bg-[#9da3a8] cursor-not-allowed text-white text-lg font-bold px-10 py-3 rounded-none transition"; } }  // 지원자 파일 Storage 업로드 및 DB 저장 async function finalSubmitApplication() { if (!selectedApplyFile) { alert('입사지원서 파일을 첨부해 주세요.'); return; }  const submitBtn = document.getElementById('final-submit-btn'); submitBtn.innerText = '제출 중...'; submitBtn.disabled = true;  const fileExt = selectedApplyFile.name.split('.').pop(); const filePath = `applicant_${Date.now()}_${Math.random().toString(36).substring(7)}.${fileExt}`;
+
+            const { data: uploadData, error: uploadError } = await supabaseClient
+                .storage
+                .from('recruitment-files')
+                .upload(filePath, selectedApplyFile);
+
+            let fileUrl = '';
+            if (!uploadError) {
+                const { data: urlData } = supabaseClient
+                    .storage
+                    .from('recruitment-files')
+                    .getPublicUrl(filePath);
+                fileUrl = urlData.publicUrl;
             }
-        }
 
-        function goToApplyPage2() {
-            if (!selectedApplyFileName) { alert('입사지원서 파일을 첨부해 주세요.'); return; }
-            if (!document.getElementById('apply-check-1').checked || !document.getElementById('apply-check-2').checked) {
-                alert('모든 동의 항목에 체크하셔야 다음 단계로 이동 가능합니다.');
-                return;
-            }
-            switchTab('apply-page2');
-        }
-
-        function validatePledgeInput() {
-            const targetText = document.getElementById('pledge-target-text').innerText.trim();
-            const inputText = document.getElementById('pledge-input').value.trim();
-            const submitBtn = document.getElementById('final-submit-btn');
-
-            if (targetText === inputText) {
-                submitBtn.disabled = false;
-                submitBtn.className = "bg-[#25408f] hover:bg-blue-900 cursor-pointer text-white text-lg font-bold px-10 py-3 rounded-none transition";
-            } else {
-                submitBtn.disabled = true;
-                submitBtn.className = "bg-[#9da3a8] cursor-not-allowed text-white text-lg font-bold px-10 py-3 rounded-none transition";
-            }
-        }
-
-        async function finalSubmitApplication() {
             const { error } = await supabaseClient.from('applications').insert([
                 { 
                     job_id: currentJob.id, 
                     job_title: currentJob.title, 
                     applicant_username: currentUser.username, 
-                    file_name: selectedApplyFileName,
+                    file_name: selectedApplyFile.name,
+                    file_url: fileUrl,
                     status: '서류 심사 중',
                     is_archived: false
                 }
             ]);
 
-            if (error) alert(`지원서 제출 실패: ${error.message}`);
-            else {
-                alert('입사지원서가 성공적으로 제출되었습니다!');
-                switchTab('my');
-            }
-        }
+            submitBtn.innerText = '제출하기';
 
-        async function adminAddJob() {
-            const category = document.getElementById('admin-job-cat').value.trim();
-            const title = document.getElementById('admin-job-title').value.trim();
-            const headcount = document.getElementById('admin-job-count').value.trim();
-            const content = document.getElementById('admin-job-content').value.trim();
-            const fileInput = document.getElementById('admin-job-file');
-            
-            if (!category || !title || !headcount) { alert('구분, 제목, 선발인원은 필수 입력사항입니다.'); return; }
-
-            let fileDataArray = [];
-
-            if (fileInput.files && fileInput.files.length > 0) {
-                for (let i = 0; i < fileInput.files.length; i++) {
-                    const file = fileInput.files[i];
-                    const fileExt = file.name.split('.').pop();
-                    const filePath = `${Date.now()}_${Math.random().toString(36).substring(7)}.${fileExt}`;
+            if (error) {
+                alert(`지원서 제출 실패: ${error.message}`); } else { alert('입사지원서가 성공적으로 제출되었습니다!'); switchTab('my'); } }  // 채용공고 모집요강 파일 Storage 다중 업로드 async function adminAddJob() { const category = document.getElementById('admin-job-cat').value.trim(); const title = document.getElementById('admin-job-title').value.trim(); const headcount = document.getElementById('admin-job-count').value.trim(); const content = document.getElementById('admin-job-content').value.trim(); const fileInput = document.getElementById('admin-job-file');  if (!category \vert{}\vert{} !title \vert{}\vert{} !headcount) { alert('구분, 제목, 선발인원은 필수 입력사항입니다.'); return; }  let fileDataArray = [];  if (fileInput.files && fileInput.files.length > 0) { for (let i = 0; i < fileInput.files.length; i++) { const file = fileInput.files[i]; const fileExt = file.name.split('.').pop(); const filePath = `job_${Date.now()}_${Math.random().toString(36).substring(7)}.${fileExt}`;
 
                     const { data: uploadData, error: uploadError } = await supabaseClient
                         .storage
@@ -805,24 +690,7 @@
                 file_name: JSON.stringify(fileDataArray)
             }]);
 
-            if (error) alert(`채용공고 등록 실패: ${error.message}`);
-            else {
-                alert('새 채용공고가 게시되었습니다.');
-                closeModal('jobWriteModal');
-                await loadJobs();
-                switchTab('jobs');
-            }
-        }
-
-        async function adminAddNotice() {
-            const title = document.getElementById('admin-notice-title').value.trim();
-            const content = document.getElementById('admin-notice-content').value.trim();
-
-            if (!title) { alert('제목을 입력하세요.'); return; }
-
-            const { error } = await supabaseClient.from('notices').insert([{ title, content }]);
-
-            if (error) alert(`공지사항 등록 실패: ${error.message}`);
+            if (error) alert(`채용공고 등록 실패: ${error.message}`); else { alert('새 채용공고가 게시되었습니다.'); closeModal('jobWriteModal'); await loadJobs(); switchTab('jobs'); } }  async function adminAddNotice() { const title = document.getElementById('admin-notice-title').value.trim(); const content = document.getElementById('admin-notice-content').value.trim();  if (!title) { alert('제목을 입력하세요.'); return; }  const { error } = await supabaseClient.from('notices').insert([{ title, content }]);  if (error) alert(`공지사항 등록 실패: ${error.message}`);
             else {
                 alert('새 공지사항이 작성되었습니다.');
                 closeModal('noticeWriteModal');
@@ -831,14 +699,9 @@
             }
         }
 
-        // ================= 1. 게시글(채용공고/공지사항) 삭제 버튼 기능 수정 =================
         async function deleteCurrentJob() {
             if (!currentJob || !currentJob.id) return;
-            if (!confirm(`'${currentJob.title}' 채용공고를 정말 삭제하시겠습니까?`)) return;
-
-            const { error } = await supabaseClient.from('jobs').delete().eq('id', currentJob.id);
-            if (error) {
-                alert(`삭제 실패: ${error.message}`);
+            if (!confirm(`'${currentJob.title}' 채용공고를 정말 삭제하시겠습니까?`)) return;  const { error } = await supabaseClient.from('jobs').delete().eq('id', currentJob.id); if (error) { alert(`삭제 실패: ${error.message}`);
             } else {
                 alert('채용공고가 삭제되었습니다.');
                 await loadJobs();
@@ -848,11 +711,7 @@
 
         async function deleteCurrentNotice() {
             if (!currentNotice || !currentNotice.id) return;
-            if (!confirm(`'${currentNotice.title}' 공지사항을 정말 삭제하시겠습니까?`)) return;
-
-            const { error } = await supabaseClient.from('notices').delete().eq('id', currentNotice.id);
-            if (error) {
-                alert(`삭제 실패: ${error.message}`);
+            if (!confirm(`'${currentNotice.title}' 공지사항을 정말 삭제하시겠습니까?`)) return;  const { error } = await supabaseClient.from('notices').delete().eq('id', currentNotice.id); if (error) { alert(`삭제 실패: ${error.message}`);
             } else {
                 alert('공지사항이 삭제되었습니다.');
                 await loadNotices();
@@ -860,7 +719,6 @@
             }
         }
 
-        // ================= 2. 관리자 지원자 관리 및 보관함 서브탭 제어 =================
         function switchAdminSubTab(tab) {
             adminCurrentSubTab = tab;
             const btnActive = document.getElementById('admin-tab-active-btn');
@@ -879,6 +737,7 @@
             loadAdminApplications();
         }
 
+        // 관리자 검토 화면에서 지원자 제출 파일을 클릭 시 직접 다운로드 가능하도록 링크 렌더링
         async function loadAdminApplications() {
             const body = document.getElementById('admin-apps-body');
             let query = supabaseClient.from('applications').select('*').order('created_at', { ascending: false });
@@ -908,11 +767,17 @@
                     actionBtns = `<span class="text-xs text-gray-500 font-bold">처리완료 (보관함 이동됨)</span>`;
                 }
 
+                // 첨부 파일 다운로드 링크 생성
+                let fileCell = app.file_name || '첨부파일 없음';
+                if (app.file_url) {
+                    fileCell = `<a href="${app.file_url}" download="${app.file_name}" target="_blank" class="text-blue-700 font-bold underline hover:text-blue-900">📥 ${app.file_name}</a>`;
+                }
+
                 body.innerHTML += `
                     <tr class="border-b">
                         <td class="p-3 font-bold">${app.job_title}</td>
                         <td class="p-3 text-gray-800 font-bold">${app.applicant_username}</td>
-                        <td class="p-3 text-blue-700 font-bold">${app.file_name || '첨부파일 없음'}</td>
+                        <td class="p-3">${fileCell}</td>
                         <td class="p-3 font-bold ${app.status === '서류 합격' ? 'text-blue-600' : app.status === '불합격' ? 'text-red-600' : 'text-gray-800'}">${app.status}</td>
                         <td class="p-3 space-x-1">${actionBtns}</td>
                     </tr>
@@ -921,12 +786,9 @@
         }
 
         async function updateAppStatus(id, status) {
-            // 상태 변경 시 is_archived를 false로 두어 지원자가 다음에 로그인할 때 알림창이 뜰 수 있도록 함
             const { error } = await supabaseClient.from('applications').update({ status, is_archived: false }).eq('id', id);
             if (error) {
-                alert(`상태 변경 실패: ${error.message}`);
-            } else {
-                alert(`상태가 [${status}](으)로 변경되었습니다. (지원자가 로그인하면 알림이 전송됩니다.)`);
+                alert(`상태 변경 실패: ${error.message}`); } else { alert(`상태가 [${status}](으)로 변경되었습니다. (지원자가 로그인하면 알림이 전송됩니다.)`);
                 loadAdminApplications();
             }
         }
@@ -972,6 +834,7 @@
             });
         }
 
+        // 채용공고 상세 페이지에서 PDF 등 모집요강 파일 다운로드 버튼 렌더링
         function openJobDetail(job) {
             currentJob = job;
             document.getElementById('detail-job-cat').innerText = job.category;
@@ -1077,52 +940,4 @@
         async function renderMyRecruitment() {
             const container = document.getElementById('my-recruitment-container');
             if (!currentUser) {
-                container.innerHTML = `<div class="text-center py-8"><p class="text-xl font-bold text-gray-800 mb-4">로그인이 필요한 서비스입니다.</p><button onclick="switchTab('login')" class="bg-[#25408f] text-white px-8 py-3 font-bold">로그인하러 가기</button></div>`;
-                return;
-            }
-            const { data } = await supabaseClient.from('applications').select('*').eq('applicant_username', currentUser.username);
-            if (!data || data.length === 0) {
-                container.innerHTML = `<div class="bg-gray-50 border p-6 text-center rounded"><p class="font-bold text-gray-800 text-lg mb-2">${currentUser.username} 님의 접수된 입사지원 내역이 없습니다.</p><button onclick="switchTab('jobs')" class="bg-[#25408f] text-white px-6 py-2 font-bold text-sm mt-2">채용공고 확인하기</button></div>`;
-                return;
-            }
-            container.innerHTML = '';
-            data.forEach((app) => {
-                const statusColor = app.status === '서류 합격' ? 'bg-blue-600' : app.status === '불합격' ? 'bg-red-600' : 'bg-gray-600';
-                container.innerHTML += `
-                    <div class="bg-blue-50 border border-blue-200 p-6 text-left rounded mb-4 shadow-sm">
-                        <div class="flex justify-between items-center mb-2">
-                            <h3 class="font-bold text-blue-900 text-xl">${app.job_title}</h3>
-                            <span class="${statusColor} text-white font-bold text-xs px-3 py-1 rounded-full">${app.status}</span>
-                        </div>
-                        <p class="text-gray-700 text-sm">첨부 서류: <strong>${app.file_name || '없음'}</strong></p>
-                        <p class="text-xs text-gray-400 mt-2">접수일시: ${new Date(app.created_at).toLocaleString()}</p>
-                    </div>
-                `;
-            });
-        }
-
-        function switchTab(tabId) {
-            const sections = document.querySelectorAll('.view-section');
-            sections.forEach(el => el.classList.remove('active'));
-
-            const skyBanner = document.getElementById('sky-header-banner');
-            if (tabId === 'home') skyBanner.classList.add('hidden');
-            else skyBanner.classList.remove('hidden');
-
-            const target = document.getElementById(`view-${tabId}`);
-            if (target) {
-                setTimeout(() => target.classList.add('active'), 50);
-            }
-
-            if (tabId === 'my') renderMyRecruitment();
-            if (tabId === 'admin') loadAdminApplications();
-
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        }
-
-        function toggleMobileNav() { document.getElementById('mobile-nav').classList.toggle('hidden'); }
-
-        window.addEventListener('DOMContentLoaded', initData);
-    </script>
-</body>
-</html>
+                container.innerHTML = `<div class="text-center py-8"><p class="text-xl font-bold text-gray-800
