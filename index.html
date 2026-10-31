@@ -506,7 +506,7 @@
         let currentUser = null;
         let currentJob = null;
         let currentNotice = null;
-        let selectedApplyFile = null; // 실제 파일 객체 저장용
+        let selectedApplyFile = null;
         let adminCurrentSubTab = 'active';
 
         async function initData() {
@@ -738,23 +738,26 @@
             }
         }
 
-        // 지원서 파일 Storage 업로드 및 다운로드 URL 생성 적용
+        // 확실하고 정확하게 다운로드 가능한 Supabase Public URL 생성 및 저장
         async function finalSubmitApplication() {
             let fileInfo = { name: selectedApplyFile.name, url: '#' };
             const fileExt = selectedApplyFile.name.split('.').pop();
-            const filePath = `applicant_${Date.now()}_${Math.random().toString(36).substring(7)}.${fileExt}`;
+            const fileNameOnly = `${Date.now()}_${Math.random().toString(36).substring(7)}.${fileExt}`;
 
             const { error: uploadError } = await supabaseClient
                 .storage
                 .from('recruitment-files')
-                .upload(filePath, selectedApplyFile);
+                .upload(fileNameOnly, selectedApplyFile);
 
             if (!uploadError) {
                 const { data: urlData } = supabaseClient
                     .storage
                     .from('recruitment-files')
-                    .getPublicUrl(filePath);
+                    .getPublicUrl(fileNameOnly);
                 fileInfo.url = urlData.publicUrl;
+            } else {
+                alert(`파일 업로드 실패: ${uploadError.message}`);
+                return;
             }
 
             const { error } = await supabaseClient.from('applications').insert([
@@ -762,7 +765,7 @@
                     job_id: currentJob.id, 
                     job_title: currentJob.title, 
                     applicant_username: currentUser.username, 
-                    file_name: JSON.stringify(fileInfo), // 파일명 및 다운로드 URL 객체로 저장
+                    file_name: JSON.stringify(fileInfo), 
                     status: '서류 심사 중',
                     is_archived: false
                 }
@@ -775,7 +778,6 @@
             }
         }
 
-        // 채용공고 모집요강 다중 파일 Storage 업로드 처리
         async function adminAddJob() {
             const category = document.getElementById('admin-job-cat').value.trim();
             const title = document.getElementById('admin-job-title').value.trim();
@@ -791,18 +793,18 @@
                 for (let i = 0; i < fileInput.files.length; i++) {
                     const file = fileInput.files[i];
                     const fileExt = file.name.split('.').pop();
-                    const filePath = `job_${Date.now()}_${Math.random().toString(36).substring(7)}.${fileExt}`;
+                    const fileNameOnly = `job_${Date.now()}_${Math.random().toString(36).substring(7)}.${fileExt}`;
 
                     const { error: uploadError } = await supabaseClient
                         .storage
                         .from('recruitment-files')
-                        .upload(filePath, file);
+                        .upload(fileNameOnly, file);
 
                     if (!uploadError) {
                         const { data: urlData } = supabaseClient
                             .storage
                             .from('recruitment-files')
-                            .getPublicUrl(filePath);
+                            .getPublicUrl(fileNameOnly);
 
                         fileDataArray.push({
                             name: file.name,
@@ -890,7 +892,7 @@
             loadAdminApplications();
         }
 
-        // 관리자 지원자 검토 목록에서 첨부된 지원서 파일을 다운로드할 수 있도록 링크 생성
+        // 지원서 파일 다운로드/새창 열기 버튼 개선
         async function loadAdminApplications() {
             const body = document.getElementById('admin-apps-body');
             let query = supabaseClient.from('applications').select('*').order('created_at', { ascending: false });
@@ -920,12 +922,13 @@
                     actionBtns = `<span class="text-xs text-gray-500 font-bold">처리완료 (보관함 이동됨)</span>`;
                 }
 
-                // 지원서 파일 다운로드 링크 파싱
                 let fileDisplay = '첨부파일 없음';
                 try {
                     const fObj = JSON.parse(app.file_name);
                     if (fObj && fObj.url) {
-                        fileDisplay = `<a href="${fObj.url}" download="${fObj.name}" target="_blank" class="bg-blue-600 text-white text-xs px-3 py-1 rounded font-bold hover:bg-blue-800 transition">📥 ${fObj.name} 다운로드</a>`;
+                        fileDisplay = `<a href="${fObj.url}" target="_blank" rel="noopener noreferrer" class="bg-blue-600 text-white text-xs px-3 py-1.5 rounded font-bold hover:bg-blue-800 transition inline-block">📥 ${fObj.name || '지원서'} 다운로드/보기</a>`;
+                    } else {
+                        fileDisplay = app.file_name;
                     }
                 } catch(e) {
                     fileDisplay = app.file_name || '첨부파일 없음';
@@ -993,7 +996,7 @@
             });
         }
 
-        // 공고 상세 페이지에서 모집요강 파일 다운로드 버튼 렌더링
+        // 공고 상세 페이지에서 모집요강 파일 안전하게 파싱하여 버튼 렌더링
         function openJobDetail(job) {
             currentJob = job;
             document.getElementById('detail-job-cat').innerText = job.category;
@@ -1015,15 +1018,24 @@
                             fileBadge.className = "inline-flex items-center space-x-2 bg-blue-50 border border-blue-300 px-3 py-1.5 text-sm font-bold text-blue-800 rounded shadow-sm";
                             fileBadge.innerHTML = `
                                 <span>📄 ${f.name}</span>
-                                <a href="${f.url}" download="${f.name}" target="_blank" class="bg-blue-600 text-white px-3 py-1 text-xs rounded hover:bg-blue-800 transition">📥 다운로드</a>
+                                <a href="${f.url}" target="_blank" rel="noopener noreferrer" class="bg-blue-600 text-white px-3 py-1 text-xs rounded hover:bg-blue-800 transition">📥 다운로드/보기</a>
                             `;
                             fileListContainer.appendChild(fileBadge);
                         });
                     } else { 
-                        fileWrap.classList.add('hidden'); 
+                        // JSON 배열이 아닐 경우 단일 문자열 처리
+                        fileListContainer.innerHTML = `
+                            <div class="inline-flex items-center space-x-2 bg-blue-50 border border-blue-300 px-3 py-1.5 text-sm font-bold text-blue-800 rounded shadow-sm">
+                                <span>📄 ${job.file_name}</span>
+                            </div>
+                        `;
                     }
                 } catch(e) {
-                    fileWrap.classList.add('hidden');
+                    fileListContainer.innerHTML = `
+                        <div class="inline-flex items-center space-x-2 bg-blue-50 border border-blue-300 px-3 py-1.5 text-sm font-bold text-blue-800 rounded shadow-sm">
+                            <span>📄 ${job.file_name}</span>
+                        </div>
+                    `;
                 }
             } else {
                 fileWrap.classList.add('hidden');
