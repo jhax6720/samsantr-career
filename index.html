@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>삼산여객 채용 홈페이지</title>
+    <title>삼산여객주 채용 홈페이지</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Supabase JS CDN -->
@@ -16,110 +16,32 @@
         tailwind.config = {
             theme: {
                 extend: {
-                    colors: {
-                        samsanBlue: '#25408f'
-                    },
-                    fontFamily: {
-                        sans: ['"Noto Sans KR"', 'sans-serif']
-                    }
+                    colors: { samsanBlue: '#25408f' },
+                    fontFamily: { sans: ['"Noto Sans KR"', 'sans-serif'] }
                 }
             }
         }
     </script>
     <style>
-        body {
-            font-family: 'Noto Sans KR', sans-serif;
-            background-color: #ffffff;
-            margin: 0;
-            padding: 0;
-        }
-
-        .hero-banner-container {
-            position: relative;
-            background: url('background.png') no-repeat center center;
-            background-size: cover;
-            min-height: 850px;
-            width: 100%;
-        }
-
-        .sky-sub-header {
-            background: url('sky.png') no-repeat center center;
-            background-size: cover;
-            height: 120px;
-            width: 100%;
-            border-bottom: 1px solid #e5e7eb;
-        }
-
-        .exact-job-card {
-            background-color: #ffffff;
-            border-radius: 0px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
-            height: 210px;
-            padding: 24px 22px;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-        }
-
-        .exact-job-card:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
-        }
-
-        .hamburger-btn {
-            background-color: #25408f;
-            width: 64px;
-            height: 64px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .std-input {
-            width: 100%;
-            height: 48px;
-            padding: 0 16px;
-            font-size: 16px;
-            border: 2px solid #2b4bb7;
-            background-color: #ffffff !important;
-            color: #000000 !important;
-            outline: none;
-            box-sizing: border-box;
-        }
-
-        .std-textarea {
-            width: 100%;
-            padding: 12px 16px;
-            font-size: 16px;
-            border: 2px solid #2b4bb7;
-            background-color: #ffffff !important;
-            color: #000000 !important;
-            outline: none;
-            box-sizing: border-box;
-        }
-
-        .view-section {
-            display: none;
-            opacity: 0;
-            transition: opacity 0.3s ease-in-out;
-        }
-
-        .view-section.active {
-            display: block;
-            opacity: 1;
-        }
+        body { font-family: 'Noto Sans KR', sans-serif; background-color: #ffffff; margin: 0; padding: 0; }
+        .hero-banner-container { position: relative; background: url('background.png') no-repeat center center; background-size: cover; min-height: 850px; width: 100%; }
+        .sky-sub-header { background: url('sky.png') no-repeat center center; background-size: cover; height: 120px; width: 100%; border-bottom: 1px solid #e5e7eb; }
+        .exact-job-card { background-color: #ffffff; border-radius: 0px; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08); transition: transform 0.2s ease, box-shadow 0.2s ease; height: 210px; padding: 24px 22px; display: flex; flex-direction: column; justify-content: space-between; }
+        .exact-job-card:hover { transform: translateY(-4px); box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15); }
+        .hamburger-btn { background-color: #25408f; width: 64px; height: 64px; display: flex; align-items: center; justify-content: center; }
+        .std-input { width: 100%; height: 48px; padding: 0 16px; font-size: 16px; border: 2px solid #2b4bb7; background-color: #ffffff !important; color: #000000 !important; outline: none; box-sizing: border-box; }
+        .std-textarea { width: 100%; padding: 12px 16px; font-size: 16px; border: 2px solid #2b4bb7; background-color: #ffffff !important; color: #000000 !important; outline: none; box-sizing: border-box; }
+        .view-section { display: none; opacity: 0; transition: opacity 0.3s ease-in-out; }
+        .view-section.active { display: block; opacity: 1; }
     </style>
 </head>
 <body class="flex flex-col min-h-screen">
 
-    <!-- 상단 헤더 -->
     <header class="bg-white border-b border-gray-200 h-20 sticky top-0 z-50">
         <div class="max-w-[1400px] mx-auto h-full flex items-center justify-between px-4 lg:px-8">
             <a href="#" onclick="switchTab('home')" class="flex items-center">
                 <img src="Logo.png" alt="삼산여객주 채용" class="h-10 sm:h-12 w-auto object-contain" onerror="this.onerror=null; this.src='https://via.placeholder.com/260x50?text=SAMSAN+LOGO';">
             </a>
-
             <div class="flex items-center space-x-8 sm:space-x-12">
                 <nav class="hidden md:flex items-center space-x-10 text-xl font-bold text-gray-800 tracking-tight">
                     <button onclick="switchTab('my')" class="hover:text-blue-700 transition">나의채용</button>
@@ -129,14 +51,11 @@
                     <button onclick="switchTab('notice')" class="hover:text-blue-700 transition">공지사항</button>
                     <button id="admin-nav-btn" onclick="switchTab('admin')" class="hidden text-red-600 hover:text-red-800 font-extrabold transition">[지원자 관리]</button>
                 </nav>
-
                 <button onclick="toggleMobileNav()" class="hamburger-btn text-white text-2xl hover:bg-blue-900 transition focus:outline-none">
                     <i class="fas fa-bars"></i>
                 </button>
             </div>
         </div>
-
-        <!-- 햄버거 메뉴 -->
         <div id="mobile-nav" class="hidden bg-white w-full border-b border-gray-300 shadow-xl py-4 px-6 absolute top-20 left-0 z-50">
             <div class="max-w-[1400px] mx-auto flex flex-col space-y-3 font-bold text-gray-800 text-lg">
                 <button onclick="switchTab('home'); toggleMobileNav();" class="text-left py-2 border-b">홈</button>
@@ -153,8 +72,7 @@
     <div id="sky-header-banner" class="sky-sub-header hidden"></div>
 
     <main class="flex-grow">
-
-        <!-- 메인 홈 화면 -->
+        <!-- 메인 홈 -->
         <div id="view-home" class="view-section active">
             <section class="hero-banner-container px-4 sm:px-8 lg:px-12 py-6">
                 <div class="max-w-[1360px] mx-auto relative">
@@ -167,8 +85,7 @@
                     </div>
                     <div class="flex justify-end mb-6">
                         <button onclick="switchTab('jobs')" class="bg-[#2a4ec2] hover:bg-blue-800 text-white font-bold px-6 py-2 rounded-none text-base shadow-md transition flex items-center space-x-2">
-                            <span>더보기</span>
-                            <span>&gt;</span>
+                            <span>더보기</span><span>&gt;</span>
                         </button>
                     </div>
                     <div id="home-jobs-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -178,12 +95,12 @@
             </section>
         </div>
 
-        <!-- 로그인 화면 -->
+        <!-- 로그인 -->
         <div id="view-login" class="view-section max-w-5xl mx-auto px-6 py-12">
             <h1 class="text-5xl font-black text-gray-900 mb-10 tracking-tight">로그인</h1>
             <form onsubmit="event.preventDefault(); handleLoginSubmit();" class="grid grid-cols-1 lg:grid-cols-12 gap-4 items-stretch mb-8">
                 <div class="lg:col-span-7 space-y-3">
-                    <input type="text" id="login-id" class="std-input" placeholder="아이디" required autocomplete="username">
+                    <input type="email" id="login-id" class="std-input" placeholder="이메일 (아이디 대신 이메일 사용)" required autocomplete="username">
                     <input type="password" id="login-pw" class="std-input" placeholder="비밀번호" required autocomplete="current-password">
                 </div>
                 <div class="lg:col-span-2">
@@ -201,12 +118,13 @@
             </form>
         </div>
 
-        <!-- 회원가입 1단계 -->
+        <!-- 회원가입 1단계 (전문 보기 버튼 연동) -->
         <div id="view-signup-1" class="view-section max-w-5xl mx-auto px-6 py-12">
             <h1 class="text-5xl font-black text-gray-900 mb-10 tracking-tight">회원가입</h1>
             <div class="flex items-center space-x-3 text-xl font-bold text-gray-900 mb-16">
                 <span>■ 당사의 개인정보처리방침에 동의하십니까?</span>
-                <input type="checkbox" id="agree-check" class="w-6 h-6 border-2 border-black rounded-none cursor-pointer">
+                <button type="button" onclick="switchTab('privacy')" class="text-blue-700 underline text-base font-bold hover:text-blue-900 ml-2">[전문 보기]</button>
+                <input type="checkbox" id="agree-check" class="w-6 h-6 border-2 border-black rounded-none cursor-pointer ml-auto">
             </div>
             <div class="flex justify-center space-x-4">
                 <button onclick="switchTab('login')" class="bg-[#9da3a8] hover:bg-gray-500 text-white text-lg font-bold px-10 py-3 rounded-none">&lt; Prev</button>
@@ -227,12 +145,9 @@
             <div class="mb-12">
                 <p class="text-xl font-bold text-gray-900 mb-3">■ 회원정보를 입력하여 주십시오.</p>
                 <div class="space-y-3">
-                    <div class="flex items-center space-x-3">
-                        <input type="text" id="reg-id" class="std-input" placeholder="아이디">
-                        <button type="button" onclick="checkIdDup()" class="bg-[#9da3a8] hover:bg-gray-500 text-white font-bold px-6 py-3 text-base whitespace-nowrap rounded-none">ID 중복확인</button>
-                    </div>
-                    <input type="password" id="reg-pw" class="std-input" placeholder="비밀번호">
-                    <input type="email" id="reg-email" class="std-input" placeholder="이메일">
+                    <input type="text" id="reg-id" class="std-input" placeholder="이름/닉네임">
+                    <input type="email" id="reg-email" class="std-input" placeholder="이메일 (로그인에 사용됩니다)">
+                    <input type="password" id="reg-pw" class="std-input" placeholder="비밀번호 (6자리 이상)">
                 </div>
             </div>
             <div class="flex justify-center space-x-4">
@@ -241,35 +156,125 @@
             </div>
         </div>
 
+        <!-- 개인정보처리방침 전문 뷰 (sky.png 헤더 템플릿 사용) -->
+        <div id="view-privacy" class="view-section max-w-5xl mx-auto px-6 py-12">
+            <div class="bg-white p-8 md:p-12 border border-gray-300 shadow-sm leading-relaxed text-gray-800">
+                <h1 class="text-3xl font-extrabold text-center text-gray-900 mb-8 border-b pb-4">
+                    삼산여객 주식회사 홈페이지 개인정보처리방침 <br>
+                    <span class="text-lg font-normal text-gray-600">(채용 홈페이지에 관한 내용)</span>
+                </h1>
+                
+                <p class="mb-6 font-medium">
+                    삼산여객 주식회사(이하 ‘회사’ )는 『개인정보 보호법』 제 30조에 따라 정보주체의 개인정보를 보호하고 이와 관련한 고충을 신속하고 원활하게 처리할 수 있도록 하기 위하여 다음과 같이 개인정보 처리방침을 수립, 공개합니다.
+                </p>
+
+                <div class="space-y-6">
+                    <section>
+                        <h2 class="text-xl font-bold text-gray-900 mb-2">제 1조 (개인정보의 처리 목적)</h2>
+                        <p class="mb-1">제 1항. 회사는 다음의 목적을 위하여 최소한의 개인정보를 처리한다.</p>
+                        <p class="mb-1">제 1항 -1. 처리하고 있는 개인정보는 다음의 목적 이외의 용도로는 이용되지 않으며, 이용 목적이 변경되는 경우에는 별도의 동의를 받는 등 필요한 조치를 이용한다.</p>
+                        <p class="font-bold mt-2 mb-1">제 1항 -2. 목적</p>
+                        <ul class="list-disc list-inside space-y-1 pl-2">
+                            <li>① 회원가입 등 - 회원 가입 의사 확인, 본인 인증, 회원자격 유지관리, 부정 이용 방지</li>
+                            <li>② 입사지원 및 채용 심사 - 입사지원서 접수, 자격 요건 검토, 합격 여부 결정 및 통보, 학력정보 확인 등</li>
+                            <li>③ 채용 문의의 처리 : Q&A 문의 접수 및 답변 작성</li>
+                        </ul>
+                    </section>
+
+                    <section>
+                        <h2 class="text-xl font-bold text-gray-900 mb-2">제 2조 (처리하는 개인정보의 항목)</h2>
+                        <p class="mb-1">제 1항. 회사는 서비스 제공을 위해 아래와 같은 개인정보 항목을 수집, 처리한다.</p>
+                        <p class="font-bold mt-2 mb-1">제 1항 -1. 목록</p>
+                        <ul class="list-disc list-inside space-y-1 pl-2">
+                            <li>① 회원가입 - ID, 비밀번호, E-mail주소, 로블록스 계정 정보 등</li>
+                            <li>② 입사지원서 - 인적사항, 지원정보, 근무이력서, 자기소개, 서약 등</li>
+                            <li>③ 서비스 이용 과정에서 수집되는 항목 - 쿠키, 서비스 이용 기록, 접속 로그 등</li>
+                        </ul>
+                    </section>
+
+                    <section>
+                        <h2 class="text-xl font-bold text-gray-900 mb-2">제 3조 (개인정보의 처리 및 보유 기간)</h2>
+                        <p class="mb-1">제 1항. 회사는 법령에 따른 개인정보 보유, 이용 기간 또는 정보주체로부터 개인정보 수집 시에 동의받은 개인정보 보유, 이용 기간 내에서 개인정보를 처리, 보유한다.</p>
+                        <p class="mb-1">제 2항. 각각의 개인정보 처리 및 보유 기간은 다음과 같다.</p>
+                        <ul class="list-disc list-inside space-y-1 pl-2">
+                            <li>① 회원가입 및 관리 정보 - 회원 탈퇴 시 까지</li>
+                            <li>② 입사지원서 및 채용 관련 기록 - 채용종료 후 6개월간 보유</li>
+                            <li>③ 채용 문의(Q&A) 기록 - 삭제하지 않음</li>
+                        </ul>
+                    </section>
+
+                    <section>
+                        <h2 class="text-xl font-bold text-gray-900 mb-2">제 4조 (개인정보의 파기절차 및 파기방법)</h2>
+                        <p class="mb-1">제 1항. 회사는 개인정보 보유기간의 경과, 처리목적 달성 등 개인정보가 불필요하게 되었을 때에는 해당 개인정보를 파기한다.</p>
+                        <p class="mb-1">제 2항. 파기 절차 및 방법은 다음과 같다.</p>
+                        <ul class="list-disc list-inside space-y-1 pl-2">
+                            <li>① 파기 절차 - 불필요해진 개인정보는 내부 방침 및 관련 법령에 따라 파기 대상 선정 후 파기한다.</li>
+                            <li>② 파기 방법 - 전자적 파일 형태로 저장된 개인정보는 기록을 재생할 수 없는 기술적 방법을 사용하여 삭제하며, DB(데이터 베이스) 내 해당 데이터 및 스토리지 첨부파일을 완전히 영구 삭제한다.</li>
+                        </ul>
+                    </section>
+
+                    <section>
+                        <h2 class="text-xl font-bold text-gray-900 mb-2">제 5조 (개인정보의 제3자 제공 및 위탁)</h2>
+                        <p class="mb-1">제 1항. 회사는 정보주체의 동의 없이 개인정보를 외부에 제공하지 않는다.</p>
+                        <p class="mb-1">제 2항. 회사는 원활한 서비스 제공 및 데이터 관리를 위하여 다음과 같이 개인정보 처리 업무를 외부 전문업체에 위탁하고 있다.</p>
+                        <p class="font-bold mt-2 mb-1">제 2항 -1. 항목은 다음과 같다.</p>
+                        <ul class="list-disc list-inside space-y-1 pl-2">
+                            <li>① 업체 - Supabase Inc. (DB 관리), Vercel Inc. (사이트 호스팅)</li>
+                            <li>② 업무 내용 - DB 및 파일 스토리지 호스팅, 웹 애플리케이션 배포 및 데이터 저장 관리</li>
+                        </ul>
+                    </section>
+
+                    <section>
+                        <h2 class="text-xl font-bold text-gray-900 mb-2">제 6조 (정보주체와 법정대리인의 권리, 의무 및 행사방법)</h2>
+                        <p class="mb-1">제 1항. 정보주체는 회사에 대해 언제든지 개인정보 열람, 정정, 삭제, 처리정지 요구 등의 권리를 행사할 수 있다.</p>
+                        <p class="mb-1">제 2항. 정보주체는 홈페이지 내 ‘마이페이지’ 를 통해 본인의 회원정보를 직접 조회 및 수정할 수 있으며, ‘계정 탈퇴’ 기능을 통해 가입 해지를 요청할 수 있다.</p>
+                    </section>
+
+                    <section>
+                        <h2 class="text-xl font-bold text-gray-900 mb-2">제 7조 (개인정보의 안전성 확보 조치)</h2>
+                        <p class="mb-1">제 1항. 회사는 개인정보의 안전성 확보를 위해 다음과 같은 조치를 취한다.</p>
+                        <p class="font-bold mt-2 mb-1">제 1항 -1. 다음과 같다.</p>
+                        <ul class="list-disc list-inside space-y-1 pl-2">
+                            <li>① 비밀번호 암호화 - 이용자의 비밀번호는 암호화되어 저장 및 관리된다.</li>
+                            <li>② 해킹 등에 대비한 기술적 대책 - DB 보안 정책 설정 및 SSL/TLS 기반 암호화 통신을 통한 데이터 전송 보호</li>
+                        </ul>
+                    </section>
+
+                    <section>
+                        <h2 class="text-xl font-bold text-gray-900 mb-2">제 8조 (개인정보 보호책임자 및 문의처)</h2>
+                        <p class="mb-1">제 1항. 회사는 개인정보 처리에 관한 업무를 총괄해서 책임지고, 개인정보 처리와 관련한 정보주체의 불만처리 및 피해구제 등을 위하여 아래와 같이 개인정보 보호책임자를 지정하고 있다.</p>
+                        <p class="font-bold mt-2 mb-1">제 1항 -1. 다음과 같다.</p>
+                        <ul class="list-disc list-inside space-y-1 pl-2">
+                            <li>① 회사명 - 삼산여객 주식회사</li>
+                            <li>② 채용 및 개인정보 문의 전화 : ffhhgogbv(채용), this0833(채용), quartey123456(기술)</li>
+                        </ul>
+                    </section>
+
+                    <section>
+                        <h2 class="text-xl font-bold text-gray-900 mb-2">제 9조 (개인정보 처리방침의 변경)</h2>
+                        <p class="mb-1">제 1항. 이 개인정보처리방침은 홈페이지가 게시된 시점부터 적용된다. 내용의 추가, 삭제 및 수정이 있을 시에는 홈페이지 공지사항을 통해 고지할 것이다.</p>
+                    </section>
+                </div>
+
+                <div class="mt-12 pt-6 border-t border-gray-300 text-sm text-gray-600 space-y-1">
+                    <p>최종 수정자 : quartey123456</p>
+                    <p class="font-bold text-gray-800">삼산여객 주식회사</p>
+                    <p>이 『개인정보처리방침』 은 2026년 10월 31일에 개정되었다.</p>
+                </div>
+            </div>
+        </div>
+
         <!-- 마이페이지 -->
         <div id="view-mypage" class="view-section max-w-3xl mx-auto px-6 py-12">
-            <h1 class="text-4xl font-black text-gray-900 mb-8 border-b pb-4">마이페이지 / 회원정보 수정</h1>
+            <h1 class="text-4xl font-black text-gray-900 mb-8 border-b pb-4">마이페이지 / 회원정보</h1>
             <div class="bg-white border border-gray-300 p-8 shadow-sm space-y-6">
                 <div>
-                    <label class="block text-sm font-bold text-gray-700 mb-1">아이디 (수정 불가)</label>
+                    <label class="block text-sm font-bold text-gray-700 mb-1">이메일 계정</label>
+                    <input type="text" id="my-email" class="std-input bg-gray-100 cursor-not-allowed" readonly>
+                </div>
+                <div>
+                    <label class="block text-sm font-bold text-gray-700 mb-1">이름/닉네임</label>
                     <input type="text" id="my-username" class="std-input bg-gray-100 cursor-not-allowed" readonly>
-                </div>
-                <div>
-                    <label class="block text-sm font-bold text-gray-700 mb-1">비밀번호 변경</label>
-                    <input type="password" id="my-password" class="std-input" placeholder="새 비밀번호 입력">
-                </div>
-                <div>
-                    <label class="block text-sm font-bold text-gray-700 mb-1">이메일</label>
-                    <input type="email" id="my-email" class="std-input" placeholder="이메일 주소">
-                </div>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-sm font-bold text-gray-700 mb-1">로블록스 ID</label>
-                        <input type="text" id="my-roblox-id" class="std-input" placeholder="로블록스 ID">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-bold text-gray-700 mb-1">로블록스 프로필 링크</label>
-                        <input type="text" id="my-roblox-link" class="std-input" placeholder="프로필 링크">
-                    </div>
-                </div>
-                <div class="flex justify-between items-center pt-6 border-t">
-                    <button type="button" onclick="handleDeleteAccount()" class="bg-red-600 hover:bg-red-700 text-white font-bold px-6 py-3">계정 탈퇴</button>
-                    <button type="button" onclick="handleUpdateUserInfo()" class="bg-[#25408f] hover:bg-blue-900 text-white font-bold px-8 py-3">정보 수정 저장</button>
                 </div>
             </div>
         </div>
@@ -342,21 +347,18 @@
             </div>
         </div>
 
-        <!-- 채용공고 상세 페이지 -->
+        <!-- 공고 상세 -->
         <div id="view-job-detail" class="view-section max-w-5xl mx-auto px-6 py-12">
             <button onclick="switchTab('jobs')" class="mb-6 text-gray-600 font-bold hover:text-black">&lt; 목록으로 돌아가기</button>
             <div class="bg-white border p-8 shadow-sm">
                 <span id="detail-job-cat" class="text-orange-600 font-extrabold text-lg block mb-2"></span>
                 <h1 id="detail-job-title" class="text-3xl font-bold text-gray-900 mb-4"></h1>
                 <p id="detail-job-count" class="text-gray-500 mb-4 font-semibold"></p>
-                
                 <div id="detail-job-file-wrap" class="mb-6 pb-4 border-b hidden">
-                    <span class="block font-bold text-sm text-gray-700 mb-2">첨부파일</span>
+                    <span class="block font-bold text-sm text-gray-700 mb-2">📌 첨부 모집요강 파일 (클릭하여 다운로드):</span>
                     <div id="detail-job-file-list" class="flex flex-wrap gap-2"></div>
                 </div>
-
                 <div id="detail-job-content" class="text-gray-800 text-lg whitespace-pre-wrap leading-relaxed min-h-[200px] mb-8"></div>
-                
                 <div class="border-t pt-6 flex justify-between items-center">
                     <button id="admin-delete-job-btn" onclick="deleteCurrentJob()" class="hidden bg-red-600 text-white px-4 py-2 font-bold hover:bg-red-700">공고 삭제 (관리자)</button>
                     <button onclick="startApplyProcess()" class="bg-[#25408f] text-white px-8 py-3 font-bold text-lg hover:bg-blue-900 ml-auto">입사지원하기</button>
@@ -364,7 +366,7 @@
             </div>
         </div>
 
-        <!-- 공지사항 게시판 -->
+        <!-- 공지사항 -->
         <div id="view-notice" class="view-section max-w-6xl mx-auto px-6 py-12">
             <div class="flex justify-between items-center mb-6 border-b pb-4">
                 <h2 class="text-4xl font-extrabold text-gray-900">공지사항 게시판</h2>
@@ -384,7 +386,7 @@
             </div>
         </div>
 
-        <!-- 공지사항 상세 -->
+        <!-- 공지 상세 -->
         <div id="view-notice-detail" class="view-section max-w-5xl mx-auto px-6 py-12">
             <button onclick="switchTab('notice')" class="mb-6 text-gray-600 font-bold hover:text-black">&lt; 목록으로 돌아가기</button>
             <div class="bg-white border p-8 shadow-sm">
@@ -397,7 +399,7 @@
             </div>
         </div>
 
-        <!-- 나의채용 -->
+        <!-- 나의 채용 -->
         <div id="view-my" class="view-section max-w-4xl mx-auto px-6 py-12">
             <div class="bg-white p-8 border border-gray-300 shadow-md">
                 <h2 class="text-3xl font-bold text-gray-900 mb-6 text-center">나의 채용 / 지원 내역 확인</h2>
@@ -405,7 +407,7 @@
             </div>
         </div>
 
-        <!-- 채용문의 Q&A -->
+        <!-- 채용문의 -->
         <div id="view-inquiry" class="view-section max-w-4xl mx-auto px-6 py-12">
             <div class="flex justify-between items-center mb-8">
                 <h2 class="text-4xl font-extrabold text-gray-900">채용문의 Q&A</h2>
@@ -417,17 +419,15 @@
         <!-- 관리자 지원자 관리 -->
         <div id="view-admin" class="view-section max-w-7xl mx-auto px-6 py-12">
             <div class="bg-red-50 border border-red-300 p-6 mb-8 rounded">
-                <h2 class="text-3xl font-black text-red-700">관리자 전용 지원자 관리 시스템 (admin)</h2>
+                <h2 class="text-3xl font-black text-red-700">⚙️ 관리자 전용 지원자 관리 시스템 (admin)</h2>
                 <p class="text-gray-700 mt-1">접수된 지원 내역을 관리하고, 합격/불합격 처리된 내역은 보관함으로 이동합니다.</p>
             </div>
-
             <div class="flex space-x-4 mb-6 border-b pb-3">
                 <button onclick="switchAdminSubTab('active')" id="admin-tab-active-btn" class="font-bold text-lg text-blue-900 border-b-2 border-blue-900 pb-1">진행중인 지원 내역</button>
                 <button onclick="switchAdminSubTab('archived')" id="admin-tab-archived-btn" class="font-bold text-lg text-gray-500 pb-1">합격/불합격 보관함</button>
             </div>
-
             <div class="bg-white p-6 border border-gray-300 shadow-sm">
-                <h3 id="admin-table-title" class="text-2xl font-bold mb-4 text-gray-900">심사 진행 중</h3>
+                <h3 id="admin-table-title" class="text-2xl font-bold mb-4 text-gray-900">📋 심사 진행 중인 지원자 목록</h3>
                 <div class="overflow-x-auto">
                     <table class="w-full text-left border">
                         <thead class="bg-gray-100 border-b">
@@ -444,41 +444,42 @@
                 </div>
             </div>
         </div>
-
     </main>
 
-    <!-- 푸터 -->
+    <!-- 푸터 (개인정보처리방침 버튼 추가) -->
     <footer class="bg-gray-900 text-gray-400 py-8 px-4 text-center text-sm border-t border-gray-800">
-        <p class="mb-2"><strong>삼산여객 주식회사</strong> | 채용 문의: ffhhgogbv, this0833 | 사이트 문의: quartey123456</p>
+        <div class="mb-3">
+            <button onclick="switchTab('privacy')" class="text-gray-300 hover:text-white underline font-bold px-2 py-1">개인정보처리방침</button>
+        </div>
+        <p class="mb-2"><strong>삼산여객주 주식회사</strong> | 채용 및 개인정보 문의: ffhhgogbv(채용), this0833(채용), quartey123456(기술)</p>
         <p class="text-xs text-gray-500">&copy; 2026 SAMSAN PASSENGER CORP. ALL RIGHTS RESERVED.</p>
     </footer>
 
-    <!-- 채용공고 작성 모달 -->
+    <!-- 모달 레이어들 -->
     <div id="jobWriteModal" class="fixed inset-0 bg-black/50 hidden items-center justify-center p-4 z-50">
         <div class="bg-white p-8 max-w-xl w-full relative">
             <button onclick="closeModal('jobWriteModal')" class="absolute top-4 right-4 text-gray-400 text-xl"><i class="fas fa-times"></i></button>
             <h3 class="text-2xl font-bold mb-4 text-gray-900">📢 새 채용공고 등록</h3>
             <div class="space-y-3">
-                <input type="text" id="admin-job-cat" class="std-input" placeholder="구분 (예: 신입사원, 고위직)">
+                <input type="text" id="admin-job-cat" class="std-input" placeholder="구분 (예: 신입사원)">
                 <input type="text" id="admin-job-title" class="std-input" placeholder="채용 공고 제목">
-                <input type="text" id="admin-job-count" class="std-input" placeholder="선발예정인원 (예: 선발예정인원 : 5명)">
+                <input type="text" id="admin-job-count" class="std-input" placeholder="선발예정인원">
                 <div>
-                    <label class="block text-xs font-bold text-gray-600 mb-1">모집요강 파일 첨부 (여러 개 업로드 가능)</label>
+                    <label class="block text-xs font-bold text-gray-600 mb-1">모집요강 파일 첨부</label>
                     <input type="file" id="admin-job-file" multiple class="std-input py-2 text-sm">
                 </div>
-                <textarea id="admin-job-content" rows="5" class="std-textarea" placeholder="채용 공고 본문 내용"></textarea>
+                <textarea id="admin-job-content" rows="5" class="std-textarea" placeholder="본문 내용"></textarea>
                 <button onclick="adminAddJob()" class="w-full bg-blue-800 text-white font-bold py-3 hover:bg-blue-900">등록하기</button>
             </div>
         </div>
     </div>
 
-    <!-- 공지사항 작성 모달 -->
     <div id="noticeWriteModal" class="fixed inset-0 bg-black/50 hidden items-center justify-center p-4 z-50">
         <div class="bg-white p-8 max-w-xl w-full relative">
             <button onclick="closeModal('noticeWriteModal')" class="absolute top-4 right-4 text-gray-400 text-xl"><i class="fas fa-times"></i></button>
             <h3 class="text-2xl font-bold mb-4 text-gray-900">📌 새 공지사항 작성</h3>
             <div class="space-y-3">
-                <input type="text" id="admin-notice-title" class="std-input" placeholder="공지사항 제목">
+                <input type="text" id="admin-notice-title" class="std-input" placeholder="공지 제목">
                 <textarea id="admin-notice-content" rows="6" class="std-textarea" placeholder="공지 내용"></textarea>
                 <button onclick="adminAddNotice()" class="w-full bg-green-700 text-white font-bold py-3 hover:bg-green-800">등록하기</button>
             </div>
@@ -491,7 +492,7 @@
             <h3 class="text-2xl font-bold mb-4 text-gray-900">채용문의 작성</h3>
             <div class="space-y-3">
                 <input type="text" id="inq-title" placeholder="문의 제목" class="std-input">
-                <textarea id="inq-content" rows="4" placeholder="문의 내용을 입력하세요" class="std-textarea"></textarea>
+                <textarea id="inq-content" rows="4" placeholder="문의 내용" class="std-textarea"></textarea>
                 <button onclick="submitInquiry()" class="w-full bg-[#25408f] text-white font-bold py-3 hover:bg-blue-900">문의 등록</button>
             </div>
         </div>
@@ -510,27 +511,19 @@
         let adminCurrentSubTab = 'active';
 
         async function initData() {
-            checkSession();
+            await checkSession();
             await loadJobs();
             await loadNotices();
             await loadInquiries();
         }
 
-        function openModal(id) { 
-            const m = document.getElementById(id);
-            if(m) { m.classList.remove('hidden'); m.classList.add('flex'); }
-        }
-
-        function closeModal(id) { 
-            const m = document.getElementById(id);
-            if(m) { m.classList.add('hidden'); m.classList.remove('flex'); }
-        }
-
+        function openModal(id) { const m = document.getElementById(id); if(m) { m.classList.remove('hidden'); m.classList.add('flex'); } }
+        function closeModal(id) { const m = document.getElementById(id); if(m) { m.classList.add('hidden'); m.classList.remove('flex'); } }
         function openJobWriteModal() { openModal('jobWriteModal'); }
         function openNoticeWriteModal() { openModal('noticeWriteModal'); }
 
         async function checkSession() {
-            const savedUser = localStorage.getItem('samsan_user');
+            const { data: { session } } = await supabaseClient.auth.getSession();
             const container = document.getElementById('auth-status-container');
             const adminNav = document.getElementById('admin-nav-btn');
             const mobileAdminNav = document.getElementById('mobile-admin-btn');
@@ -539,8 +532,14 @@
             const btnWriteJob = document.getElementById('btn-write-job');
             const btnWriteNotice = document.getElementById('btn-write-notice');
 
-            if (savedUser) {
-                currentUser = JSON.parse(savedUser);
+            if (session && session.user) {
+                currentUser = {
+                    id: session.user.id,
+                    email: session.user.email,
+                    username: session.user.user_metadata?.username || session.user.email.split('@')[0],
+                    role: session.user.user_metadata?.role || (session.user.email === 'admin@samsan.com' ? 'admin' : 'user')
+                };
+
                 navMypage.classList.remove('hidden');
                 mobileMypage.classList.remove('hidden');
 
@@ -599,83 +598,59 @@
         }
 
         async function handleLoginSubmit() {
-            const inputId = document.getElementById('login-id').value.trim();
-            const inputPw = document.getElementById('login-pw').value.trim();
+            const email = document.getElementById('login-id').value.trim();
+            const password = document.getElementById('login-pw').value.trim();
 
-            if (!inputId || !inputPw) { alert('아이디와 비밀번호를 입력해주세요.'); return; }
+            if (!email || !password) { alert('이메일과 비밀번호를 입력해주세요.'); return; }
 
-            if (inputId === 'admin' && inputPw === 'HycpHpwEQN') {
-                currentUser = { username: 'admin', role: 'admin' };
-                localStorage.setItem('samsan_user', JSON.stringify(currentUser));
-                alert('관리자로 로그인되었습니다.');
-                checkSession();
-                switchTab('admin');
-                loadAdminApplications();
+            const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
+
+            if (error) {
+                alert(`로그인 실패: ${error.message}`);
                 return;
             }
 
-            const { data: user, error } = await supabaseClient
-                .from('users')
-                .select('*')
-                .eq('username', inputId)
-                .eq('password', inputPw)
-                .maybeSingle();
-
-            if (error || !user) { alert('아이디 또는 비밀번호가 일치하지 않습니다.'); return; }
-
-            currentUser = { username: user.username, role: user.role };
-            localStorage.setItem('samsan_user', JSON.stringify(currentUser));
-            alert(`${user.username}님 로그인되었습니다.`);
-            
-            checkSession();
-            switchTab('my');
+            alert('로그인되었습니다.');
+            await checkSession();
+            if (currentUser && currentUser.role === 'admin') switchTab('admin');
+            else switchTab('my');
         }
 
-        function handleLogout() {
-            localStorage.removeItem('samsan_user');
-            currentUser = null;
+        async function handleLogout() {
+            await supabaseClient.auth.signOut();
             alert('로그아웃 되었습니다.');
-            checkSession();
+            await checkSession();
             switchTab('home');
         }
 
         function goToSignupStep2() {
-            const registeredAcc = localStorage.getItem('samsan_pc_registered_account');
-            if (registeredAcc && registeredAcc !== 'admin') {
-                alert(`이미 이 컴퓨터에서 생성된 계정(${registeredAcc})이 존재합니다.\n한 컴퓨터당 1개의 계정만 만들 수 있습니다.`);
-                return;
-            }
             if (!document.getElementById('agree-check').checked) { alert('개인정보처리방침에 동의하셔야 합니다.'); return; }
             switchTab('signup-2');
         }
 
-        async function checkIdDup() {
-            const regId = document.getElementById('reg-id').value.trim();
-            if (!regId) { alert('아이디를 입력하세요.'); return; }
-            if (regId === 'admin') { alert('사용할 수 없는 아이디입니다.'); return; }
-
-            const { data } = await supabaseClient.from('users').select('username').eq('username', regId);
-            if (data && data.length > 0) alert('이미 존재하는 아이디입니다.');
-            else alert('사용 가능한 아이디입니다.');
-        }
-
         async function handleCompleteSignup() {
+            const username = document.getElementById('reg-id').value.trim();
+            const email = document.getElementById('reg-email').value.trim();
+            const password = document.getElementById('reg-pw').value.trim();
             const robloxId = document.getElementById('roblox-id').value.trim();
             const robloxLink = document.getElementById('roblox-link').value.trim();
-            const username = document.getElementById('reg-id').value.trim();
-            const password = document.getElementById('reg-pw').value.trim();
-            const email = document.getElementById('reg-email').value.trim();
 
-            if (!username || !password) { alert('아이디와 비밀번호는 필수 입력 항목입니다.'); return; }
+            if (!username || !email || !password) { alert('모든 필수 항목을 입력하세요.'); return; }
 
-            const { error } = await supabaseClient.from('users').insert([
-                { username, password, roblox_id: robloxId, roblox_link: robloxLink, email, role: 'user' }
-            ]);
+            const role = (email === 'admin@samsan.com') ? 'admin' : 'user';
 
-            if (error) alert('회원가입 실패: 이미 가입된 아이디입니다.');
-            else {
-                localStorage.setItem('samsan_pc_registered_account', username);
-                alert('회원가입이 정상 완료되었습니다! 로그인해 주십시오.');
+            const { data, error } = await supabaseClient.auth.signUp({
+                email,
+                password,
+                options: {
+                    data: { username, roblox_id: robloxId, roblox_link: robloxLink, role }
+                }
+            });
+
+            if (error) {
+                alert(`회원가입 실패: ${error.message}`);
+            } else {
+                alert('회원가입이 완료되었습니다! 바로 로그인해 주세요.');
                 switchTab('login');
             }
         }
@@ -690,7 +665,7 @@
                 .eq('status', '서류 심사 중');
 
             if (existingApps && existingApps.length > 0) {
-                alert(`이미 진행 중인 입사지원(${existingApps[0].job_title})이 있습니다.\n한 계정당 동시에 1개의 채용공고에만 지원할 수 있습니다.`);
+                alert(`이미 진행 중인 입사지원(${existingApps[0].job_title})이 있습니다.`);
                 return;
             }
 
@@ -738,7 +713,6 @@
             }
         }
 
-        // 입사지원서 파일 업로드 (Bucket 없을 시 상세 안내)
         async function finalSubmitApplication() {
             let fileInfo = { name: selectedApplyFile.name, url: '#' };
             const fileExt = selectedApplyFile.name.split('.').pop();
@@ -750,15 +724,11 @@
                 .upload(fileNameOnly, selectedApplyFile);
 
             if (uploadError) {
-                alert(`파일 업로드 실패: ${uploadError.message}\n\n[해결 방법]\nSupabase 대시보드 -> Storage 메뉴에서 [recruitment-files] 버킷을 Public으로 생성했는지 확인해주세요!`);
+                alert(`파일 업로드 실패: ${uploadError.message}\nSupabase Storage에 [recruitment-files] 버킷이 Public 상태인지 확인하세요.`);
                 return;
             }
 
-            const { data: urlData } = supabaseClient
-                .storage
-                .from('recruitment-files')
-                .getPublicUrl(fileNameOnly);
-            
+            const { data: urlData } = supabaseClient.storage.from('recruitment-files').getPublicUrl(fileNameOnly);
             fileInfo.url = urlData.publicUrl;
 
             const { error } = await supabaseClient.from('applications').insert([
@@ -801,29 +771,15 @@
                         .from('recruitment-files')
                         .upload(fileNameOnly, file);
 
-                    if (uploadError) {
-                        alert(`모집요강 파일 업로드 실패: ${uploadError.message}\nSupabase Storage에 [recruitment-files] 버킷이 있는지 확인하세요.`);
-                        return;
+                    if (!uploadError) {
+                        const { data: urlData } = supabaseClient.storage.from('recruitment-files').getPublicUrl(fileNameOnly);
+                        fileDataArray.push({ name: file.name, url: urlData.publicUrl });
                     }
-
-                    const { data: urlData } = supabaseClient
-                        .storage
-                        .from('recruitment-files')
-                        .getPublicUrl(fileNameOnly);
-
-                    fileDataArray.push({
-                        name: file.name,
-                        url: urlData.publicUrl
-                    });
                 }
             }
 
             const { error } = await supabaseClient.from('jobs').insert([{ 
-                category, 
-                title, 
-                headcount, 
-                content, 
-                file_name: JSON.stringify(fileDataArray)
+                category, title, headcount, content, file_name: JSON.stringify(fileDataArray)
             }]);
 
             if (error) alert(`채용공고 등록 실패: ${error.message}`);
@@ -896,16 +852,12 @@
             loadAdminApplications();
         }
 
-        // 관리자 지원자 관리 목록 (다운로드 버튼 명확히 표시)
         async function loadAdminApplications() {
             const body = document.getElementById('admin-apps-body');
             let query = supabaseClient.from('applications').select('*').order('created_at', { ascending: false });
 
-            if (adminCurrentSubTab === 'active') {
-                query = query.eq('status', '서류 심사 중');
-            } else {
-                query = query.neq('status', '서류 심사 중');
-            }
+            if (adminCurrentSubTab === 'active') query = query.eq('status', '서류 심사 중');
+            else query = query.neq('status', '서류 심사 중');
 
             const { data, error } = await query;
 
@@ -931,12 +883,8 @@
                     const fObj = JSON.parse(app.file_name);
                     if (fObj && fObj.url) {
                         fileDisplay = `<a href="${fObj.url}" target="_blank" rel="noopener noreferrer" class="bg-blue-600 text-white text-xs px-3 py-1.5 rounded font-bold hover:bg-blue-800 transition inline-block"><i class="fas fa-download mr-1"></i> ${fObj.name || '지원서'} 다운로드</a>`;
-                    } else {
-                        fileDisplay = app.file_name;
                     }
-                } catch(e) {
-                    fileDisplay = app.file_name || '첨부파일 없음';
-                }
+                } catch(e) { fileDisplay = app.file_name || '첨부파일 없음'; }
 
                 body.innerHTML += `
                     <tr class="border-b">
@@ -1000,7 +948,6 @@
             });
         }
 
-        // 채용공고 상세 페이지 파일 이름 및 다운로드 버튼 정상 렌더링
         function openJobDetail(job) {
             currentJob = job;
             document.getElementById('detail-job-cat').innerText = job.category;
@@ -1026,15 +973,9 @@
                             `;
                             fileListContainer.appendChild(fileBadge);
                         });
-                    } else { 
-                        fileWrap.classList.add('hidden'); 
-                    }
-                } catch(e) {
-                    fileWrap.classList.add('hidden');
-                }
-            } else {
-                fileWrap.classList.add('hidden');
-            }
+                    } else { fileWrap.classList.add('hidden'); }
+                } catch(e) { fileWrap.classList.add('hidden'); }
+            } else { fileWrap.classList.add('hidden'); }
 
             const delBtn = document.getElementById('admin-delete-job-btn');
             if (currentUser && currentUser.role === 'admin') delBtn.classList.remove('hidden');
@@ -1078,12 +1019,10 @@
         async function loadInquiries() {
             const { data: list } = await supabaseClient.from('inquiries').select('*').order('created_at', { ascending: false });
             const container = document.getElementById('inquiry-list');
-
             if (!list || list.length === 0) {
                 container.innerHTML = `<div class="bg-white p-6 border text-gray-500 text-center">등록된 문의사항이 없습니다.</div>`;
                 return;
             }
-
             container.innerHTML = '';
             list.forEach((item) => {
                 container.innerHTML += `
@@ -1111,6 +1050,10 @@
                 container.innerHTML = `<div class="text-center py-8"><p class="text-xl font-bold text-gray-800 mb-4">로그인이 필요한 서비스입니다.</p><button onclick="switchTab('login')" class="bg-[#25408f] text-white px-8 py-3 font-bold">로그인하러 가기</button></div>`;
                 return;
             }
+
+            document.getElementById('my-email').value = currentUser.email;
+            document.getElementById('my-username').value = currentUser.username;
+
             const { data } = await supabaseClient.from('applications').select('*').eq('applicant_username', currentUser.username);
             if (!data || data.length === 0) {
                 container.innerHTML = `<div class="bg-gray-50 border p-6 text-center rounded"><p class="font-bold text-gray-800 text-lg mb-2">${currentUser.username} 님의 접수된 입사지원 내역이 없습니다.</p><button onclick="switchTab('jobs')" class="bg-[#25408f] text-white px-6 py-2 font-bold text-sm mt-2">채용공고 확인하기</button></div>`;
@@ -1119,14 +1062,11 @@
             container.innerHTML = '';
             data.forEach((app) => {
                 const statusColor = app.status === '서류 합격' ? 'bg-blue-600' : app.status === '불합격' ? 'bg-red-600' : 'bg-gray-600';
-                
                 let fileTxt = '첨부파일 없음';
                 try {
                     const parsed = JSON.parse(app.file_name);
                     if (parsed && parsed.name) fileTxt = parsed.name;
-                } catch(e) {
-                    fileTxt = app.file_name || '첨부파일 없음';
-                }
+                } catch(e) { fileTxt = app.file_name || '첨부파일 없음'; }
 
                 container.innerHTML += `
                     <div class="bg-blue-50 border border-blue-200 p-6 text-left rounded mb-4 shadow-sm">
@@ -1150,9 +1090,7 @@
             else skyBanner.classList.remove('hidden');
 
             const target = document.getElementById(`view-${tabId}`);
-            if (target) {
-                setTimeout(() => target.classList.add('active'), 50);
-            }
+            if (target) setTimeout(() => target.classList.add('active'), 50);
 
             if (tabId === 'my') renderMyRecruitment();
             if (tabId === 'admin') loadAdminApplications();
