@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>삼산여객주 채용 홈페이지</title>
+    <title>삼산여객 채용 홈페이지</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Supabase JS CDN -->
@@ -40,7 +40,7 @@
     <header class="bg-white border-b border-gray-200 h-20 sticky top-0 z-50">
         <div class="max-w-[1400px] mx-auto h-full flex items-center justify-between px-4 lg:px-8">
             <a href="#" onclick="switchTab('home')" class="flex items-center">
-                <img src="Logo.png" alt="삼산여객주 채용" class="h-10 sm:h-12 w-auto object-contain" onerror="this.onerror=null; this.src='https://via.placeholder.com/260x50?text=SAMSAN+LOGO';">
+                <img src="Logo.png" alt="삼산여객 채용" class="h-10 sm:h-12 w-auto object-contain" onerror="this.onerror=null; this.src='https://via.placeholder.com/260x50?text=SAMSAN+LOGO';">
             </a>
             <div class="flex items-center space-x-8 sm:space-x-12">
                 <nav class="hidden md:flex items-center space-x-10 text-xl font-bold text-gray-800 tracking-tight">
@@ -89,13 +89,13 @@
                         </button>
                     </div>
                     <div id="home-jobs-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                        <div class="col-span-4 text-center text-white text-lg py-12">채용 공고를 불러오는 중입니다...</div>
+                        <div class="col-span-4 text-center text-white text-lg py-12">채용 공고를 불러오는 중입니다...  이 상황이 10초 이상 지속될 경우 홈페이지 관리자에게 문의하십시오.</div>
                     </div>
                 </div>
             </section>
         </div>
 
-        <!-- 로그인 (일반 ID/PW 입력) -->
+        <!-- 로그인 -->
         <div id="view-login" class="view-section max-w-5xl mx-auto px-6 py-12">
             <h1 class="text-5xl font-black text-gray-900 mb-10 tracking-tight">로그인</h1>
             <form onsubmit="event.preventDefault(); handleLoginSubmit();" class="grid grid-cols-1 lg:grid-cols-12 gap-4 items-stretch mb-8">
@@ -111,7 +111,7 @@
                 </div>
                 <div class="lg:col-span-3">
                     <button type="button" onclick="switchTab('signup-1')" class="w-full h-full bg-[#9da3a8] hover:bg-gray-500 text-white font-bold py-4 rounded-none transition flex flex-col items-center justify-center min-h-[105px]">
-                        <span class="text-base font-normal mb-1">계정이 없다.</span>
+                        <span class="text-base font-normal mb-1">계정이 없습니다.</span>
                         <span class="text-2xl font-black">회원가입</span>
                     </button>
                 </div>
@@ -258,7 +258,7 @@
                 <div class="mt-12 pt-6 border-t border-gray-300 text-sm text-gray-600 space-y-1">
                     <p>최종 수정자 : quartey123456</p>
                     <p class="font-bold text-gray-800">삼산여객 주식회사</p>
-                    <p>이 『개인정보처리방침』 은 2026년 10월 31일에 개정되었다.</p>
+                    <p>이 『개인정보처리방침』 은 2026년 10월 31일에 개정되었습니다.</p>
                 </div>
             </div>
         </div>
@@ -354,7 +354,7 @@
                 <h1 id="detail-job-title" class="text-3xl font-bold text-gray-900 mb-4"></h1>
                 <p id="detail-job-count" class="text-gray-500 mb-4 font-semibold"></p>
                 <div id="detail-job-file-wrap" class="mb-6 pb-4 border-b hidden">
-                    <span class="block font-bold text-sm text-gray-700 mb-2">📌 첨부 모집요강 파일 (클릭하여 다운로드):</span>
+                    <span class="block font-bold text-sm text-gray-700 mb-2">첨부파일</span>
                     <div id="detail-job-file-list" class="flex flex-wrap gap-2"></div>
                 </div>
                 <div id="detail-job-content" class="text-gray-800 text-lg whitespace-pre-wrap leading-relaxed min-h-[200px] mb-8"></div>
@@ -406,27 +406,68 @@
             </div>
         </div>
 
-        <!-- 채용문의 -->
-        <div id="view-inquiry" class="view-section max-w-4xl mx-auto px-6 py-12">
-            <div class="flex justify-between items-center mb-8">
-                <h2 class="text-4xl font-extrabold text-gray-900">채용문의 Q&A</h2>
+        <!-- 채용문의 게시판 -->
+        <div id="view-inquiry" class="view-section max-w-5xl mx-auto px-6 py-12">
+            <div class="flex justify-between items-center mb-8 border-b pb-4">
+                <h2 class="text-4xl font-extrabold text-gray-900">채용문의 Q&A 게시판</h2>
                 <button onclick="openModal('inquiryModal')" class="bg-[#25408f] text-white px-6 py-3 font-bold shadow hover:bg-blue-900 transition">문의 등록하기</button>
             </div>
-            <div id="inquiry-list" class="space-y-4"></div>
+            <div class="bg-white border border-gray-300 shadow-sm">
+                <table class="w-full text-left">
+                    <thead class="bg-gray-100 border-b">
+                        <tr>
+                            <th class="p-4 text-center w-20">번호</th>
+                            <th class="p-4">문의 제목</th>
+                            <th class="p-4 text-center w-32">작성자</th>
+                            <th class="p-4 text-center w-32">답변 상태</th>
+                            <th class="p-4 text-center w-32">작성일</th>
+                        </tr>
+                    </thead>
+                    <tbody id="inquiry-list-body"></tbody>
+                </table>
+            </div>
         </div>
 
-        <!-- 관리자 지원자 관리 -->
+        <!-- 문의 상세 및 답변 조회 뷰 -->
+        <div id="view-inquiry-detail" class="view-section max-w-5xl mx-auto px-6 py-12">
+            <button onclick="switchTab('inquiry')" class="mb-6 text-gray-600 font-bold hover:text-black">&lt; 목록으로 돌아가기</button>
+            <div class="bg-white border p-8 shadow-sm space-y-6">
+                <div>
+                    <span id="detail-inq-status" class="inline-block px-3 py-1 rounded text-xs font-bold mb-2"></span>
+                    <h1 id="detail-inq-title" class="text-3xl font-bold text-gray-900"></h1>
+                    <p id="detail-inq-author" class="text-gray-400 text-sm mt-1"></p>
+                </div>
+                <div class="border-t pt-4">
+                    <h3 class="font-bold text-gray-700 mb-2">문의 내용</h3>
+                    <div id="detail-inq-content" class="text-gray-800 text-lg whitespace-pre-wrap leading-relaxed bg-gray-50 p-4 border"></div>
+                </div>
+                <div class="border-t pt-4">
+                    <h3 class="font-bold text-blue-900 mb-2">답변</h3>
+                    <div id="detail-inq-answer" class="text-gray-800 text-lg whitespace-pre-wrap leading-relaxed bg-blue-50 p-4 border border-blue-200">등록된 답변이 없습니다.</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 관리자 지원자 및 문의 관리 -->
         <div id="view-admin" class="view-section max-w-7xl mx-auto px-6 py-12">
             <div class="bg-red-50 border border-red-300 p-6 mb-8 rounded">
-                <h2 class="text-3xl font-black text-red-700">⚙️ 관리자 전용 지원자 관리 시스템 (admin)</h2>
-                <p class="text-gray-700 mt-1">접수된 지원 내역을 관리하고, 합격/불합격 처리된 내역은 보관함으로 이동합니다.</p>
+                <h2 class="text-3xl font-black text-red-700">관리자 전용 통합 관리 시스템</h2>
+                <p class="text-gray-700 mt-1">지원자 서류 심사 및 채용문의 답변 작성을 관리할 수 있습니다.</p>
             </div>
-            <div class="flex space-x-4 mb-6 border-b pb-3">
-                <button onclick="switchAdminSubTab('active')" id="admin-tab-active-btn" class="font-bold text-lg text-blue-900 border-b-2 border-blue-900 pb-1">진행중인 지원 내역</button>
-                <button onclick="switchAdminSubTab('archived')" id="admin-tab-archived-btn" class="font-bold text-lg text-gray-500 pb-1">합격/불합격 보관함</button>
+
+            <!-- 탭 전환 버튼 -->
+            <div class="flex space-x-6 mb-6 border-b pb-3">
+                <button onclick="switchAdminMainTab('applicants')" id="admin-main-tab-app" class="font-extrabold text-xl text-blue-900 border-b-2 border-blue-900 pb-1">지원자 관리</button>
+                <button onclick="switchAdminMainTab('inquiries')" id="admin-main-tab-inq" class="font-extrabold text-xl text-gray-500 pb-1">채용문의 답변 관리</button>
             </div>
-            <div class="bg-white p-6 border border-gray-300 shadow-sm">
-                <h3 id="admin-table-title" class="text-2xl font-bold mb-4 text-gray-900">📋 심사 진행 중인 지원자 목록</h3>
+
+            <!-- 지원자 관리 구역 -->
+            <div id="admin-section-applicants" class="bg-white p-6 border border-gray-300 shadow-sm">
+                <div class="flex space-x-4 mb-4 border-b pb-3">
+                    <button onclick="switchAdminSubTab('active')" id="admin-tab-active-btn" class="font-bold text-lg text-blue-900 border-b-2 border-blue-900 pb-1">진행중인 지원 내역</button>
+                    <button onclick="switchAdminSubTab('archived')" id="admin-tab-archived-btn" class="font-bold text-lg text-gray-500 pb-1">합격/불합격 보관함</button>
+                </div>
+                <h3 id="admin-table-title" class="text-2xl font-bold mb-4 text-gray-900">심사 진행 중인 지원자 목록</h3>
                 <div class="overflow-x-auto">
                     <table class="w-full text-left border">
                         <thead class="bg-gray-100 border-b">
@@ -442,6 +483,24 @@
                     </table>
                 </div>
             </div>
+
+            <!-- 채용문의 답변 관리 구역 -->
+            <div id="admin-section-inquiries" class="bg-white p-6 border border-gray-300 shadow-sm hidden">
+                <h3 class="text-2xl font-bold mb-4 text-gray-900">미답변 및 전체 채용문의 목록</h3>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border">
+                        <thead class="bg-gray-100 border-b">
+                            <tr>
+                                <th class="p-3">문의 제목</th>
+                                <th class="p-3">작성자</th>
+                                <th class="p-3">상태</th>
+                                <th class="p-3">관리자 답변 입력 및 수정</th>
+                            </tr>
+                        </thead>
+                        <tbody id="admin-inquiries-body"></tbody>
+                    </table>
+                </div>
+            </div>
         </div>
     </main>
 
@@ -450,15 +509,15 @@
         <div class="mb-3">
             <button onclick="switchTab('privacy')" class="text-gray-300 hover:text-white underline font-bold px-2 py-1">개인정보처리방침</button>
         </div>
-        <p class="mb-2"><strong>삼산여객주 주식회사</strong> | 채용 및 개인정보 문의: ffhhgogbv(채용), this0833(채용), quartey123456(기술)</p>
-        <p class="text-xs text-gray-500">&copy; 2026 SAMSAN PASSENGER CORP. ALL RIGHTS RESERVED.</p>
+        <p class="mb-2"><strong>삼산여객 주식회사</strong> | 채용 및 개인정보 문의: ffhhgogbv(채용), this0833(채용), quartey123456(기술)</p>
+        <p class="text-xs text-gray-500">&copy; 2026 삼산여객주식회사. ALL RIGHTS RESERVED.</p>
     </footer>
 
     <!-- 모달 레이어들 -->
     <div id="jobWriteModal" class="fixed inset-0 bg-black/50 hidden items-center justify-center p-4 z-50">
         <div class="bg-white p-8 max-w-xl w-full relative">
             <button onclick="closeModal('jobWriteModal')" class="absolute top-4 right-4 text-gray-400 text-xl"><i class="fas fa-times"></i></button>
-            <h3 class="text-2xl font-bold mb-4 text-gray-900">📢 새 채용공고 등록</h3>
+            <h3 class="text-2xl font-bold mb-4 text-gray-900">채용공고 등록</h3>
             <div class="space-y-3">
                 <input type="text" id="admin-job-cat" class="std-input" placeholder="구분 (예: 신입사원)">
                 <input type="text" id="admin-job-title" class="std-input" placeholder="채용 공고 제목">
@@ -476,7 +535,7 @@
     <div id="noticeWriteModal" class="fixed inset-0 bg-black/50 hidden items-center justify-center p-4 z-50">
         <div class="bg-white p-8 max-w-xl w-full relative">
             <button onclick="closeModal('noticeWriteModal')" class="absolute top-4 right-4 text-gray-400 text-xl"><i class="fas fa-times"></i></button>
-            <h3 class="text-2xl font-bold mb-4 text-gray-900">📌 새 공지사항 작성</h3>
+            <h3 class="text-2xl font-bold mb-4 text-gray-900">공지사항 작성</h3>
             <div class="space-y-3">
                 <input type="text" id="admin-notice-title" class="std-input" placeholder="공지 제목">
                 <textarea id="admin-notice-content" rows="6" class="std-textarea" placeholder="공지 내용"></textarea>
@@ -506,6 +565,7 @@
         let currentUser = null;
         let currentJob = null;
         let currentNotice = null;
+        let currentInquiry = null;
         let selectedApplyFile = null;
         let adminCurrentSubTab = 'active';
 
@@ -831,6 +891,27 @@
             }
         }
 
+        function switchAdminMainTab(mainTab) {
+            const btnApp = document.getElementById('admin-main-tab-app');
+            const btnInq = document.getElementById('admin-main-tab-inq');
+            const secApp = document.getElementById('admin-section-applicants');
+            const secInq = document.getElementById('admin-section-inquiries');
+
+            if (mainTab === 'applicants') {
+                btnApp.className = "font-extrabold text-xl text-blue-900 border-b-2 border-blue-900 pb-1";
+                btnInq.className = "font-extrabold text-xl text-gray-500 pb-1";
+                secApp.classList.remove('hidden');
+                secInq.classList.add('hidden');
+                loadAdminApplications();
+            } else {
+                btnInq.className = "font-extrabold text-xl text-blue-900 border-b-2 border-blue-900 pb-1";
+                btnApp.className = "font-extrabold text-xl text-gray-500 pb-1";
+                secInq.classList.remove('hidden');
+                secApp.classList.add('hidden');
+                loadAdminInquiries();
+            }
+        }
+
         function switchAdminSubTab(tab) {
             adminCurrentSubTab = tab;
             const btnActive = document.getElementById('admin-tab-active-btn');
@@ -893,6 +974,49 @@
                     </tr>
                 `;
             });
+        }
+
+        async function loadAdminInquiries() {
+            const body = document.getElementById('admin-inquiries-body');
+            const { data, error } = await supabaseClient.from('inquiries').select('*').order('created_at', { ascending: false });
+
+            if (error || !data || data.length === 0) {
+                body.innerHTML = `<tr><td colspan="4" class="p-4 text-center text-gray-500">등록된 문의사항이 없습니다.</td></tr>`;
+                return;
+            }
+
+            body.innerHTML = '';
+            data.forEach((inq) => {
+                const statusBadge = inq.status === '답변 완료' ? '<span class="bg-blue-100 text-blue-800 text-xs px-2 py-1 font-bold rounded">답변 완료</span>' : '<span class="bg-orange-100 text-orange-800 text-xs px-2 py-1 font-bold rounded">답변 대기 중</span>';
+                body.innerHTML += `
+                    <tr class="border-b">
+                        <td class="p-3 font-bold text-gray-900">${inq.title}</td>
+                        <td class="p-3 text-sm text-gray-600">${inq.username || '익명'}</td>
+                        <td class="p-3">${statusBadge}</td>
+                        <td class="p-3 space-y-2">
+                            <textarea id="admin-ans-${inq.id}" rows="2" class="std-textarea text-sm" placeholder="답변 내용을 입력하세요">${inq.answer || ''}</textarea>
+                            <button onclick="submitInquiryAnswer('${inq.id}')" class="bg-blue-800 hover:bg-blue-900 text-white text-xs px-4 py-2 font-bold">답변 등록/수정</button>
+                        </td>
+                    </tr>
+                `;
+            });
+        }
+
+        async function submitInquiryAnswer(id) {
+            const answerText = document.getElementById(`admin-ans-${id}`).value.trim();
+            if (!answerText) { alert('답변 내용을 입력해주세요.'); return; }
+
+            const { error } = await supabaseClient.from('inquiries').update({
+                answer: answerText,
+                status: '답변 완료'
+            }).eq('id', id);
+
+            if (error) {
+                alert(`답변 등록 실패: ${error.message}`);
+            } else {
+                alert('답변이 성공적으로 등록되었습니다.');
+                loadAdminInquiries();
+            }
         }
 
         async function updateAppStatus(id, status) {
@@ -1015,30 +1139,80 @@
 
         async function loadInquiries() {
             const { data: list } = await supabaseClient.from('inquiries').select('*').order('created_at', { ascending: false });
-            const container = document.getElementById('inquiry-list');
+            const body = document.getElementById('inquiry-list-body');
             if (!list || list.length === 0) {
-                container.innerHTML = `<div class="bg-white p-6 border text-gray-500 text-center">등록된 문의사항이 없습니다.</div>`;
+                body.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-gray-500">등록된 문의사항이 없습니다.</td></tr>`;
                 return;
             }
-            container.innerHTML = '';
-            list.forEach((item) => {
-                container.innerHTML += `
-                    <div class="bg-white p-6 border border-gray-200 shadow-sm">
-                        <h3 class="font-bold text-lg mb-2 text-gray-900">Q. ${item.title}</h3>
-                        <p class="text-gray-600 text-sm">${item.content}</p>
-                    </div>
+            body.innerHTML = '';
+            list.forEach((item, index) => {
+                const statusBadge = item.status === '답변 완료' 
+                    ? '<span class="bg-blue-100 text-blue-800 text-xs px-2.5 py-1 font-bold rounded">답변 완료</span>' 
+                    : '<span class="bg-orange-100 text-orange-800 text-xs px-2.5 py-1 font-bold rounded">답변 대기 중</span>';
+
+                const tr = document.createElement('tr');
+                tr.className = "border-b hover:bg-gray-50 cursor-pointer";
+                tr.onclick = () => openInquiryDetail(item);
+                tr.innerHTML = `
+                    <td class="p-4 text-center font-bold">${index + 1}</td>
+                    <td class="p-4 font-bold text-gray-900">${item.title}</td>
+                    <td class="p-4 text-center text-sm text-gray-600">${item.username || '익명'}</td>
+                    <td class="p-4 text-center">${statusBadge}</td>
+                    <td class="p-4 text-center text-gray-400 text-sm">${new Date(item.created_at).toLocaleDateString()}</td>
                 `;
+                body.appendChild(tr);
             });
         }
 
+        function openInquiryDetail(inq) {
+            currentInquiry = inq;
+            document.getElementById('detail-inq-title').innerText = inq.title;
+            document.getElementById('detail-inq-author').innerText = `작성자: ${inq.username || '익명'} | 작성일: ${new Date(inq.created_at).toLocaleString()}`;
+            document.getElementById('detail-inq-content').innerText = inq.content || '내용이 없습니다.';
+            
+            const statusBadge = document.getElementById('detail-inq-status');
+            if (inq.status === '답변 완료') {
+                statusBadge.className = "inline-block bg-blue-100 text-blue-800 px-3 py-1 rounded text-xs font-bold mb-2";
+                statusBadge.innerText = "답변 완료";
+            } else {
+                statusBadge.className = "inline-block bg-orange-100 text-orange-800 px-3 py-1 rounded text-xs font-bold mb-2";
+                statusBadge.innerText = "답변 대기 중";
+            }
+
+            const answerBox = document.getElementById('detail-inq-answer');
+            if (inq.answer) {
+                answerBox.innerText = inq.answer;
+                answerBox.className = "text-gray-800 text-lg whitespace-pre-wrap leading-relaxed bg-blue-50 p-4 border border-blue-200";
+            } else {
+                answerBox.innerText = "아직 관리자 답변이 등록되지 않았습니다. 잠시만 기다려 주세요.";
+                answerBox.className = "text-gray-400 text-lg italic bg-gray-50 p-4 border";
+            }
+
+            switchTab('inquiry-detail');
+        }
+
         async function submitInquiry() {
+            if (!currentUser) { alert('로그인 후 문의를 등록할 수 있습니다.'); switchTab('login'); return; }
             const title = document.getElementById('inq-title').value.trim();
             const content = document.getElementById('inq-content').value.trim();
             if (!title || !content) { alert('제목과 내용을 입력하세요.'); return; }
-            await supabaseClient.from('inquiries').insert([{ title, content }]);
-            alert('문의가 등록되었습니다.');
-            closeModal('inquiryModal');
-            loadInquiries();
+
+            const { error } = await supabaseClient.from('inquiries').insert([{ 
+                title, 
+                content, 
+                username: currentUser.username,
+                status: '답변 대기 중'
+            }]);
+
+            if (error) {
+                alert(`문의 등록 실패: ${error.message}`);
+            } else {
+                alert('문의가 성공적으로 등록되었습니다.');
+                closeModal('inquiryModal');
+                document.getElementById('inq-title').value = '';
+                document.getElementById('inq-content').value = '';
+                loadInquiries();
+            }
         }
 
         async function renderMyRecruitment() {
@@ -1090,7 +1264,10 @@
             if (target) setTimeout(() => target.classList.add('active'), 50);
 
             if (tabId === 'my') renderMyRecruitment();
-            if (tabId === 'admin') loadAdminApplications();
+            if (tabId === 'admin') {
+                switchAdminMainTab('applicants');
+            }
+            if (tabId === 'inquiry') loadInquiries();
 
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
