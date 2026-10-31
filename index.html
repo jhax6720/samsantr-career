@@ -95,12 +95,12 @@
             </section>
         </div>
 
-        <!-- 로그인 -->
+        <!-- 로그인 (일반 ID/PW 입력) -->
         <div id="view-login" class="view-section max-w-5xl mx-auto px-6 py-12">
             <h1 class="text-5xl font-black text-gray-900 mb-10 tracking-tight">로그인</h1>
             <form onsubmit="event.preventDefault(); handleLoginSubmit();" class="grid grid-cols-1 lg:grid-cols-12 gap-4 items-stretch mb-8">
                 <div class="lg:col-span-7 space-y-3">
-                    <input type="email" id="login-id" class="std-input" placeholder="이메일 (아이디 대신 이메일 사용)" required autocomplete="username">
+                    <input type="text" id="login-id" class="std-input" placeholder="아이디 (예: admin)" required autocomplete="username">
                     <input type="password" id="login-pw" class="std-input" placeholder="비밀번호" required autocomplete="current-password">
                 </div>
                 <div class="lg:col-span-2">
@@ -118,7 +118,7 @@
             </form>
         </div>
 
-        <!-- 회원가입 1단계 (전문 보기 버튼 연동) -->
+        <!-- 회원가입 1단계 -->
         <div id="view-signup-1" class="view-section max-w-5xl mx-auto px-6 py-12">
             <h1 class="text-5xl font-black text-gray-900 mb-10 tracking-tight">회원가입</h1>
             <div class="flex items-center space-x-3 text-xl font-bold text-gray-900 mb-16">
@@ -145,9 +145,8 @@
             <div class="mb-12">
                 <p class="text-xl font-bold text-gray-900 mb-3">■ 회원정보를 입력하여 주십시오.</p>
                 <div class="space-y-3">
-                    <input type="text" id="reg-id" class="std-input" placeholder="이름/닉네임">
-                    <input type="email" id="reg-email" class="std-input" placeholder="이메일 (로그인에 사용됩니다)">
-                    <input type="password" id="reg-pw" class="std-input" placeholder="비밀번호 (6자리 이상)">
+                    <input type="text" id="reg-id" class="std-input" placeholder="아이디 (로그인용)">
+                    <input type="password" id="reg-pw" class="std-input" placeholder="비밀번호">
                 </div>
             </div>
             <div class="flex justify-center space-x-4">
@@ -156,7 +155,7 @@
             </div>
         </div>
 
-        <!-- 개인정보처리방침 전문 뷰 (sky.png 헤더 템플릿 사용) -->
+        <!-- 개인정보처리방침 전문 뷰 -->
         <div id="view-privacy" class="view-section max-w-5xl mx-auto px-6 py-12">
             <div class="bg-white p-8 md:p-12 border border-gray-300 shadow-sm leading-relaxed text-gray-800">
                 <h1 class="text-3xl font-extrabold text-center text-gray-900 mb-8 border-b pb-4">
@@ -269,12 +268,12 @@
             <h1 class="text-4xl font-black text-gray-900 mb-8 border-b pb-4">마이페이지 / 회원정보</h1>
             <div class="bg-white border border-gray-300 p-8 shadow-sm space-y-6">
                 <div>
-                    <label class="block text-sm font-bold text-gray-700 mb-1">이메일 계정</label>
-                    <input type="text" id="my-email" class="std-input bg-gray-100 cursor-not-allowed" readonly>
+                    <label class="block text-sm font-bold text-gray-700 mb-1">아이디</label>
+                    <input type="text" id="my-username" class="std-input bg-gray-100 cursor-not-allowed" readonly>
                 </div>
                 <div>
-                    <label class="block text-sm font-bold text-gray-700 mb-1">이름/닉네임</label>
-                    <input type="text" id="my-username" class="std-input bg-gray-100 cursor-not-allowed" readonly>
+                    <label class="block text-sm font-bold text-gray-700 mb-1">로블록스 ID</label>
+                    <input type="text" id="my-roblox-id" class="std-input bg-gray-100 cursor-not-allowed" readonly>
                 </div>
             </div>
         </div>
@@ -446,7 +445,7 @@
         </div>
     </main>
 
-    <!-- 푸터 (개인정보처리방침 버튼 추가) -->
+    <!-- 푸터 -->
     <footer class="bg-gray-900 text-gray-400 py-8 px-4 text-center text-sm border-t border-gray-800">
         <div class="mb-3">
             <button onclick="switchTab('privacy')" class="text-gray-300 hover:text-white underline font-bold px-2 py-1">개인정보처리방침</button>
@@ -511,7 +510,7 @@
         let adminCurrentSubTab = 'active';
 
         async function initData() {
-            await checkSession();
+            checkLocalSession();
             await loadJobs();
             await loadNotices();
             await loadInquiries();
@@ -522,8 +521,8 @@
         function openJobWriteModal() { openModal('jobWriteModal'); }
         function openNoticeWriteModal() { openModal('noticeWriteModal'); }
 
-        async function checkSession() {
-            const { data: { session } } = await supabaseClient.auth.getSession();
+        function checkLocalSession() {
+            const saved = localStorage.getItem('samsan_user');
             const container = document.getElementById('auth-status-container');
             const adminNav = document.getElementById('admin-nav-btn');
             const mobileAdminNav = document.getElementById('mobile-admin-btn');
@@ -532,14 +531,8 @@
             const btnWriteJob = document.getElementById('btn-write-job');
             const btnWriteNotice = document.getElementById('btn-write-notice');
 
-            if (session && session.user) {
-                currentUser = {
-                    id: session.user.id,
-                    email: session.user.email,
-                    username: session.user.user_metadata?.username || session.user.email.split('@')[0],
-                    role: session.user.user_metadata?.role || (session.user.email === 'admin@samsan.com' ? 'admin' : 'user')
-                };
-
+            if (saved) {
+                currentUser = JSON.parse(saved);
                 navMypage.classList.remove('hidden');
                 mobileMypage.classList.remove('hidden');
 
@@ -598,28 +591,37 @@
         }
 
         async function handleLoginSubmit() {
-            const email = document.getElementById('login-id').value.trim();
+            const username = document.getElementById('login-id').value.trim();
             const password = document.getElementById('login-pw').value.trim();
 
-            if (!email || !password) { alert('이메일과 비밀번호를 입력해주세요.'); return; }
+            if (!username || !password) { alert('아이디와 비밀번호를 입력해주세요.'); return; }
 
-            const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
+            const { data, error } = await supabaseClient
+                .from('users')
+                .select('*')
+                .eq('username', username)
+                .eq('password', password)
+                .single();
 
-            if (error) {
-                alert(`로그인 실패: ${error.message}`);
+            if (error || !data) {
+                alert('아이디 또는 비밀번호가 일치하지 않습니다.');
                 return;
             }
 
-            alert('로그인되었습니다.');
-            await checkSession();
-            if (currentUser && currentUser.role === 'admin') switchTab('admin');
+            currentUser = data;
+            localStorage.setItem('samsan_user', JSON.stringify(currentUser));
+            alert(`${currentUser.username}님 환영합니다!`);
+            checkLocalSession();
+
+            if (currentUser.role === 'admin') switchTab('admin');
             else switchTab('my');
         }
 
-        async function handleLogout() {
-            await supabaseClient.auth.signOut();
+        function handleLogout() {
+            localStorage.removeItem('samsan_user');
+            currentUser = null;
             alert('로그아웃 되었습니다.');
-            await checkSession();
+            checkLocalSession();
             switchTab('home');
         }
 
@@ -630,27 +632,22 @@
 
         async function handleCompleteSignup() {
             const username = document.getElementById('reg-id').value.trim();
-            const email = document.getElementById('reg-email').value.trim();
             const password = document.getElementById('reg-pw').value.trim();
             const robloxId = document.getElementById('roblox-id').value.trim();
             const robloxLink = document.getElementById('roblox-link').value.trim();
 
-            if (!username || !email || !password) { alert('모든 필수 항목을 입력하세요.'); return; }
+            if (!username || !password) { alert('아이디와 비밀번호를 입력하세요.'); return; }
 
-            const role = (email === 'admin@samsan.com') ? 'admin' : 'user';
+            const role = (username === 'admin') ? 'admin' : 'user';
 
-            const { data, error } = await supabaseClient.auth.signUp({
-                email,
-                password,
-                options: {
-                    data: { username, roblox_id: robloxId, roblox_link: robloxLink, role }
-                }
-            });
+            const { error } = await supabaseClient
+                .from('users')
+                .insert([{ username, password, roblox_id: robloxId, roblox_link: robloxLink, role }]);
 
             if (error) {
-                alert(`회원가입 실패: ${error.message}`);
+                alert(`회원가입 실패 (중복된 아이디일 수 있습니다): ${error.message}`);
             } else {
-                alert('회원가입이 완료되었습니다! 바로 로그인해 주세요.');
+                alert('회원가입이 완료되었습니다! 로그인해 주세요.');
                 switchTab('login');
             }
         }
@@ -1051,8 +1048,8 @@
                 return;
             }
 
-            document.getElementById('my-email').value = currentUser.email;
             document.getElementById('my-username').value = currentUser.username;
+            document.getElementById('my-roblox-id').value = currentUser.roblox_id || '등록되지 않음';
 
             const { data } = await supabaseClient.from('applications').select('*').eq('applicant_username', currentUser.username);
             if (!data || data.length === 0) {
