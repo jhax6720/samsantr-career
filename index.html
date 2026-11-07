@@ -33,6 +33,21 @@
         .std-textarea { width: 100%; padding: 12px 16px; font-size: 16px; border: 2px solid #2b4bb7; background-color: #ffffff !important; color: #000000 !important; outline: none; box-sizing: border-box; }
         .view-section { display: none; opacity: 0; transition: opacity 0.3s ease-in-out; }
         .view-section.active { display: block; opacity: 1; }
+
+        .result-modal-overlay { position:fixed; inset:0; z-index:100; background:rgba(12,18,35,.72); display:none; align-items:center; justify-content:center; padding:16px; }
+        .result-modal-overlay.show { display:flex; }
+        .result-modal-card { width:min(900px,100%); max-height:92vh; overflow:auto; background:#fff; border-radius:10px; box-shadow:0 25px 80px rgba(0,0,0,.3); }
+        .result-action-btn { background:#25408f;color:#fff;padding:9px 13px;font-weight:800;border-radius:3px; }
+        .result-action-btn:hover { background:#1c3274; }
+        .result-secondary-btn { background:#eef2ff;color:#25408f;padding:9px 13px;font-weight:800;border:1px solid #c7d2fe;border-radius:3px; }
+        .result-image { display:block;width:100%;max-height:320px;object-fit:contain;background:#f8fafc; }
+        .result-body { white-space:pre-wrap; line-height:1.9; color:#292929; font-size:15px; }
+        .result-history-item { border-left:4px solid #cbd5e1;padding:10px 12px;margin:8px 0;background:#f8fafc; }
+        .result-history-item.pass { border-color:#3157b7; }
+        .result-history-item.fail { border-color:#c62828; }
+        .stage-post-card { border:1px solid #d1d5db;background:#fff;padding:18px;margin-bottom:16px; }
+        .stage-comment { padding:10px 12px;background:#f8fafc;border-top:1px solid #e5e7eb; }
+
     </style>
 </head>
 <body class="flex flex-col min-h-screen">
@@ -410,6 +425,26 @@
             </div>
         </div>
 
+
+        <!-- 전형별 공지 게시판 -->
+        <div id="view-stage-board" class="view-section max-w-6xl mx-auto px-6 py-12">
+            <div class="flex flex-wrap justify-between items-center gap-3 border-b pb-4 mb-6">
+                <div>
+                    <p class="text-sm font-bold text-blue-700">합격자 전용 게시판</p>
+                    <h2 id="stage-board-heading" class="text-3xl font-extrabold text-gray-900">전형 공지</h2>
+                </div>
+                <button onclick="switchTab('my')" class="bg-gray-200 px-5 py-2 font-bold">나의 채용으로 돌아가기</button>
+            </div>
+            <p id="stage-board-description" class="text-gray-600 mb-6">해당 전형 대상자에게만 공개됩니다.</p>
+            <div id="stage-post-write" class="hidden bg-blue-50 border border-blue-200 p-5 mb-6">
+                <h3 class="font-extrabold text-lg mb-3">관리자 게시물 작성</h3>
+                <input id="stage-post-title" class="std-input mb-3" maxlength="200" placeholder="게시물 제목">
+                <textarea id="stage-post-body" class="std-textarea mb-3" rows="5" maxlength="20000" placeholder="게시물 내용"></textarea>
+                <button onclick="createStagePost()" class="result-action-btn">게시물 등록</button>
+            </div>
+            <div id="stage-post-list"><div class="p-8 text-center text-gray-500">게시물을 불러오는 중입니다.</div></div>
+        </div>
+
         <!-- 채용문의 게시판 -->
         <div id="view-inquiry" class="view-section max-w-5xl mx-auto px-6 py-12">
             <div class="flex justify-between items-center mb-8 border-b pb-4">
@@ -563,6 +598,47 @@
                 <button onclick="submitInquiry()" class="w-full bg-[#25408f] text-white font-bold py-3 hover:bg-blue-900">문의 등록</button>
             </div>
         </div>
+    </div>
+
+
+    <!-- 전형 결과 비밀번호 재확인 모달 -->
+    <div id="resultReauthModal" class="result-modal-overlay" role="dialog" aria-modal="true" aria-labelledby="result-reauth-title">
+      <div class="result-modal-card max-w-lg p-7">
+        <div class="flex justify-between items-center mb-4">
+          <h3 id="result-reauth-title" class="text-2xl font-extrabold">본인 확인</h3>
+          <button type="button" onclick="closeResultReauth()" class="text-2xl text-gray-500" aria-label="닫기">×</button>
+        </div>
+        <p id="result-reauth-description" class="text-gray-600 mb-4">전형 결과 확인을 위해 비밀번호를 다시 입력해 주세요.</p>
+        <form onsubmit="submitResultReauth(event)">
+          <label for="result-reauth-password" class="block font-bold mb-2">비밀번호</label>
+          <input id="result-reauth-password" type="password" class="std-input mb-4" autocomplete="current-password" required>
+          <p id="result-reauth-error" class="text-red-600 text-sm mb-3" role="alert"></p>
+          <div class="flex justify-end gap-2">
+            <button type="button" onclick="closeResultReauth()" class="result-secondary-btn">취소</button>
+            <button id="result-reauth-submit" type="submit" class="result-action-btn">본인 확인 및 계속</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- 전형 결과 팝업: 이미지에는 배경/큰 제목, 본문은 동적 텍스트 -->
+    <div id="resultViewModal" class="result-modal-overlay" role="dialog" aria-modal="true" aria-labelledby="result-view-title">
+      <div class="result-modal-card">
+        <div class="flex justify-between items-center p-4 border-b">
+          <h3 id="result-view-title" class="text-xl font-extrabold">채용 전형 결과</h3>
+          <button type="button" onclick="closeResultView()" class="text-2xl text-gray-500" aria-label="닫기">×</button>
+        </div>
+        <div class="p-4 sm:p-6">
+          <img id="result-view-image" class="result-image mb-5" alt="전형 결과 안내 이미지">
+          <h4 id="result-view-headline" class="text-2xl font-extrabold mb-4 text-center"></h4>
+          <div id="result-view-body" class="result-body"></div>
+          <div id="result-view-history" class="mt-6"></div>
+          <div class="flex flex-wrap justify-end gap-2 mt-6">
+            <button id="result-view-board-btn" class="hidden result-action-btn" onclick="openNextStageBoardFromResult()">다음 전형 공지 확인</button>
+            <button onclick="closeResultView()" class="result-secondary-btn">닫기</button>
+          </div>
+        </div>
+      </div>
     </div>
 
     <script>
@@ -1338,5 +1414,357 @@
 
         window.addEventListener('DOMContentLoaded', initData);
     </script>
+
+<script>
+// ==== 전형 결과/공지 기능 통합 패치 (기존 사이트 데이터 모델 호환) ====
+const RESULT_FUNCTION_URL = `${SUPABASE_URL}/functions/v1/confirm-application-result`;
+const RESULT_CODE_META = {
+  document_pass:{stage:'document',label:'서류 합격(1차전형 대상자)',image:'zeok',pass:true},
+  document_fail:{stage:'document',label:'서류 불합격',image:'zeno',pass:false},
+  first_pass:{stage:'first',label:'1차전형 합격',image:'stok',pass:true},
+  first_fail:{stage:'first',label:'1차전형 불합격',image:'stno',pass:false},
+  second_pass:{stage:'second',label:'2차전형 합격',image:'ndok',pass:true},
+  second_fail:{stage:'second',label:'2차전형 불합격',image:'ndno',pass:false},
+  final_pass:{stage:'final',label:'최종합격',image:'fiok',pass:true},
+  final_fail:{stage:'final',label:'최종 불합격',image:'fino',pass:false}
+};
+const RESULT_STAGE_LABEL = {document:'서류전형',first:'1차전형',second:'2차전형',final:'최종전형'};
+let resultReauthContext = null;
+let currentResultResponse = null;
+let currentBoardState = null;
+let currentBoardPassword = null; // 메모리에서만 사용하며 localStorage에는 저장하지 않음
+
+function resultEsc(v) {
+  return String(v ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+function resultStageForStatus(status) {
+  const s = String(status || '');
+  if (['서류 합격','서류 합격(1차전형 대상자)'].includes(s)) return 'first';
+  if (s === '1차전형 합격') return 'second';
+  if (s === '2차전형 합격') return 'final';
+  return null;
+}
+function stageForResultCode(code) {
+  const meta = RESULT_CODE_META[code];
+  if (!meta || !meta.pass) return null;
+  return ({document:'first',first:'second',second:'final'})[meta.stage] || null;
+}
+function statusForResultCode(code) {
+  const labels = {
+    document_pass:'서류 합격', document_fail:'불합격',
+    first_pass:'1차전형 합격', first_fail:'1차전형 불합격',
+    second_pass:'2차전형 합격', second_fail:'2차전형 불합격',
+    final_pass:'최종합격', final_fail:'최종 불합격'
+  };
+  return labels[code] || '서류 심사 중';
+}
+async function resultApi(payload) {
+  const response = await fetch(RESULT_FUNCTION_URL, {
+    method:'POST',
+    headers:{
+      'Content-Type':'application/json',
+      'apikey':SUPABASE_ANON_KEY,
+      'Authorization':`Bearer ${SUPABASE_ANON_KEY}`
+    },
+    body:JSON.stringify(payload)
+  });
+  const data = await response.json().catch(() => ({}));
+  if (!response.ok) throw new Error(data.message || data.error || `요청 실패 (${response.status})`);
+  return data;
+}
+
+// 이전 사이트의 알림은 결과를 비밀번호 확인 없이 노출했으므로 끕니다.
+async function checkApplicantNotification() { /* 결과는 명시적 본인확인 후에만 표시 */ }
+
+// localStorage의 기존 사용자 객체에 저장된 비밀번호를 제거합니다.
+function checkLocalSession() {
+  let saved = null;
+  try { saved = JSON.parse(localStorage.getItem('samsan_user') || 'null'); } catch (_) {}
+  const container = document.getElementById('auth-status-container');
+  const ids = ['admin-nav-btn','mobile-admin-btn','nav-mypage-btn','mobile-mypage-btn','btn-write-job','btn-write-notice'];
+  if (saved && saved.username) {
+    currentUser = { id:saved.id ?? null, username:saved.username, role:saved.role || 'user', roblox_id:saved.roblox_id || '', roblox_link:saved.roblox_link || '' };
+    localStorage.setItem('samsan_user', JSON.stringify(currentUser));
+    document.getElementById('nav-mypage-btn')?.classList.remove('hidden');
+    document.getElementById('mobile-mypage-btn')?.classList.remove('hidden');
+    const isAdmin = currentUser.role === 'admin';
+    ['admin-nav-btn','mobile-admin-btn','btn-write-job','btn-write-notice'].forEach(id => document.getElementById(id)?.classList.toggle('hidden', !isAdmin));
+    if (container) container.innerHTML = `<span class="text-blue-900 font-bold">${resultEsc(currentUser.username)} 님</span><span class="text-gray-300">|</span><button onclick="handleLogout()" class="hover:text-blue-700">로그아웃</button>`;
+  } else {
+    currentUser = null;
+    ids.forEach(id => document.getElementById(id)?.classList.add('hidden'));
+    if (container) container.innerHTML = `<button onclick="switchTab('login')" class="hover:text-blue-700 transition">로그인</button><span class="text-gray-300">|</span><button onclick="switchTab('signup-1')" class="hover:text-blue-700 transition">회원가입</button>`;
+  }
+}
+
+// 로그인 결과에서 비밀번호를 localStorage에 저장하지 않도록 수정.
+async function handleLoginSubmit() {
+  const username = document.getElementById('login-id').value.trim();
+  const password = document.getElementById('login-pw').value;
+  if (!username || !password) { alert('아이디와 비밀번호를 입력해주세요.'); return; }
+  const {data,error} = await supabaseClient.from('users')
+    .select('id, username, role, roblox_id, roblox_link')
+    .eq('username', username).eq('password', password).maybeSingle();
+  if (error || !data) { alert('아이디 또는 비밀번호가 일치하지 않습니다.'); return; }
+  currentUser = {id:data.id ?? null, username:data.username, role:data.role || 'user', roblox_id:data.roblox_id || '', roblox_link:data.roblox_link || ''};
+  localStorage.setItem('samsan_user', JSON.stringify(currentUser));
+  document.getElementById('login-pw').value = '';
+  checkLocalSession();
+  alert(`${currentUser.username}님 환영합니다!`);
+  switchTab(currentUser.role === 'admin' ? 'admin' : 'my');
+}
+
+// 신규 가입으로 admin 역할을 자가 부여하는 기존 취약 동작을 제거합니다.
+async function handleCompleteSignup() {
+  const username = document.getElementById('reg-id').value.trim();
+  const password = document.getElementById('reg-pw').value;
+  const robloxId = document.getElementById('roblox-id').value.trim();
+  const robloxLink = document.getElementById('roblox-link').value.trim();
+  if (!username || !password) { alert('아이디와 비밀번호를 입력하세요.'); return; }
+  if (username.length < 3 || password.length < 8) { alert('아이디는 3자 이상, 비밀번호는 8자 이상으로 입력해 주세요.'); return; }
+  if (username.toLowerCase() === 'admin') { alert('admin 아이디는 신규 가입할 수 없습니다. 기존 관리자에게 계정을 요청하세요.'); return; }
+  const {error} = await supabaseClient.from('users').insert([{username,password,roblox_id:robloxId,roblox_link:robloxLink,role:'user'}]);
+  if (error) alert(`회원가입 실패: ${error.message}`);
+  else { alert('회원가입이 완료되었습니다! 로그인해 주세요.'); document.getElementById('reg-pw').value=''; switchTab('login'); }
+}
+
+function openResultReauthModal(applicationId, purpose='result', stage=null) {
+  if (!currentUser) { alert('로그인 후 이용할 수 있습니다.'); switchTab('login'); return; }
+  resultReauthContext = {applicationId, purpose, stage};
+  document.getElementById('result-reauth-title').innerText = purpose === 'board' ? '전형 공지 본인 확인' : '합격 확인 본인 인증';
+  document.getElementById('result-reauth-description').innerText = purpose === 'board'
+    ? '해당 전형 게시판 접근 권한을 확인하기 위해 비밀번호를 입력해 주세요.'
+    : '결과를 확인하기 위해 비밀번호를 다시 입력해 주세요.';
+  document.getElementById('result-reauth-password').value = '';
+  document.getElementById('result-reauth-error').innerText = '';
+  document.getElementById('resultReauthModal').classList.add('show');
+  setTimeout(() => document.getElementById('result-reauth-password').focus(), 30);
+}
+function closeResultReauth() {
+  document.getElementById('resultReauthModal').classList.remove('show');
+  document.getElementById('result-reauth-password').value = '';
+  resultReauthContext = null;
+}
+function openApplicationResult(applicationId) { openResultReauthModal(applicationId, 'result'); }
+
+async function submitResultReauth(event) {
+  event.preventDefault();
+  if (!resultReauthContext || !currentUser) return;
+  const password = document.getElementById('result-reauth-password').value;
+  if (!password) return;
+  const submit = document.getElementById('result-reauth-submit');
+  submit.disabled = true; submit.innerText = '확인 중...';
+  const context = {...resultReauthContext};
+  try {
+    const action = context.purpose === 'board' ? 'list-posts' : 'confirm-result';
+    const response = await resultApi({action, username:currentUser.username, password, applicationId:context.applicationId, stage:context.stage});
+    currentBoardPassword = password; // 탭을 떠나거나 만료되면 제거하며 저장소에는 기록하지 않음
+    closeResultReauth();
+    if (context.purpose === 'board') {
+      currentBoardState = {applicationId:context.applicationId, stage:context.stage, jobId:response.jobId};
+      renderStageBoard(response);
+    } else {
+      currentResultResponse = response;
+      renderResultPopup(response);
+    }
+  } catch (error) {
+    document.getElementById('result-reauth-error').innerText = error.message || '본인 확인에 실패했습니다.';
+  } finally {
+    submit.disabled = false; submit.innerText = '본인 확인 및 계속';
+  }
+}
+
+function resultBodyText(result, app) {
+  const meta = RESULT_CODE_META[result.resultCode];
+  const year = app.recruitmentYear || new Date().getFullYear();
+  const cycle = app.recruitmentCycle || '1차';
+  const stage = result.stageName || RESULT_STAGE_LABEL[meta?.stage] || '채용전형';
+  const pass = Boolean(meta?.pass);
+  let body = `${app.applicantName || currentUser?.username || '지원자'}님 안녕하십니까?\n\n${year}년 ${cycle} 신입사원 선발 ${stage} 결과 ${pass ? '합격하셨음' : '합격하지 못하셨음'}을 알려드립니다.`;
+  if (result.resultCode === 'final_pass') body += '\n당사에 입사하신 것을 축하드리며, 입사 일정에 관해서는 별도로 안내드리도록 하겠습니다.';
+  else if (pass) body += '\n\n다음 전형 일정에 관해서는 추후 안내드릴 예정이며, 채용 홈페이지의 해당 전형 공지를 확인하시기 바랍니다.';
+  else body += '\n당사 채용에 관심을 가지고 지원해 주셔서 감사드립니다.';
+  body += '\n\n삼산여객 인사부 드림';
+  return body;
+}
+function resultHeadlineText(result) { return RESULT_CODE_META[result.resultCode]?.label || result.resultName || '채용 전형 결과'; }
+function renderResultPopup(response) {
+  const results = response.results || [];
+  const latest = response.currentResult || results[results.length - 1];
+  const modal = document.getElementById('resultViewModal');
+  const headline = document.getElementById('result-view-headline');
+  const image = document.getElementById('result-view-image');
+  const body = document.getElementById('result-view-body');
+  const history = document.getElementById('result-view-history');
+  const boardBtn = document.getElementById('result-view-board-btn');
+  const app = response.application || {};
+  document.getElementById('result-view-title').innerText = app.jobTitle || '채용 전형 결과';
+  if (!latest) {
+    image.classList.add('hidden');
+    headline.innerText = '아직 발표된 전형 결과가 없습니다.';
+    body.innerText = '결과 발표 후 이 화면에서 확인하실 수 있습니다.';
+    history.innerHTML = '';
+    boardBtn.classList.add('hidden');
+    modal.classList.add('show'); return;
+  }
+  image.classList.remove('hidden');
+  const code = RESULT_CODE_META[latest.resultCode]?.image || latest.imageName || '';
+  image.alt = resultHeadlineText(latest);
+  image.onerror = function() {
+    if (!this.dataset.fallbackTried) { this.dataset.fallbackTried = '1'; this.src = `./${code}.png`; }
+    else { this.style.display='none'; }
+  };
+  image.onload = function(){ this.style.display='block'; this.dataset.fallbackTried=''; };
+  image.src = `./assets/results/${code}.png`;
+  headline.innerText = resultHeadlineText(latest);
+  body.innerText = resultBodyText(latest, app);
+  history.innerHTML = `<h5 class="font-extrabold text-gray-800 mb-2">전형 결과 이력</h5>` + results.map(r => {
+    const m = RESULT_CODE_META[r.resultCode] || {};
+    const cls = m.pass ? 'pass' : 'fail';
+    const when = r.announcedAt ? new Date(r.announcedAt).toLocaleString() : '';
+    return `<div class="result-history-item ${cls}"><div class="font-bold">${resultEsc(r.stageName || RESULT_STAGE_LABEL[r.stage] || '')} · ${resultEsc(resultHeadlineText(r))}</div><div class="text-xs text-gray-500 mt-1">발표: ${resultEsc(when)}</div>${r.adminNote ? `<div class="mt-2 whitespace-pre-wrap">${resultEsc(r.adminNote)}</div>` : ''}</div>`;
+  }).join('');
+  const nextStage = stageForResultCode(latest.resultCode);
+  if (nextStage) { boardBtn.dataset.stage = nextStage; boardBtn.dataset.applicationId = app.id; boardBtn.classList.remove('hidden'); }
+  else boardBtn.classList.add('hidden');
+  modal.classList.add('show');
+}
+function closeResultView() { document.getElementById('resultViewModal').classList.remove('show'); }
+function openNextStageBoardFromResult() {
+  const b = document.getElementById('result-view-board-btn');
+  closeResultView();
+  openResultReauthModal(b.dataset.applicationId, 'board', b.dataset.stage);
+}
+
+// 나의 채용: 세부 결과는 본인확인 버튼을 눌러야만 조회됩니다.
+async function renderMyRecruitment() {
+  const container = document.getElementById('my-recruitment-container');
+  if (!currentUser) {
+    container.innerHTML = `<div class="text-center py-8"><p class="text-xl font-bold text-gray-800 mb-4">로그인이 필요한 서비스입니다.</p><button onclick="switchTab('login')" class="bg-[#25408f] text-white px-8 py-3 font-bold">로그인하러 가기</button></div>`;
+    return;
+  }
+  document.getElementById('my-username').value = currentUser.username || '';
+  document.getElementById('my-roblox-id').value = currentUser.roblox_id || '등록되지 않음';
+  container.innerHTML = `<div class="py-8 text-center text-gray-500">지원 내역을 불러오는 중입니다...</div>`;
+  const {data,error} = await supabaseClient.from('applications').select('*').eq('applicant_username', currentUser.username).order('created_at',{ascending:false});
+  if (error) { container.innerHTML = `<div class="p-5 text-red-700">지원 내역을 불러오지 못했습니다: ${resultEsc(error.message)}</div>`; return; }
+  if (!data || !data.length) {
+    container.innerHTML = `<div class="bg-gray-50 border p-6 text-center rounded"><p class="font-bold text-gray-800 text-lg mb-2">${resultEsc(currentUser.username)} 님의 접수된 입사지원 내역이 없습니다.</p><button onclick="switchTab('jobs')" class="bg-[#25408f] text-white px-6 py-2 font-bold text-sm mt-2">채용공고 확인하기</button></div>`;
+    return;
+  }
+  container.innerHTML = data.map(app => {
+    let fileTxt='첨부파일 없음';
+    try { const parsed=JSON.parse(app.file_name); if (parsed?.name) fileTxt=parsed.name; else if (Array.isArray(parsed)) fileTxt=parsed.map(x=>x.name).join(', '); } catch (_) { fileTxt=app.file_name || '첨부파일 없음'; }
+    const boardStage = resultStageForStatus(app.status);
+    return `<article class="bg-white border border-gray-300 p-5 sm:p-6 text-left rounded mb-4 shadow-sm">
+      <div class="flex flex-wrap justify-between items-start gap-3 mb-3"><h3 class="font-bold text-blue-900 text-xl">${resultEsc(app.job_title)}</h3><span class="bg-gray-100 text-gray-700 font-bold text-xs px-3 py-1 rounded-full">지원 접수 내역</span></div>
+      <p class="text-gray-700 text-sm">첨부 서류: <strong>${resultEsc(fileTxt)}</strong></p>
+      <p class="text-xs text-gray-400 mt-2 mb-4">접수일시: ${resultEsc(new Date(app.created_at).toLocaleString())}</p>
+      <div class="flex flex-wrap gap-2"><button class="result-action-btn" onclick="openApplicationResult('${app.id}')">합격 확인 / 전형 결과 확인</button>
+      ${boardStage ? `<button class="result-secondary-btn" onclick="openResultReauthModal('${app.id}','board','${boardStage}')">${({first:'1차전형공지',second:'2차전형공지',final:'최종전형공지'})[boardStage]} 보기</button>` : ''}</div>
+      <p class="text-xs text-gray-500 mt-3">결과는 본인 확인 후에만 표시됩니다.</p>
+    </article>`;
+  }).join('');
+}
+
+// 관리자 지원자 표: 단계별 결과 선택/발표를 기존 테이블 안에서 처리.
+function updateResultCodeOptions(applicationId) {
+  const stage = document.getElementById(`result-stage-${applicationId}`)?.value || 'document';
+  const select = document.getElementById(`result-code-${applicationId}`);
+  if (!select) return;
+  const options = {
+    document:[['document_pass','서류 합격(1차전형 대상자)'],['document_fail','서류 불합격']],
+    first:[['first_pass','1차전형 합격'],['first_fail','1차전형 불합격']],
+    second:[['second_pass','2차전형 합격'],['second_fail','2차전형 불합격']],
+    final:[['final_pass','최종합격'],['final_fail','최종 불합격']]
+  }[stage];
+  select.innerHTML = options.map(([v,l]) => `<option value="${v}">${l}</option>`).join('');
+}
+async function publishApplicationResult(applicationId) {
+  if (!currentUser || currentUser.role !== 'admin') { alert('관리자 권한이 필요합니다.'); return; }
+  const stage = document.getElementById(`result-stage-${applicationId}`)?.value;
+  const resultCode = document.getElementById(`result-code-${applicationId}`)?.value;
+  const adminNote = document.getElementById(`result-note-${applicationId}`)?.value.trim() || '';
+  const password = prompt('관리자 본인 확인을 위해 비밀번호를 입력하세요.');
+  if (password === null) return;
+  try {
+    const res = await resultApi({action:'publish-result', username:currentUser.username, password, applicationId, stage, resultCode, adminNote});
+    alert(`결과 발표 완료: ${res.resultName}`);
+    await loadAdminApplications();
+  } catch (e) { alert(`결과 발표 실패: ${e.message}`); }
+}
+async function loadAdminApplications() {
+  const body = document.getElementById('admin-apps-body');
+  if (!currentUser || currentUser.role !== 'admin') { body.innerHTML = '<tr><td colspan="5" class="p-4 text-center text-red-600">관리자 권한이 필요합니다.</td></tr>'; return; }
+  let query = supabaseClient.from('applications').select('*').order('created_at',{ascending:false});
+  if (adminCurrentSubTab === 'active') query = query.eq('status','서류 심사 중');
+  else query = query.neq('status','서류 심사 중');
+  const {data,error} = await query;
+  if (error) { body.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-red-600">${resultEsc(error.message)}</td></tr>`; return; }
+  if (!data?.length) { body.innerHTML = '<tr><td colspan="5" class="p-4 text-center text-gray-500">내역이 없습니다.</td></tr>'; return; }
+  body.innerHTML = data.map(app => {
+    let fileDisplay='첨부파일 없음';
+    try { const f=JSON.parse(app.file_name); if (f?.url) fileDisplay=`<a href="${resultEsc(f.url)}" target="_blank" rel="noopener noreferrer" class="bg-blue-600 text-white text-xs px-3 py-1.5 rounded font-bold inline-block">${resultEsc(f.name || '지원서')} 다운로드</a>`; else if (Array.isArray(f)) fileDisplay=f.map(x=>`<a href="${resultEsc(x.url)}" target="_blank" rel="noopener noreferrer">${resultEsc(x.name || '지원서')}</a>`).join('<br>'); } catch (_) { fileDisplay=resultEsc(app.file_name || '첨부파일 없음'); }
+    return `<tr class="border-b align-top"><td class="p-3 font-bold">${resultEsc(app.job_title)}</td><td class="p-3 font-bold">${resultEsc(app.applicant_username)}</td><td class="p-3">${fileDisplay}</td><td class="p-3 font-bold">${resultEsc(app.status)}</td><td class="p-3 min-w-[260px]"><div class="space-y-2"><select id="result-stage-${app.id}" onchange="updateResultCodeOptions('${app.id}')" class="std-input text-sm"><option value="document">서류전형</option><option value="first">1차전형</option><option value="second">2차전형</option><option value="final">최종전형</option></select><select id="result-code-${app.id}" class="std-input text-sm"><option value="document_pass">서류 합격(1차전형 대상자)</option><option value="document_fail">서류 불합격</option></select><textarea id="result-note-${app.id}" class="std-textarea text-sm" rows="2" placeholder="선택 사항: 관리자 메모"></textarea><button onclick="publishApplicationResult('${app.id}')" class="result-action-btn w-full">결과 저장 / 발표</button><div class="flex gap-2"><select id="board-stage-${app.id}" class="std-input text-xs"><option value="first">1차전형공지</option><option value="second">2차전형공지</option><option value="final">최종전형공지</option></select><button onclick="openResultReauthModal('${app.id}','board',document.getElementById('board-stage-${app.id}').value)" class="result-secondary-btn text-xs">게시판 관리</button></div></div></td></tr>`;
+  }).join('');
+}
+
+function openStageBoardFromApp(applicationId, stage) { openResultReauthModal(applicationId,'board',stage); }
+function renderStageBoard(response) {
+  const stage = currentBoardState.stage;
+  const labels = {first:'1차전형공지',second:'2차전형공지',final:'최종전형공지'};
+  document.getElementById('stage-board-heading').innerText = labels[stage] || '전형 공지';
+  document.getElementById('stage-board-description').innerText = currentUser?.role === 'admin' ? '관리자 전용 게시판 관리 화면입니다. 게시물 작성은 관리자만 가능합니다.' : '해당 전형 대상자와 관리자만 열람할 수 있습니다. 댓글은 게시물 하단에서 작성할 수 있습니다.';
+  document.getElementById('stage-post-write').classList.toggle('hidden', currentUser?.role !== 'admin');
+  const list = document.getElementById('stage-post-list');
+  if (!response.posts?.length) list.innerHTML = '<div class="p-8 text-center border bg-white text-gray-500">등록된 게시물이 없습니다.</div>';
+  else list.innerHTML = response.posts.map(p => `<article class="stage-post-card"><h3 class="text-xl font-extrabold mb-2">${resultEsc(p.title)}</h3><p class="text-xs text-gray-500 mb-4">작성자: ${resultEsc(p.created_by_username || '관리자')} · ${resultEsc(new Date(p.created_at).toLocaleString())}</p><div class="whitespace-pre-wrap leading-relaxed mb-5">${resultEsc(p.body)}</div><div id="stage-comments-${p.id}" class="border-t"></div><form class="mt-3 flex flex-col sm:flex-row gap-2" onsubmit="submitStageComment(event,'${p.id}')"><input class="std-input" id="stage-comment-input-${p.id}" maxlength="5000" placeholder="댓글을 입력하세요" required><button class="result-action-btn">댓글 등록</button></form></article>`).join('');
+  for (const p of (response.posts || [])) loadStageComments(p.id);
+  switchTab('stage-board');
+}
+async function openStageBoardWithCredential(applicationId, stage, password) {
+  const response = await resultApi({action:'list-posts',username:currentUser.username,password,applicationId,stage});
+  currentBoardPassword = password;
+  currentBoardState = {applicationId,stage,jobId:response.jobId};
+  renderStageBoard(response);
+}
+async function loadStageComments(postId) {
+  if (!currentBoardState || !currentBoardPassword) return;
+  const target = document.getElementById(`stage-comments-${postId}`);
+  if (!target) return;
+  try {
+    const data = await resultApi({action:'list-comments',username:currentUser.username,password:currentBoardPassword,applicationId:currentBoardState.applicationId,stage:currentBoardState.stage,postId});
+    target.innerHTML = data.comments?.length ? data.comments.map(c=>`<div class="stage-comment"><div class="text-xs text-gray-500 mb-1">${resultEsc(c.author_username || '지원자')} · ${resultEsc(new Date(c.created_at).toLocaleString())}</div><div class="whitespace-pre-wrap">${resultEsc(c.body)}</div></div>`).join('') : '<div class="stage-comment text-sm text-gray-500">아직 댓글이 없습니다.</div>';
+  } catch (e) { target.innerHTML = `<div class="stage-comment text-sm text-red-600">댓글을 불러오지 못했습니다: ${resultEsc(e.message)}</div>`; }
+}
+async function createStagePost() {
+  if (currentUser?.role !== 'admin' || !currentBoardState || !currentBoardPassword) { alert('관리자 본인 확인이 필요합니다.'); return; }
+  const title=document.getElementById('stage-post-title').value.trim();
+  const body=document.getElementById('stage-post-body').value.trim();
+  if (!title || !body) { alert('제목과 내용을 입력해 주세요.'); return; }
+  try {
+    await resultApi({action:'create-post',username:currentUser.username,password:currentBoardPassword,applicationId:currentBoardState.applicationId,stage:currentBoardState.stage,title,body});
+    document.getElementById('stage-post-title').value=''; document.getElementById('stage-post-body').value='';
+    const data=await resultApi({action:'list-posts',username:currentUser.username,password:currentBoardPassword,applicationId:currentBoardState.applicationId,stage:currentBoardState.stage});
+    currentBoardState.jobId=data.jobId; renderStageBoard(data);
+  } catch(e) { alert(`게시물 등록 실패: ${e.message}`); }
+}
+async function submitStageComment(event, postId) {
+  event.preventDefault();
+  if (!currentBoardState || !currentBoardPassword) { alert('본인 확인이 만료되었습니다. 게시판을 다시 열어 주세요.'); return; }
+  const input=document.getElementById(`stage-comment-input-${postId}`);
+  const body=input?.value.trim(); if (!body) return;
+  try {
+    await resultApi({action:'create-comment',username:currentUser.username,password:currentBoardPassword,applicationId:currentBoardState.applicationId,stage:currentBoardState.stage,postId,body});
+    input.value=''; await loadStageComments(postId);
+  } catch(e) { alert(`댓글 등록 실패: ${e.message}`); }
+}
+
+// 재인증한 비밀번호는 메모리에서만 유지하고, 닫기/로그아웃 시 비웁니다.
+function handleLogout() { currentBoardPassword=null; currentBoardState=null; currentResultResponse=null; closeResultReauth(); closeResultView(); localStorage.removeItem('samsan_user'); currentUser=null; alert('로그아웃 되었습니다.'); checkLocalSession(); switchTab('home'); }
+document.getElementById('resultReauthModal')?.addEventListener('click', e => { if (e.target.id === 'resultReauthModal') closeResultReauth(); });
+document.getElementById('resultViewModal')?.addEventListener('click', e => { if (e.target.id === 'resultViewModal') closeResultView(); });
+</script>
+
 </body>
 </html>
