@@ -34,17 +34,29 @@
         .view-section { display: none; opacity: 0; transition: opacity 0.3s ease-in-out; }
         .view-section.active { display: block; opacity: 1; }
 
-        .result-modal-overlay { position:fixed; inset:0; z-index:100; background:rgba(12,18,35,.72); display:none; align-items:center; justify-content:center; padding:16px; }
+        .result-modal-overlay { position:fixed; inset:0; z-index:100; background:rgba(12,18,35,.78); display:none; align-items:center; justify-content:center; padding:12px; }
         .result-modal-overlay.show { display:flex; }
         .result-modal-card { width:min(900px,100%); max-height:92vh; overflow:auto; background:#fff; border-radius:10px; box-shadow:0 25px 80px rgba(0,0,0,.3); }
+        .result-notice-modal { width:min(1040px,96vw); max-height:96vh; overflow:auto; background:#fff; border-radius:12px; box-shadow:0 25px 80px rgba(0,0,0,.38); padding:10px 12px 14px; }
+        .result-notice-topbar { display:flex; align-items:center; justify-content:flex-end; height:34px; }
+        .result-notice-close { width:32px; height:32px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:27px; line-height:1; color:#596273; }
+        .result-notice-close:hover { background:#f1f5f9; color:#111827; }
+        .result-notice-image-wrap { display:flex; align-items:center; justify-content:center; min-height:100px; }
+        .result-image { display:block; width:auto; height:auto; max-width:100%; max-height:calc(100dvh - 125px); object-fit:contain; object-position:center; background:#fff; margin:0 auto; }
+        .result-notice-actions { display:flex; justify-content:center; gap:10px; flex-wrap:wrap; padding-top:12px; }
+        .result-notice-empty { padding:40px 16px; text-align:center; color:#4b5563; font-weight:700; }
         .result-action-btn { background:#25408f;color:#fff;padding:9px 13px;font-weight:800;border-radius:3px; }
         .result-action-btn:hover { background:#1c3274; }
         .result-secondary-btn { background:#eef2ff;color:#25408f;padding:9px 13px;font-weight:800;border:1px solid #c7d2fe;border-radius:3px; }
-        .result-image { display:block;width:100%;max-height:320px;object-fit:contain;background:#f8fafc; }
         .result-body { white-space:pre-wrap; line-height:1.9; color:#292929; font-size:15px; }
         .result-history-item { border-left:4px solid #cbd5e1;padding:10px 12px;margin:8px 0;background:#f8fafc; }
         .result-history-item.pass { border-color:#3157b7; }
         .result-history-item.fail { border-color:#c62828; }
+        @media (max-width: 640px) {
+          .result-notice-modal { width:100%; max-height:98dvh; padding:7px; border-radius:8px; }
+          .result-image { max-height:calc(100dvh - 118px); }
+          .result-notice-topbar { height:28px; }
+        }
         .stage-post-card { border:1px solid #d1d5db;background:#fff;padding:18px;margin-bottom:16px; }
         .stage-comment { padding:10px 12px;background:#f8fafc;border-top:1px solid #e5e7eb; }
 
@@ -621,22 +633,20 @@
       </div>
     </div>
 
-    <!-- 전형 결과 팝업: 이미지에는 배경/큰 제목, 본문은 동적 텍스트 -->
+    <!-- 전형 결과 팝업: 통지서에 모든 문구가 포함된 PNG 이미지 자체를 표시 -->
     <div id="resultViewModal" class="result-modal-overlay" role="dialog" aria-modal="true" aria-labelledby="result-view-title">
-      <div class="result-modal-card">
-        <div class="flex justify-between items-center p-4 border-b">
-          <h3 id="result-view-title" class="text-xl font-extrabold">채용 전형 결과</h3>
-          <button type="button" onclick="closeResultView()" class="text-2xl text-gray-500" aria-label="닫기">×</button>
+      <div class="result-notice-modal">
+        <h3 id="result-view-title" class="sr-only">채용 전형 결과 통지서</h3>
+        <div class="result-notice-topbar">
+          <button type="button" onclick="closeResultView()" class="result-notice-close" aria-label="결과 팝업 닫기" title="닫기">×</button>
         </div>
-        <div class="p-4 sm:p-6">
-          <img id="result-view-image" class="result-image mb-5" alt="전형 결과 안내 이미지">
-          <h4 id="result-view-headline" class="text-2xl font-extrabold mb-4 text-center"></h4>
-          <div id="result-view-body" class="result-body"></div>
-          <div id="result-view-history" class="mt-6"></div>
-          <div class="flex flex-wrap justify-end gap-2 mt-6">
-            <button id="result-view-board-btn" class="hidden result-action-btn" onclick="openNextStageBoardFromResult()">다음 전형 공지 확인</button>
-            <button onclick="closeResultView()" class="result-secondary-btn">닫기</button>
-          </div>
+        <div class="result-notice-image-wrap">
+          <img id="result-view-image" class="result-image hidden" alt="채용 전형 결과 통지서">
+          <div id="result-view-empty" class="result-notice-empty hidden">아직 발표된 전형 결과가 없습니다.</div>
+          <div id="result-view-image-error" class="result-notice-empty hidden" role="alert">결과 통지서 이미지를 불러오지 못했습니다. 이미지 파일명과 배포 경로를 확인해 주세요.</div>
+        </div>
+        <div class="result-notice-actions">
+          <button id="result-view-board-btn" class="hidden result-action-btn" onclick="openNextStageBoardFromResult()">다음 전형 공지 확인</button>
         </div>
       </div>
     </div>
@@ -1587,46 +1597,94 @@ function resultBodyText(result, app) {
   body += '\n\n삼산여객 인사부 드림';
   return body;
 }
-function resultHeadlineText(result) { return RESULT_CODE_META[result.resultCode]?.label || result.resultName || '채용 전형 결과'; }
-function renderResultPopup(response) {
-  const results = response.results || [];
-  const latest = response.currentResult || results[results.length - 1];
-  const modal = document.getElementById('resultViewModal');
-  const headline = document.getElementById('result-view-headline');
-  const image = document.getElementById('result-view-image');
-  const body = document.getElementById('result-view-body');
-  const history = document.getElementById('result-view-history');
-  const boardBtn = document.getElementById('result-view-board-btn');
-  const app = response.application || {};
-  document.getElementById('result-view-title').innerText = app.jobTitle || '채용 전형 결과';
-  if (!latest) {
-    image.classList.add('hidden');
-    headline.innerText = '아직 발표된 전형 결과가 없습니다.';
-    body.innerText = '결과 발표 후 이 화면에서 확인하실 수 있습니다.';
-    history.innerHTML = '';
-    boardBtn.classList.add('hidden');
-    modal.classList.add('show'); return;
+function normalizePopupResultCode(result) {
+  if (!result || typeof result !== 'object') return '';
+  const raw = String(result.resultCode ?? result.result_code ?? result.result_status ?? result.outcome ?? result.decision ?? '').trim().toLowerCase();
+  if (RESULT_CODE_META[raw]) return raw;
+  const labelCandidate = String(result.resultName ?? result.result_name ?? result.status ?? '').trim();
+  for (const [code, meta] of Object.entries(RESULT_CODE_META)) {
+    if (labelCandidate === meta.label || raw === meta.label.toLowerCase()) return code;
   }
-  image.classList.remove('hidden');
-  const code = RESULT_CODE_META[latest.resultCode]?.image || latest.imageName || '';
-  image.alt = resultHeadlineText(latest);
-  image.onerror = function() {
-    if (!this.dataset.fallbackTried) { this.dataset.fallbackTried = '1'; this.src = `./${code}.png`; }
-    else { this.style.display='none'; }
+  const stageText = String(result.stage ?? result.stage_code ?? result.stageCode ?? result.stageName ?? result.stage_name ?? raw ?? '').toLowerCase();
+  let stage = '';
+  if (/document|서류/.test(stageText)) stage = 'document';
+  else if (/second|2차/.test(stageText)) stage = 'second';
+  else if (/first|1차/.test(stageText)) stage = 'first';
+  else if (/final|최종/.test(stageText)) stage = 'final';
+  if (!stage) {
+    const labelText = `${labelCandidate} ${raw}`;
+    if (/서류/.test(labelText)) stage = 'document';
+    else if (/2차|second/.test(labelText)) stage = 'second';
+    else if (/1차|first/.test(labelText)) stage = 'first';
+    else if (/최종|final/.test(labelText)) stage = 'final';
+  }
+  const outcomeText = `${raw} ${labelCandidate} ${String(result.result_status ?? '')} ${String(result.decision ?? '')} ${String(result.outcome ?? '')}`.toLowerCase();
+  let outcome = '';
+  if (/불합격|탈락|fail|reject|불통과/.test(outcomeText)) outcome = 'fail';
+  else if (/합격|pass|accept|success|통과/.test(outcomeText)) outcome = 'pass';
+  if (stage && outcome) return `${stage}_${outcome}`;
+  return '';
+}
+function resultHeadlineText(result) {
+  const code = normalizePopupResultCode(result) || result?.resultCode || '';
+  return RESULT_CODE_META[code]?.label || result?.resultName || result?.result_name || '채용 전형 결과';
+}
+function renderResultPopup(response) {
+  const modal = document.getElementById('resultViewModal');
+  const image = document.getElementById('result-view-image');
+  const empty = document.getElementById('result-view-empty');
+  const imageError = document.getElementById('result-view-image-error');
+  const boardBtn = document.getElementById('result-view-board-btn');
+  const app = response?.application || response?.data?.application || {};
+  const results = response?.results || response?.data?.results || [];
+  const rawLatest = response?.currentResult || response?.result || response?.data?.currentResult || response?.data?.result || results[results.length - 1] || null;
+  const latestCode = normalizePopupResultCode(rawLatest);
+  const latest = rawLatest ? { ...rawLatest, resultCode: latestCode || rawLatest.resultCode || rawLatest.result_code || '' } : null;
+
+  image.onerror = null;
+  image.onload = null;
+  image.removeAttribute('src');
+  image.classList.add('hidden');
+  empty.classList.add('hidden');
+  imageError.classList.add('hidden');
+  boardBtn.classList.add('hidden');
+  boardBtn.removeAttribute('data-stage');
+  boardBtn.removeAttribute('data-application-id');
+
+  if (!latest || !latest.resultCode || !RESULT_CODE_META[latest.resultCode]) {
+    empty.classList.remove('hidden');
+    modal.classList.add('show');
+    return;
+  }
+
+  const meta = RESULT_CODE_META[latest.resultCode];
+  const allowedImageNames = new Set(['zeok', 'zeno', 'stok', 'stno', 'ndok', 'ndno', 'fiok', 'fino']);
+  const imageName = allowedImageNames.has(meta.image) ? meta.image : '';
+  if (!imageName) {
+    imageError.classList.remove('hidden');
+    modal.classList.add('show');
+    return;
+  }
+
+  image.alt = meta.label + ' 통지서';
+  image.onload = () => {
+    image.classList.remove('hidden');
+    imageError.classList.add('hidden');
   };
-  image.onload = function(){ this.style.display='block'; this.dataset.fallbackTried=''; };
-  image.src = `./assets/results/${code}.png`;
-  headline.innerText = resultHeadlineText(latest);
-  body.innerText = resultBodyText(latest, app);
-  history.innerHTML = `<h5 class="font-extrabold text-gray-800 mb-2">전형 결과 이력</h5>` + results.map(r => {
-    const m = RESULT_CODE_META[r.resultCode] || {};
-    const cls = m.pass ? 'pass' : 'fail';
-    const when = r.announcedAt ? new Date(r.announcedAt).toLocaleString() : '';
-    return `<div class="result-history-item ${cls}"><div class="font-bold">${resultEsc(r.stageName || RESULT_STAGE_LABEL[r.stage] || '')} · ${resultEsc(resultHeadlineText(r))}</div><div class="text-xs text-gray-500 mt-1">발표: ${resultEsc(when)}</div>${r.adminNote ? `<div class="mt-2 whitespace-pre-wrap">${resultEsc(r.adminNote)}</div>` : ''}</div>`;
-  }).join('');
+  image.onerror = () => {
+    image.classList.add('hidden');
+    imageError.classList.remove('hidden');
+  };
+  // PNG 파일이 index.html과 같은 배포 루트에 있으므로 상대 경로로 직접 불러옵니다.
+  image.src = `./${imageName}.png`;
+
   const nextStage = stageForResultCode(latest.resultCode);
-  if (nextStage) { boardBtn.dataset.stage = nextStage; boardBtn.dataset.applicationId = app.id; boardBtn.classList.remove('hidden'); }
-  else boardBtn.classList.add('hidden');
+  const applicationId = app.id || app.applicationId || latest.applicationId || latest.application_id;
+  if (meta.pass && nextStage && applicationId) {
+    boardBtn.dataset.stage = nextStage;
+    boardBtn.dataset.applicationId = applicationId;
+    boardBtn.classList.remove('hidden');
+  }
   modal.classList.add('show');
 }
 function closeResultView() { document.getElementById('resultViewModal').classList.remove('show'); }
@@ -1764,6 +1822,7 @@ async function submitStageComment(event, postId) {
 function handleLogout() { currentBoardPassword=null; currentBoardState=null; currentResultResponse=null; closeResultReauth(); closeResultView(); localStorage.removeItem('samsan_user'); currentUser=null; alert('로그아웃 되었습니다.'); checkLocalSession(); switchTab('home'); }
 document.getElementById('resultReauthModal')?.addEventListener('click', e => { if (e.target.id === 'resultReauthModal') closeResultReauth(); });
 document.getElementById('resultViewModal')?.addEventListener('click', e => { if (e.target.id === 'resultViewModal') closeResultView(); });
+document.addEventListener('keydown', e => { if (e.key === 'Escape') { closeResultView(); closeResultReauth(); } });
 </script>
 
 </body>
