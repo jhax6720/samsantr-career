@@ -227,7 +227,7 @@
                     <section>
                         <h2 class="text-xl font-bold text-gray-900 mb-2">제 5조 (개인정보의 제3자 제공 및 위탁)</h2>
                         <p class="mb-1">제 1항. 회사는 정보주체의 동의 없이 개인정보를 외부에 제공하지 않는다.</p>
-                        <p class="mb-1">제 2항. 회사는 원활한 서비스 제공 및 데이터 관리를 위하여 다음과 같이 개인정보 처리 업무를 외부 전문업체에 위탁하고 있다.</p>
+                        <p class="mb-1">제 2항. 회사는 원활한 서비스 제공 및 데이터 관리를 위하여 다음과 같이 개인정보 처리 업무를 외부 전문업체에 위탁한다.</p>
                         <p class="font-bold mt-2 mb-1">제 2항 -1. 항목은 다음과 같다.</p>
                         <ul class="list-disc list-inside space-y-1 pl-2">
                             <li>① 업체 - Supabase Inc. (DB 관리), Vercel Inc. (사이트 호스팅)</li>
@@ -253,7 +253,7 @@
 
                     <section>
                         <h2 class="text-xl font-bold text-gray-900 mb-2">제 8조 (개인정보 보호책임자 및 문의처)</h2>
-                        <p class="mb-1">제 1항. 회사는 개인정보 처리에 관한 업무를 총괄해서 책임지고, 개인정보 처리와 관련한 정보주체의 불만처리 및 피해구제 등을 위하여 아래와 같이 개인정보 보호책임자를 지정하고 있다.</p>
+                        <p class="mb-1">제 1항. 회사는 개인정보 처리에 관한 업무를 총괄해서 책임지고, 개인정보 처리와 관련한 정보주체의 불만처리 및 피해구제 등을 위하여 아래와 같이 개인정보 보호책임자를 지정한다.</p>
                         <p class="font-bold mt-2 mb-1">제 1항 -1. 다음과 같다.</p>
                         <ul class="list-disc list-inside space-y-1 pl-2">
                             <li>① 회사명 - 삼산여객 주식회사</li>
@@ -263,14 +263,14 @@
 
                     <section>
                         <h2 class="text-xl font-bold text-gray-900 mb-2">제 9조 (개인정보 처리방침의 변경)</h2>
-                        <p class="mb-1">제 1항. 이 개인정보처리방침은 홈페이지가 게시된 시점부터 적용된다. 내용의 추가, 삭제 및 수정이 있을 시에는 홈페이지 공지사항을 통해 고지할 것이다.</p>
+                        <p class="mb-1">제 1항. 이 개인정보처리방침은 홈페이지가 게시된 시점부터 적용된다. 내용의 추가, 삭제 및 수정이 있을 시에는 홈페이지 공지사항을 통해 고지한다.</p>
                     </section>
                 </div>
 
                 <div class="mt-12 pt-6 border-t border-gray-300 text-sm text-gray-600 space-y-1">
                     <p>최종 수정자 : quartey123456</p>
                     <p class="font-bold text-gray-800">삼산여객 주식회사</p>
-                    <p>이 『개인정보처리방침』 은 2026년 10월 31일에 개정되었습니다.</p>
+                    <p>이 『개인정보처리방침』 은 2026년 10월 30일에 개정되었습니다.</p>
                 </div>
             </div>
         </div>
@@ -755,6 +755,20 @@
             }
         }
 
+        function applicationEndReason(status) {
+            const value = String(status || '').trim();
+            return /불합격|탈락/.test(value) || /2차전형\s*최종합격|최종합격/.test(value);
+        }
+
+        function existingApplicationMessage(prior) {
+            const title = prior?.job_title || '기존 채용공고';
+            const status = prior?.status || '접수 완료';
+            if (applicationEndReason(status)) {
+                return `이번 채용 절차는 '${status}'로 종료되었습니다.\n불합격 또는 최종합격으로 종료된 지원서는 다음 전형으로 진행되지 않습니다.\n같은 계정으로는 재지원할 수 없습니다.`;
+            }
+            return `이미 입사지원 내역이 있습니다.\n지원 공고: ${title}\n현재 상태: ${status}\n중복 지원은 불가합니다.`;
+        }
+
         async function startApplyProcess() {
             if (!currentUser) { alert('로그인 후 입사지원이 가능합니다.'); switchTab('login'); return; }
             if (!currentJob) { alert('지원할 채용공고를 먼저 선택해 주세요.'); return; }
@@ -772,10 +786,7 @@
             }
             if (existingApps && existingApps.length > 0) {
                 const prior = existingApps[0];
-                alert(`이미 입사지원 내역이 있습니다.
-지원 공고: ${prior.job_title || '기존 채용공고'}
-현재 상태: ${prior.status || '접수 완료'}
-중복 지원은 불가합니다.`);
+                alert(existingApplicationMessage(prior));
                 switchTab('my');
                 return;
             }
@@ -841,7 +852,7 @@
                     .limit(1);
                 if (existingError) throw new Error(`기존 지원 내역 확인 실패: ${existingError.message}`);
                 if (existingApps && existingApps.length > 0) {
-                    alert('이미 지원 내역이 있어 중복 제출할 수 없습니다. 나의 채용에서 기존 지원 내역을 확인해 주세요.');
+                    alert(existingApplicationMessage(existingApps[0]));
                     switchTab('my');
                     return;
                 }
@@ -1439,6 +1450,49 @@ function statusForResultCode(code) {
   };
   return labels[code] || '서류 심사 중';
 }
+const ACTIVE_APPLICATION_STATUSES = new Set([
+  '서류 심사 중',
+  '서류 합격',
+  '서류 합격(1차전형 대상자)',
+  '1차전형 합격'
+]);
+function isTerminalResultCode(code) {
+  const meta = RESULT_CODE_META[code];
+  // 모든 불합격은 즉시 종료. 2차 합격은 최종합격이므로 종료.
+  return Boolean(meta && (!meta.pass || code === 'second_pass' || code === 'final_pass'));
+}
+function isTerminalApplicationStatus(status) {
+  if (applicationEndReason(status)) return true;
+  return false;
+}
+function isApplicationInProgress(app) {
+  const status = String(app?.status || '').trim();
+  return ACTIVE_APPLICATION_STATUSES.has(status) && !isTerminalApplicationStatus(status);
+}
+function getAdminStageForStatus(status) {
+  const value = String(status || '').trim();
+  if (value === '서류 심사 중') return 'document';
+  if (/^서류 합격/.test(value)) return 'first';
+  if (value === '1차전형 합격') return 'second';
+  if (/^1차전형/.test(value)) return 'first';
+  if (/^2차전형/.test(value)) return 'second';
+  if (/^최종/.test(value)) return 'final';
+  if (/^서류/.test(value)) return 'document';
+  return 'document';
+}
+function resultOptionsForStage(stage) {
+  return ({
+    document: [['document_pass', '서류 합격(1차전형 대상자)'], ['document_fail', '서류 불합격']],
+    first: [['first_pass', '1차전형 합격'], ['first_fail', '1차전형 불합격']],
+    second: [['second_pass', '2차전형 최종합격'], ['second_fail', '2차전형 불합격(최종)']]
+  })[stage] || [];
+}
+function getDefaultResultCodeForStatus(status, stage) {
+  const value = String(status || '').trim();
+  if (/불합격|탈락/.test(value)) return ({document:'document_fail', first:'first_fail', second:'second_fail'})[stage] || '';
+  if (/합격/.test(value)) return ({document:'document_pass', first:'first_pass', second:'second_pass'})[stage] || '';
+  return ({document:'document_pass', first:'first_pass', second:'second_pass'})[stage] || '';
+}
 async function resultApi(payload) {
   const response = await fetch(RESULT_FUNCTION_URL, {
     method: 'POST',
@@ -1661,12 +1715,19 @@ async function renderMyRecruitment() {
   container.innerHTML = data.map(app => {
     let fileTxt = '첨부파일 없음';
     try { const parsed = JSON.parse(app.file_name); if (parsed?.name) fileTxt = parsed.name; else if (Array.isArray(parsed)) fileTxt = parsed.map(x => x.name).join(', '); } catch (_) { fileTxt = app.file_name || '첨부파일 없음'; }
+    const status = String(app.status || '접수 완료');
+    const ended = isTerminalApplicationStatus(status) || (app.is_archived === true && !ACTIVE_APPLICATION_STATUSES.has(status));
+    const statusBadge = ended
+      ? '<span class="bg-red-100 text-red-700 font-bold text-xs px-3 py-1 rounded-full">전형 종료</span>'
+      : '<span class="bg-blue-100 text-blue-700 font-bold text-xs px-3 py-1 rounded-full">심사 진행 중</span>';
     return `<article class="bg-white border border-gray-300 p-5 sm:p-6 text-left rounded mb-4 shadow-sm">
-      <div class="flex flex-wrap justify-between items-start gap-3 mb-3"><h3 class="font-bold text-blue-900 text-xl">${resultEsc(app.job_title)}</h3><span class="bg-gray-100 text-gray-700 font-bold text-xs px-3 py-1 rounded-full">지원 접수 내역</span></div>
+      <div class="flex flex-wrap justify-between items-start gap-3 mb-3"><h3 class="font-bold text-blue-900 text-xl">${resultEsc(app.job_title)}</h3>${statusBadge}</div>
+      <p class="text-sm mb-2">현재 상태: <strong class="${ended ? 'text-red-700' : 'text-blue-800'}">${resultEsc(status)}</strong></p>
+      ${ended ? '<p class="text-sm text-red-700 mb-3">불합격 또는 최종합격으로 이 지원 절차는 종료되었습니다. 더 진행되는 전형은 없습니다.</p>' : '<p class="text-sm text-gray-600 mb-3">현재 단계의 결과 발표 후 다음 전형 진행 여부가 결정됩니다.</p>'}
       <p class="text-gray-700 text-sm">첨부 서류: <strong>${resultEsc(fileTxt)}</strong></p>
       <p class="text-xs text-gray-400 mt-2 mb-4">접수일시: ${resultEsc(new Date(app.created_at).toLocaleString())}</p>
       <div class="flex flex-wrap gap-2"><button class="result-action-btn" onclick="openApplicationResult('${app.id}')">합격 확인</button></div>
-      <p class="text-xs text-gray-500 mt-3">결과는 본인 확인 후 별도의 브라우저 팝업에서 통지서 이미지로 표시됩니다.</p>
+      <p class="text-xs text-gray-500 mt-3">결과 통지서는 본인 확인 후 별도의 브라우저 팝업에서 PNG 이미지로 표시됩니다.</p>
     </article>`;
   }).join('');
 }
@@ -1675,11 +1736,7 @@ function updateResultCodeOptions(applicationId) {
   const stage = document.getElementById(`result-stage-${applicationId}`)?.value || 'document';
   const select = document.getElementById(`result-code-${applicationId}`);
   if (!select) return;
-  const options = {
-    document: [['document_pass', '서류 합격(1차전형 대상자)'], ['document_fail', '서류 불합격']],
-    first: [['first_pass', '1차전형 합격'], ['first_fail', '1차전형 불합격']],
-    second: [['second_pass', '2차전형 최종합격'], ['second_fail', '2차전형 불합격(최종)']]
-  }[stage] || [['document_pass', '서류 합격(1차전형 대상자)'], ['document_fail', '서류 불합격']];
+  const options = resultOptionsForStage(stage);
   select.innerHTML = options.map(([value, label]) => `<option value="${value}">${label}</option>`).join('');
 }
 async function publishApplicationResult(applicationId) {
@@ -1697,13 +1754,16 @@ async function publishApplicationResult(applicationId) {
   try {
     const res = await resultApi({ action: 'publish-result', username: currentUser.username, password, applicationId, stage, resultCode, adminNote });
     // Edge Function의 전형 기록과 지원자 관리의 상태 문구를 동일하게 유지합니다.
+    const terminal = isTerminalResultCode(resultCode);
     const { error: statusSyncError } = await supabaseClient.from('applications')
-      .update({ status: statusForResultCode(resultCode), is_archived: false })
+      .update({ status: statusForResultCode(resultCode), is_archived: terminal })
       .eq('id', applicationId);
     if (statusSyncError) {
       alert(`결과 기록은 저장됐지만 지원 상태 동기화에 실패했습니다: ${statusSyncError.message}`);
+    } else if (terminal) {
+      alert(`결과 발표 완료: ${res.resultName || RESULT_CODE_META[resultCode].label}\n이 지원 절차는 종료 처리되어 '합격/불합격 보관함'으로 이동합니다.`);
     } else {
-      alert(`결과 발표 완료: ${res.resultName || RESULT_CODE_META[resultCode].label}`);
+      alert(`결과 발표 완료: ${res.resultName || RESULT_CODE_META[resultCode].label}\n다음 전형 심사 대상으로 유지됩니다.`);
     }
     await loadAdminApplications();
   } catch (error) {
@@ -1712,29 +1772,51 @@ async function publishApplicationResult(applicationId) {
 }
 async function loadAdminApplications() {
   const body = document.getElementById('admin-apps-body');
-  if (!currentUser || currentUser.role !== 'admin') { body.innerHTML = '<tr><td colspan="5" class="p-4 text-center text-red-600">관리자 권한이 필요합니다.</td></tr>'; return; }
-  let query = supabaseClient.from('applications').select('*').order('created_at', { ascending: false });
-  // 서류 합격과 1차 합격자는 다음 단계 심사가 남아 있으므로 진행 중 목록에 유지합니다.
-  const inProgressStatuses = ['서류 심사 중', '서류 합격', '서류 합격(1차전형 대상자)', '1차전형 합격'];
-  if (adminCurrentSubTab === 'active') {
-    query = query.in('status', inProgressStatuses);
-  } else {
-    for (const status of inProgressStatuses) query = query.neq('status', status);
+  if (!currentUser || currentUser.role !== 'admin') {
+    body.innerHTML = '<tr><td colspan="5" class="p-4 text-center text-red-600">관리자 권한이 필요합니다.</td></tr>';
+    return;
   }
-  const { data, error } = await query;
-  if (error) { body.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-red-600">${resultEsc(error.message)}</td></tr>`; return; }
-  if (!data?.length) { body.innerHTML = '<tr><td colspan="5" class="p-4 text-center text-gray-500">내역이 없습니다.</td></tr>'; return; }
-  body.innerHTML = data.map(app => {
+  const { data, error } = await supabaseClient.from('applications').select('*').order('created_at', { ascending: false });
+  if (error) {
+    body.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-red-600">${resultEsc(error.message)}</td></tr>`;
+    return;
+  }
+  const allRows = data || [];
+  const rows = adminCurrentSubTab === 'active'
+    ? allRows.filter(isApplicationInProgress)
+    : allRows.filter(app => !isApplicationInProgress(app));
+  if (!rows.length) {
+    body.innerHTML = '<tr><td colspan="5" class="p-4 text-center text-gray-500">내역이 없습니다.</td></tr>';
+    return;
+  }
+  body.innerHTML = rows.map(app => {
     let fileDisplay = '첨부파일 없음';
     try {
       const f = JSON.parse(app.file_name);
       if (f?.url) fileDisplay = `<a href="${resultEsc(f.url)}" target="_blank" rel="noopener noreferrer" class="bg-blue-600 text-white text-xs px-3 py-1.5 rounded font-bold inline-block">${resultEsc(f.name || '지원서')} 다운로드</a>`;
       else if (Array.isArray(f)) fileDisplay = f.map(x => `<a href="${resultEsc(x.url)}" target="_blank" rel="noopener noreferrer">${resultEsc(x.name || '지원서')}</a>`).join('<br>');
     } catch (_) { fileDisplay = resultEsc(app.file_name || '첨부파일 없음'); }
-    return `<tr class="border-b align-top"><td class="p-3 font-bold">${resultEsc(app.job_title)}</td><td class="p-3 font-bold">${resultEsc(app.applicant_username)}</td><td class="p-3">${fileDisplay}</td><td class="p-3 font-bold">${resultEsc(app.status)}</td><td class="p-3 min-w-[260px]"><div class="space-y-2"><select id="result-stage-${app.id}" onchange="updateResultCodeOptions('${app.id}')" class="std-input text-sm"><option value="document">서류전형</option><option value="first">1차전형</option><option value="second">2차전형(최종)</option></select><select id="result-code-${app.id}" class="std-input text-sm"><option value="document_pass">서류 합격(1차전형 대상자)</option><option value="document_fail">서류 불합격</option></select><textarea id="result-note-${app.id}" class="std-textarea text-sm" rows="2" placeholder="선택 사항: 관리자 메모"></textarea><button onclick="publishApplicationResult('${app.id}')" class="result-action-btn w-full">결과 저장 / 발표</button></div></td></tr>`;
+
+    const terminal = !isApplicationInProgress(app);
+    const stageDefault = getAdminStageForStatus(app.status);
+    const legacyFinal = stageDefault === 'final';
+    const stageOptions = [
+      ['document', '서류전형'], ['first', '1차전형'], ['second', '2차전형(최종)']
+    ].map(([value, label]) => `<option value="${value}" ${stageDefault === value ? 'selected' : ''}>${label}</option>`).join('');
+    const defaultCode = getDefaultResultCodeForStatus(app.status, stageDefault);
+    const codeOptions = resultOptionsForStage(stageDefault).map(([value, label]) => `<option value="${value}" ${defaultCode === value ? 'selected' : ''}>${label}</option>`).join('');
+    const actionControls = legacyFinal
+      ? `<div class="rounded border bg-gray-50 p-3 text-sm text-gray-600">기존 최종전형 결과 기록입니다. 현재 전형은 종료되었습니다.</div>`
+      : `<div class="space-y-2">
+          <select id="result-stage-${app.id}" onchange="updateResultCodeOptions('${app.id}')" class="std-input text-sm" ${terminal ? 'disabled' : ''}>${stageOptions}</select>
+          <select id="result-code-${app.id}" class="std-input text-sm">${codeOptions}</select>
+          <textarea id="result-note-${app.id}" class="std-textarea text-sm" rows="2" placeholder="선택 사항: 관리자 메모"></textarea>
+          <button onclick="publishApplicationResult('${app.id}')" class="result-action-btn w-full">${terminal ? '현재 전형 결과 수정' : '결과 저장 / 발표'}</button>
+          ${terminal ? '<p class="text-xs text-gray-500">종료된 지원자는 다른 전형으로 이동할 수 없습니다. 현재 단계의 결과만 수정할 수 있습니다.</p>' : ''}
+        </div>`;
+    return `<tr class="border-b align-top"><td class="p-3 font-bold">${resultEsc(app.job_title)}</td><td class="p-3 font-bold">${resultEsc(app.applicant_username)}</td><td class="p-3">${fileDisplay}</td><td class="p-3 font-bold">${resultEsc(app.status)}${terminal ? '<div class="text-xs text-red-600 mt-1">전형 종료</div>' : ''}</td><td class="p-3 min-w-[260px]">${actionControls}</td></tr>`;
   }).join('');
 }
-
 function handleLogout() {
   closeResultReauth();
   localStorage.removeItem('samsan_user');
