@@ -69,16 +69,23 @@
         .guide-bullet-list { list-style:none; padding:0; margin:0; }
         .guide-bullet-list li { position:relative; padding-left:1.2rem; margin:.65rem 0; font-size:1.08rem; line-height:1.8; }
         .guide-bullet-list li::before { content:'-'; position:absolute; left:0; color:#354aa0; font-weight:900; }
-        .rank-track { display:grid; grid-template-columns:repeat(5,minmax(0,1fr)); gap:10px; align-items:stretch; }
-        .rank-card { min-width:0; position:relative; border:1px solid #dbe2f5; background:#f8f9ff; padding:18px 10px; text-align:center; }
-        .rank-card .rank-number { color:#354aa0; font-size:1.55rem; font-weight:900; margin-bottom:8px; }
-        .rank-card .rank-role { color:#242424; font-weight:800; margin-bottom:6px; }
-        .rank-card .rank-note { color:#6b7280; font-size:.87rem; line-height:1.5; }
-        .rank-card:last-child { background:#354aa0; border-color:#354aa0; }
-        .rank-card:last-child .rank-number,.rank-card:last-child .rank-role,.rank-card:last-child .rank-note { color:white; }
+        .rank-track { display:grid; grid-template-columns:repeat(5,minmax(0,1fr)); gap:0; align-items:center; position:relative; padding:10px 0; }
+        .rank-track::before { content:""; position:absolute; left:10%; right:30%; top:50%; height:12px; border-radius:999px; background:#e8e8e8; transform:translateY(-50%); z-index:0; }
+        .rank-card { width:min(100%,190px); aspect-ratio:1/1; min-width:0; position:relative; z-index:1; justify-self:center; border:10px solid #ececec; border-radius:50%; background:#fff; padding:12px; text-align:center; display:flex; flex-direction:column; align-items:center; justify-content:center; }
+        .rank-card .rank-number { color:#354aa0; font-size:clamp(1.15rem,2vw,1.8rem); font-weight:900; margin-bottom:8px; }
+        .rank-card .rank-role { color:#242424; font-weight:800; font-size:clamp(.78rem,1.15vw,1rem); margin-bottom:6px; }
+        .rank-card .rank-note { color:#6b7280; font-size:clamp(.68rem,.95vw,.85rem); line-height:1.45; }
+        .rank-card:nth-child(1) .rank-number { color:#657aa9; }
+        .rank-card:nth-child(2) .rank-number { color:#4eaa60; }
+        .rank-card:nth-child(3) .rank-number { color:#4d9cae; }
+        .rank-card:nth-child(4) .rank-number { color:#477bb4; }
+        .rank-card:last-child { border-color:#ececec; background:#fff; }
+        .rank-card:last-child .rank-number { color:#354aa0; }
+        .rank-card:last-child .rank-role { color:#242424; }
+        .rank-card:last-child .rank-note { color:#b42318; font-weight:800; }
         .rank-arrow { color:#354aa0; font-size:1.4rem; font-weight:900; display:flex; align-items:center; justify-content:center; }
         .guide-salary { background:#f6f7fb; border-left:5px solid #354aa0; padding:20px 24px; }
-        @media (max-width: 640px) { .rank-track { grid-template-columns:1fr; } .rank-card { padding:13px; } .rank-arrow { transform:rotate(90deg); min-height:20px; } .guide-page-title { min-height:90px; font-size:2rem; } }
+        @media (max-width: 760px) { .rank-track { grid-template-columns:1fr; gap:14px; } .rank-track::before { left:calc(50% - 6px); right:auto; top:8%; width:12px; height:60%; transform:none; } .rank-card { width:min(180px,70vw); padding:12px; } .rank-card .rank-number { font-size:1.5rem; } .rank-card .rank-role { font-size:.95rem; } .rank-card .rank-note { font-size:.8rem; } .rank-card:last-child { margin-top:8px; } .rank-arrow { transform:rotate(90deg); min-height:20px; } .guide-page-title { min-height:90px; font-size:2rem; } }
 
     </style>
 </head>
@@ -93,7 +100,7 @@
                 <nav class="hidden md:flex items-center space-x-5 lg:space-x-7 text-lg xl:text-xl font-bold text-gray-800 tracking-tight">
                     <button onclick="switchTab('guide')" class="hover:text-blue-700 transition whitespace-nowrap">채용안내</button>
                     <button onclick="switchTab('my')" class="hover:text-blue-700 transition whitespace-nowrap">나의채용</button>
-                    <button id="nav-mypage-btn" onclick="switchTab('mypage')" class="hidden hover:text-blue-700 transition">마이페이지</button>
+                    <button id="nav-mypage-btn" onclick="enterMyPage()" class="hidden hover:text-blue-700 transition">마이페이지</button>
                     <button onclick="switchTab('inquiry')" class="hover:text-blue-700 transition">채용문의</button>
                     <button onclick="switchTab('jobs')" class="hover:text-blue-700 transition">채용공고</button>
                     <button onclick="switchTab('notice')" class="hover:text-blue-700 transition">공지사항</button>
@@ -109,7 +116,7 @@
                 <button onclick="switchTab('home'); toggleMobileNav();" class="text-left py-2 border-b">홈</button>
                 <button onclick="switchTab('guide'); toggleMobileNav();" class="text-left py-2 border-b">채용안내</button>
                 <button onclick="switchTab('my'); toggleMobileNav();" class="text-left py-2 border-b">나의채용</button>
-                <button id="mobile-mypage-btn" onclick="switchTab('mypage'); toggleMobileNav();" class="hidden text-left py-2 border-b text-blue-700">마이페이지</button>
+                <button id="mobile-mypage-btn" onclick="enterMyPage(); toggleMobileNav();" class="hidden text-left py-2 border-b text-blue-700">마이페이지</button>
                 <button onclick="switchTab('inquiry'); toggleMobileNav();" class="text-left py-2 border-b">채용문의</button>
                 <button onclick="switchTab('jobs'); toggleMobileNav();" class="text-left py-2 border-b">채용공고</button>
                 <button onclick="switchTab('notice'); toggleMobileNav();" class="text-left py-2 border-b">공지사항</button>
@@ -160,15 +167,15 @@
 
             <section class="guide-section">
                 <div class="guide-section-heading"><span class="guide-section-icon"><span></span></span><h3>승진제도</h3></div>
-                <p class="text-gray-600 mb-5">직급은 5직급에서 1직급 순으로 올라가며, 1직급은 행정 최고 간부 직급으로 추가 승진이 없습니다.</p>
+                <p class="text-gray-600 mb-5">5직급부터 2직급까지는 승진 경로에 따라 단계적으로 올라갈 수 있습니다. 1직급은 행정 최고 간부 직급으로, 일반 승진을 통해 올라갈 수 없는 별도 직급입니다.</p>
                 <div class="rank-track" aria-label="직급 승진 단계">
                     <div class="rank-card"><div class="rank-number">5직급</div><div class="rank-role">수습사원 · 사원</div><div class="rank-note">입사 초기 및 일반 사원</div></div>
                     <div class="rank-card"><div class="rank-number">4직급</div><div class="rank-role">선임</div><div class="rank-note">실무 숙련 직급</div></div>
                     <div class="rank-card"><div class="rank-number">3직급</div><div class="rank-role">주임</div><div class="rank-note">업무 관리 직급</div></div>
                     <div class="rank-card"><div class="rank-number">2직급</div><div class="rank-role">반장</div><div class="rank-note">현장 관리 직급</div></div>
-                    <div class="rank-card"><div class="rank-number">1직급</div><div class="rank-role">행정최고간부</div><div class="rank-note">승진 없음</div></div>
+                    <div class="rank-card"><div class="rank-number">1직급</div><div class="rank-role">행정최고간부</div><div class="rank-note">승진으로 진입 불가</div></div>
                 </div>
-                <div class="flex items-center justify-center gap-2 text-sm text-[#354aa0] font-extrabold mt-4"><i class="fas fa-arrow-right"></i><span>근무 실적 및 내부 승진 기준에 따라 단계별 승진</span><i class="fas fa-arrow-right"></i></div>
+                <div class="flex items-center justify-center gap-2 text-sm text-[#354aa0] font-extrabold mt-4"><i class="fas fa-arrow-right"></i><span>승진 경로: 5직급 → 4직급 → 3직급 → 2직급 (1직급은 승진 대상이 아님)</span></div>
                 <p class="mt-5 text-gray-700">※ 수습사원은 약 2주 근무 후 평가를 거쳐 일반 사원으로 전환됩니다.</p>
             </section>
 
@@ -240,8 +247,9 @@
             <div class="mb-12">
                 <p class="text-xl font-bold text-gray-900 mb-3">■ 회원정보를 입력하여 주십시오.</p>
                 <div class="space-y-3">
-                    <input type="text" id="reg-id" class="std-input" placeholder="아이디 (로그인용)">
-                    <input type="password" id="reg-pw" class="std-input" placeholder="비밀번호">
+                    <input type="email" id="reg-email" class="std-input" placeholder="이메일 (필수)" autocomplete="email" required>
+                    <input type="text" id="reg-id" class="std-input" placeholder="아이디 (로그인용)" autocomplete="username" required>
+                    <input type="password" id="reg-pw" class="std-input" placeholder="비밀번호 (8자 이상)" autocomplete="new-password" minlength="8" required>
                 </div>
             </div>
             <div class="flex justify-center space-x-4">
@@ -358,19 +366,43 @@
             </div>
         </div>
 
-        <!-- 마이페이지 -->
+        <!-- 마이페이지: 비밀번호 재확인 후에만 회원정보를 노출합니다. -->
         <div id="view-mypage" class="view-section max-w-3xl mx-auto px-6 py-12">
             <h1 class="text-4xl font-black text-gray-900 mb-8 border-b pb-4">마이페이지 / 회원정보</h1>
-            <div class="bg-white border border-gray-300 p-8 shadow-sm space-y-6">
+            <div id="my-page-locked" class="bg-blue-50 border border-blue-200 p-6 text-blue-900 leading-relaxed">
+                개인정보 보호를 위해 먼저 비밀번호를 확인해 주세요. 회원정보는 확인 후에만 표시됩니다.
+                <button type="button" onclick="enterMyPage()" class="result-action-btn block mt-4">비밀번호 확인</button>
+            </div>
+            <form id="my-profile-form" class="hidden bg-white border border-gray-300 p-8 shadow-sm space-y-5" onsubmit="saveMyPageProfile(event)">
                 <div>
-                    <label class="block text-sm font-bold text-gray-700 mb-1">아이디</label>
+                    <label class="block text-sm font-bold text-gray-700 mb-1" for="my-username">아이디 (수정 불가)</label>
                     <input type="text" id="my-username" class="std-input bg-gray-100 cursor-not-allowed" readonly>
                 </div>
                 <div>
-                    <label class="block text-sm font-bold text-gray-700 mb-1">로블록스 ID</label>
-                    <input type="text" id="my-roblox-id" class="std-input bg-gray-100 cursor-not-allowed" readonly>
+                    <label class="block text-sm font-bold text-gray-700 mb-1" for="my-email">이메일 *</label>
+                    <input type="email" id="my-email" class="std-input" autocomplete="email" required>
                 </div>
-            </div>
+                <div>
+                    <label class="block text-sm font-bold text-gray-700 mb-1" for="my-roblox-id">로블록스 ID</label>
+                    <input type="text" id="my-roblox-id" class="std-input" autocomplete="off">
+                </div>
+                <div>
+                    <label class="block text-sm font-bold text-gray-700 mb-1" for="my-roblox-link">로블록스 프로필 링크</label>
+                    <input type="url" id="my-roblox-link" class="std-input" placeholder="https://www.roblox.com/users/.../profile">
+                </div>
+                <div class="border-t pt-5">
+                    <h2 class="font-extrabold text-lg mb-2">비밀번호 변경</h2>
+                    <p class="text-sm text-gray-500 mb-3">변경하지 않으려면 아래 두 칸을 비워 두세요.</p>
+                    <div class="space-y-3">
+                        <input type="password" id="my-new-password" class="std-input" placeholder="새 비밀번호 (8자 이상)" autocomplete="new-password" minlength="8">
+                        <input type="password" id="my-new-password-confirm" class="std-input" placeholder="새 비밀번호 확인" autocomplete="new-password">
+                    </div>
+                </div>
+                <div class="flex flex-wrap gap-3 justify-end">
+                    <button type="button" onclick="enterMyPage()" class="result-secondary-btn">다시 본인 확인</button>
+                    <button type="submit" class="result-action-btn">회원정보 저장</button>
+                </div>
+            </form>
         </div>
 
         <!-- 입사지원 Page 1/2 -->
@@ -490,7 +522,7 @@
                     <span class="block font-bold text-sm text-gray-700 mb-2">첨부파일</span>
                     <div id="detail-notice-file-list" class="flex flex-wrap gap-2"></div>
                 </div>
-                <div id="detail-notice-content" class="text-gray-800 text-lg whitespace-pre-wrap leading-relaxed min-h-[200px] mb-8"></div>
+                <div id="detail-notice-content" class="job-markdown text-gray-800 min-h-[200px] mb-8"></div>
                 <div id="admin-delete-notice-wrap" class="border-t pt-6 hidden">
                     <button onclick="deleteCurrentNotice()" class="bg-red-600 text-white px-4 py-2 font-bold hover:bg-red-700">공지 삭제 (관리자)</button>
                 </div>
@@ -509,7 +541,7 @@
         <div id="view-inquiry" class="view-section max-w-5xl mx-auto px-6 py-12">
             <div class="flex justify-between items-center mb-8 border-b pb-4">
                 <h2 class="text-4xl font-extrabold text-gray-900">채용문의 Q&A 게시판</h2>
-                <button onclick="openModal('inquiryModal')" class="bg-[#25408f] text-white px-6 py-3 font-bold shadow hover:bg-blue-900 transition">문의 등록하기</button>
+                <button onclick="openInquiryModal()" class="bg-[#25408f] text-white px-6 py-3 font-bold shadow hover:bg-blue-900 transition">문의 등록하기</button>
             </div>
             <div class="bg-white border border-gray-300 shadow-sm">
                 <table class="w-full text-left">
@@ -690,7 +722,29 @@
                     <label class="block text-xs font-bold text-gray-600 mb-1">첨부파일 (여러 개 선택 가능)</label>
                     <input type="file" id="admin-notice-file" multiple class="std-input py-2 text-sm">
                 </div>
-                <textarea id="admin-notice-content" rows="6" class="std-textarea" placeholder="공지 내용"></textarea>
+                <div>
+                    <div class="flex flex-wrap items-center justify-between gap-2 mb-2">
+                        <label for="admin-notice-content" class="font-extrabold text-gray-800">공지 본문 (마크다운 지원)</label>
+                        <div class="flex flex-wrap gap-1">
+                            <button type="button" onclick="insertNoticeMarkdown('heading')" class="result-secondary-btn text-xs">제목</button>
+                            <button type="button" onclick="insertNoticeMarkdown('bold')" class="result-secondary-btn text-xs">굵게</button>
+                            <button type="button" onclick="insertNoticeMarkdown('list')" class="result-secondary-btn text-xs">목록</button>
+                            <button type="button" onclick="insertNoticeMarkdown('table')" class="result-secondary-btn text-xs">표 삽입</button>
+                        </div>
+                    </div>
+                    <textarea id="admin-notice-content" rows="8" class="std-textarea font-mono text-sm" oninput="updateNoticeContentPreview()" placeholder="## 공지 제목
+
+공지 내용을 입력하세요.
+
+| 구분 | 내용 |
+|---|---|
+| 일정 | 11월 20일 |"></textarea>
+                    <p class="text-xs text-gray-500 mt-1">지원 형식: 제목(#), 굵게(**), 기울임(*), 목록(-), 인용(>), 구분선(---), 링크, 표</p>
+                </div>
+                <div class="border rounded p-4 bg-gray-50">
+                    <h4 class="font-bold mb-2 text-gray-700">실시간 미리보기</h4>
+                    <div id="admin-notice-content-preview" class="job-markdown min-h-[60px]"><span class="text-gray-400">본문을 입력하면 여기에 표시됩니다.</span></div>
+                </div>
                 <button onclick="adminAddNotice()" class="w-full bg-green-700 text-white font-bold py-3 hover:bg-green-800">등록하기</button>
             </div>
         </div>
@@ -708,6 +762,23 @@
         </div>
     </div>
 
+
+    <!-- 마이페이지 회원정보 접근 본인확인 모달 -->
+    <div id="myPageVerifyModal" class="fixed inset-0 bg-black/50 hidden items-center justify-center p-4 z-[70]" role="dialog" aria-modal="true" aria-labelledby="my-page-verify-title">
+      <div class="bg-white p-7 max-w-md w-full shadow-2xl rounded-sm">
+        <h3 id="my-page-verify-title" class="text-2xl font-extrabold mb-3">마이페이지 본인 확인</h3>
+        <p class="text-gray-600 mb-4">회원정보를 확인하고 수정하려면 현재 비밀번호를 입력해 주세요.</p>
+        <form onsubmit="submitMyPageReauth(event)">
+          <label for="my-page-verify-password" class="block font-bold mb-2">현재 비밀번호</label>
+          <input id="my-page-verify-password" type="password" class="std-input mb-3" autocomplete="current-password" required>
+          <p id="my-page-verify-error" class="text-red-600 text-sm mb-3" role="alert"></p>
+          <div class="flex justify-end gap-2">
+            <button type="button" onclick="closeModal('myPageVerifyModal')" class="result-secondary-btn">취소</button>
+            <button id="my-page-verify-submit" type="submit" class="result-action-btn">확인</button>
+          </div>
+        </form>
+      </div>
+    </div>
 
     <!-- 전형 결과 비밀번호 재확인 모달 -->
     <div id="resultReauthModal" class="result-modal-overlay" role="dialog" aria-modal="true" aria-labelledby="result-reauth-title">
@@ -2075,6 +2146,299 @@ document.getElementById('resultReauthModal')?.addEventListener('click', e => {
   if (e.target.id === 'resultReauthModal') closeResultReauth();
 });
 document.addEventListener('keydown', e => { if (e.key === 'Escape') closeResultReauth(); });
+</script>
+
+
+
+<script>
+// ==== 회원 이메일/마이페이지 재인증, 공지 마크다운, 회원 채용문의 관리 ====
+let myPageVerifiedPassword = null;
+let myPageLoadedAccount = null;
+
+window.enterMyPage = function () {
+  if (!currentUser) { alert('로그인 후 마이페이지를 이용할 수 있습니다.'); switchTab('login'); return; }
+  document.getElementById('my-profile-form')?.classList.add('hidden');
+  document.getElementById('my-page-locked')?.classList.remove('hidden');
+  document.getElementById('my-page-verify-password').value = '';
+  document.getElementById('my-page-verify-error').innerText = '';
+  openModal('myPageVerifyModal');
+  setTimeout(() => document.getElementById('my-page-verify-password')?.focus(), 30);
+};
+
+window.submitMyPageReauth = async function (event) {
+  event.preventDefault();
+  if (!currentUser) { alert('로그인 상태를 확인할 수 없습니다. 다시 로그인해 주세요.'); closeModal('myPageVerifyModal'); switchTab('login'); return; }
+  const password = document.getElementById('my-page-verify-password').value;
+  const button = document.getElementById('my-page-verify-submit');
+  const errorBox = document.getElementById('my-page-verify-error');
+  button.disabled = true; button.innerText = '확인 중...'; errorBox.innerText = '';
+  try {
+    const { data, error } = await supabaseClient.from('users')
+      .select('id, username, password, role, roblox_id, roblox_link, email')
+      .eq('username', currentUser.username).eq('password', password).maybeSingle();
+    if (error) throw error;
+    if (!data) throw new Error('비밀번호가 일치하지 않습니다.');
+    myPageVerifiedPassword = password;
+    myPageLoadedAccount = data;
+    currentUser = { id:data.id ?? null, username:data.username, role:data.role || 'user', roblox_id:data.roblox_id || '', roblox_link:data.roblox_link || '', email:data.email || '' };
+    localStorage.setItem('samsan_user', JSON.stringify(currentUser));
+    document.getElementById('my-username').value = data.username || '';
+    document.getElementById('my-email').value = data.email || '';
+    document.getElementById('my-roblox-id').value = data.roblox_id || '';
+    document.getElementById('my-roblox-link').value = data.roblox_link || '';
+    document.getElementById('my-new-password').value = '';
+    document.getElementById('my-new-password-confirm').value = '';
+    document.getElementById('my-page-locked').classList.add('hidden');
+    document.getElementById('my-profile-form').classList.remove('hidden');
+    closeModal('myPageVerifyModal');
+    switchTab('mypage');
+  } catch (error) {
+    errorBox.innerText = error.message || '본인 확인에 실패했습니다.';
+  } finally {
+    button.disabled = false; button.innerText = '확인';
+  }
+};
+
+window.saveMyPageProfile = async function (event) {
+  event.preventDefault();
+  if (!currentUser || !myPageVerifiedPassword) { alert('먼저 마이페이지 비밀번호 확인을 완료해 주세요.'); enterMyPage(); return; }
+  const email = document.getElementById('my-email').value.trim();
+  const robloxId = document.getElementById('my-roblox-id').value.trim();
+  const robloxLink = document.getElementById('my-roblox-link').value.trim();
+  const newPassword = document.getElementById('my-new-password').value;
+  const confirmPassword = document.getElementById('my-new-password-confirm').value;
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { alert('올바른 이메일 주소를 입력해 주세요.'); return; }
+  if (newPassword && newPassword.length < 8) { alert('새 비밀번호는 8자 이상이어야 합니다.'); return; }
+  if (newPassword !== confirmPassword) { alert('새 비밀번호와 확인 비밀번호가 일치하지 않습니다.'); return; }
+  if (robloxLink && !/^https?:\/\//i.test(robloxLink)) { alert('로블록스 프로필 링크는 http:// 또는 https://로 시작해야 합니다.'); return; }
+  const updates = { email, roblox_id: robloxId, roblox_link: robloxLink };
+  if (newPassword) updates.password = newPassword;
+  try {
+    const { data, error } = await supabaseClient.from('users').update(updates)
+      .eq('username', currentUser.username).eq('password', myPageVerifiedPassword)
+      .select('id, username, role, roblox_id, roblox_link, email').maybeSingle();
+    if (error) throw error;
+    if (!data) throw new Error('회원정보가 수정되지 않았습니다. 본인 확인을 다시 진행해 주세요.');
+    currentUser = { id:data.id ?? currentUser.id, username:data.username, role:data.role || 'user', roblox_id:data.roblox_id || '', roblox_link:data.roblox_link || '', email:data.email || '' };
+    localStorage.setItem('samsan_user', JSON.stringify(currentUser));
+    if (newPassword) myPageVerifiedPassword = newPassword;
+    myPageLoadedAccount = { ...data, password: myPageVerifiedPassword };
+    document.getElementById('my-new-password').value = '';
+    document.getElementById('my-new-password-confirm').value = '';
+    alert('회원정보가 저장되었습니다.');
+    checkLocalSession();
+  } catch (error) {
+    alert(`회원정보 저장 실패: ${error.message || error}`);
+  }
+};
+
+// 로그인 세션 저장 시 비밀번호는 절대로 localStorage에 넣지 않습니다.
+window.checkLocalSession = function () {
+  let saved = null;
+  try { saved = JSON.parse(localStorage.getItem('samsan_user') || 'null'); } catch (_) {}
+  const container = document.getElementById('auth-status-container');
+  const navIds = ['admin-nav-btn','mobile-admin-btn','nav-mypage-btn','mobile-mypage-btn','btn-write-job','btn-write-notice'];
+  if (saved && saved.username) {
+    currentUser = { id:saved.id ?? null, username:saved.username, role:saved.role || 'user', roblox_id:saved.roblox_id || '', roblox_link:saved.roblox_link || '', email:saved.email || '' };
+    localStorage.setItem('samsan_user', JSON.stringify(currentUser));
+    document.getElementById('nav-mypage-btn')?.classList.remove('hidden');
+    document.getElementById('mobile-mypage-btn')?.classList.remove('hidden');
+    const admin = currentUser.role === 'admin';
+    ['admin-nav-btn','mobile-admin-btn','btn-write-job','btn-write-notice'].forEach(id => document.getElementById(id)?.classList.toggle('hidden', !admin));
+    if (container) container.innerHTML = `<span class="text-blue-900 font-bold">${resultEsc(currentUser.username)} 님</span><span class="text-gray-300">|</span><button onclick="handleLogout()" class="hover:text-blue-700">로그아웃</button>`;
+  } else {
+    currentUser = null; myPageVerifiedPassword = null; myPageLoadedAccount = null;
+    navIds.forEach(id => document.getElementById(id)?.classList.add('hidden'));
+    if (container) container.innerHTML = `<button onclick="switchTab('login')" class="hover:text-blue-700 transition">로그인</button><span class="text-gray-300">|</span><button onclick="switchTab('signup-1')" class="hover:text-blue-700 transition">회원가입</button>`;
+  }
+};
+
+window.handleLoginSubmit = async function () {
+  const username = document.getElementById('login-id').value.trim();
+  const password = document.getElementById('login-pw').value;
+  if (!username || !password) { alert('아이디와 비밀번호를 입력해 주세요.'); return; }
+  const { data, error } = await supabaseClient.from('users')
+    .select('id, username, password, role, roblox_id, roblox_link, email')
+    .eq('username', username).eq('password', password).maybeSingle();
+  if (error || !data) { alert('아이디 또는 비밀번호가 일치하지 않습니다.'); return; }
+  currentUser = { id:data.id ?? null, username:data.username, role:data.role || 'user', roblox_id:data.roblox_id || '', roblox_link:data.roblox_link || '', email:data.email || '' };
+  myPageVerifiedPassword = null; myPageLoadedAccount = null;
+  localStorage.setItem('samsan_user', JSON.stringify(currentUser));
+  document.getElementById('login-pw').value = '';
+  checkLocalSession();
+  alert(`${currentUser.username}님 환영합니다!`);
+  switchTab(currentUser.role === 'admin' ? 'admin' : 'my');
+};
+
+window.handleCompleteSignup = async function () {
+  const username = document.getElementById('reg-id').value.trim();
+  const password = document.getElementById('reg-pw').value;
+  const email = document.getElementById('reg-email').value.trim();
+  const robloxId = document.getElementById('roblox-id').value.trim();
+  const robloxLink = document.getElementById('roblox-link').value.trim();
+  if (!username || !password || !email) { alert('아이디, 비밀번호, 이메일을 모두 입력해 주세요.'); return; }
+  if (username.length < 3) { alert('아이디는 3자 이상이어야 합니다.'); return; }
+  if (password.length < 8) { alert('비밀번호는 8자 이상이어야 합니다.'); return; }
+  if (username.toLowerCase() === 'admin') { alert('admin 아이디는 신규 가입할 수 없습니다. 기존 관리자 계정을 이용해 주세요.'); return; }
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { alert('올바른 이메일 주소를 입력해 주세요.'); return; }
+  const { error } = await supabaseClient.from('users').insert([{ username, password, email, roblox_id:robloxId, roblox_link:robloxLink, role:'user' }]);
+  if (error) alert(`회원가입 실패 (아이디 또는 이메일 중복 여부를 확인해 주세요): ${error.message}`);
+  else {
+    alert('회원가입이 완료되었습니다. 로그인해 주세요.');
+    ['reg-id','reg-pw','reg-email','roblox-id','roblox-link'].forEach(id => { const e=document.getElementById(id); if(e) e.value=''; });
+    switchTab('login');
+  }
+};
+
+window.openNoticeWriteModal = function () {
+  if (!currentUser || currentUser.role !== 'admin') { alert('관리자 권한이 필요합니다.'); return; }
+  openModal('noticeWriteModal'); updateNoticeContentPreview();
+};
+window.updateNoticeContentPreview = function () {
+  const source = document.getElementById('admin-notice-content');
+  const preview = document.getElementById('admin-notice-content-preview');
+  if (!source || !preview) return;
+  preview.innerHTML = source.value.trim() ? renderJobMarkdown(source.value) : '<span class="text-gray-400">본문을 입력하면 여기에 표시됩니다.</span>';
+};
+window.insertNoticeMarkdown = function (kind) {
+  const textarea = document.getElementById('admin-notice-content'); if (!textarea) return;
+  const snippets = {
+    heading:'## 공지 제목', bold:'**굵게 표시할 내용**',
+    list:'- 첫 번째 항목\n- 두 번째 항목\n- 세 번째 항목',
+    table:'| 항목 | 내용 | 비고 |\n|---|---|---|\n| 일정 | 내용 입력 | - |\n| 대상 | 내용 입력 | - |'
+  };
+  const snippet = snippets[kind] || '';
+  textarea.setRangeText(snippet, textarea.selectionStart ?? textarea.value.length, textarea.selectionEnd ?? textarea.value.length, 'end');
+  textarea.focus(); updateNoticeContentPreview();
+};
+
+window.adminAddNotice = async function () {
+  if (!currentUser || currentUser.role !== 'admin') { alert('관리자 권한이 필요합니다.'); return; }
+  const title = document.getElementById('admin-notice-title').value.trim();
+  const content = document.getElementById('admin-notice-content').value.trim();
+  const fileInput = document.getElementById('admin-notice-file');
+  if (!title) { alert('공지 제목을 입력해 주세요.'); return; }
+  const files = [];
+  if (fileInput?.files?.length) {
+    for (const file of fileInput.files) {
+      const ext = (file.name.split('.').pop() || 'bin').replace(/[^a-zA-Z0-9]/g, '');
+      const fileName = `notice_${Date.now()}_${Math.random().toString(36).slice(2,10)}.${ext}`;
+      const { error: uploadError } = await supabaseClient.storage.from('recruitment-files').upload(fileName, file);
+      if (uploadError) { alert(`첨부파일 업로드 실패: ${uploadError.message}`); return; }
+      const { data:urlData } = supabaseClient.storage.from('recruitment-files').getPublicUrl(fileName);
+      files.push({ name:file.name, url:urlData.publicUrl });
+    }
+  }
+  const { error } = await supabaseClient.from('notices').insert([{ title, content, file_name:JSON.stringify(files) }]);
+  if (error) { alert(`공지사항 등록 실패: ${error.message}`); return; }
+  alert('새 공지사항이 게시되었습니다.');
+  closeModal('noticeWriteModal');
+  document.getElementById('admin-notice-title').value = '';
+  document.getElementById('admin-notice-content').value = '';
+  if (fileInput) fileInput.value = '';
+  updateNoticeContentPreview(); await loadNotices(); switchTab('notice');
+};
+
+window.openNoticeDetail = function (notice) {
+  currentNotice = notice;
+  document.getElementById('detail-notice-title').innerText = notice.title || '';
+  document.getElementById('detail-notice-date').innerText = `작성일시: ${new Date(notice.created_at).toLocaleString()}`;
+  const content = document.getElementById('detail-notice-content');
+  content.classList.add('job-markdown');
+  content.innerHTML = renderJobMarkdown(notice.content || '내용이 없습니다.');
+  const wrap = document.getElementById('detail-notice-file-wrap');
+  const fileList = document.getElementById('detail-notice-file-list');
+  fileList.innerHTML = '';
+  let parsedFiles = [];
+  try { const parsed = JSON.parse(notice.file_name || '[]'); parsedFiles = Array.isArray(parsed) ? parsed : []; } catch (_) {}
+  if (parsedFiles.length) {
+    wrap.classList.remove('hidden');
+    parsedFiles.forEach(file => {
+      const card = document.createElement('div'); card.className = 'inline-flex items-center gap-2 bg-blue-50 border border-blue-300 px-3 py-1.5 text-sm font-bold text-blue-800 rounded shadow-sm';
+      const name = document.createElement('span'); name.textContent = `📄 ${file.name || '첨부파일'}`;
+      const link = document.createElement('a'); link.href = file.url || '#'; link.target = '_blank'; link.rel = 'noopener noreferrer'; link.className = 'bg-blue-600 text-white px-3 py-1 text-xs rounded'; link.textContent = '다운로드';
+      card.append(name, link); fileList.appendChild(card);
+    });
+  } else wrap.classList.add('hidden');
+  document.getElementById('admin-delete-notice-wrap').classList.toggle('hidden', !(currentUser && currentUser.role === 'admin'));
+  switchTab('notice-detail');
+};
+
+window.openInquiryModal = function () {
+  if (!currentUser) { alert('채용문의 작성은 회원만 이용할 수 있습니다. 먼저 로그인해 주세요.'); switchTab('login'); return; }
+  document.getElementById('inq-title').value = '';
+  document.getElementById('inq-content').value = '';
+  openModal('inquiryModal');
+};
+window.submitInquiry = async function () {
+  if (!currentUser || !currentUser.username) { alert('채용문의 작성은 회원만 이용할 수 있습니다. 먼저 로그인해 주세요.'); closeModal('inquiryModal'); switchTab('login'); return; }
+  const title = document.getElementById('inq-title').value.trim();
+  const content = document.getElementById('inq-content').value.trim();
+  if (!title || !content) { alert('문의 제목과 내용을 모두 입력해 주세요.'); return; }
+  const { error } = await supabaseClient.from('inquiries').insert([{ title, content, username:currentUser.username, status:'답변 대기 중' }]);
+  if (error) { alert(`문의 등록 실패: ${error.message}`); return; }
+  alert('문의가 등록되었습니다.'); closeModal('inquiryModal');
+  document.getElementById('inq-title').value = ''; document.getElementById('inq-content').value = '';
+  await loadInquiries();
+};
+
+window.loadInquiries = async function () {
+  const body = document.getElementById('inquiry-list-body'); if (!body) return;
+  const { data, error } = await supabaseClient.from('inquiries').select('*').order('created_at', { ascending:false });
+  if (error) { body.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-red-600">문의 목록을 불러오지 못했습니다.</td></tr>`; return; }
+  if (!data?.length) { body.innerHTML = '<tr><td colspan="5" class="p-4 text-center text-gray-500">등록된 문의사항이 없습니다.</td></tr>'; return; }
+  body.innerHTML = '';
+  data.forEach((item, index) => {
+    const tr = document.createElement('tr'); tr.className = 'border-b hover:bg-gray-50 cursor-pointer';
+    tr.onclick = () => openInquiryDetail(item);
+    const status = item.status === '답변 완료' ? '<span class="bg-blue-100 text-blue-800 text-xs px-2.5 py-1 font-bold rounded">답변 완료</span>' : '<span class="bg-orange-100 text-orange-800 text-xs px-2.5 py-1 font-bold rounded">답변 대기 중</span>';
+    tr.innerHTML = `<td class="p-4 text-center font-bold">${index+1}</td><td class="p-4 font-bold text-gray-900">${resultEsc(item.title || '')}</td><td class="p-4 text-center text-sm text-gray-600">${resultEsc(item.username || '기존 계정 정보 없음')}</td><td class="p-4 text-center">${status}</td><td class="p-4 text-center text-gray-400 text-sm">${new Date(item.created_at).toLocaleDateString()}</td>`;
+    body.appendChild(tr);
+  });
+};
+
+window.loadAdminInquiries = async function () {
+  const body = document.getElementById('admin-inquiries-body'); if (!body) return;
+  if (!currentUser || currentUser.role !== 'admin') { body.innerHTML = '<tr><td colspan="4" class="p-4 text-center text-red-600">관리자 권한이 필요합니다.</td></tr>'; return; }
+  const { data, error } = await supabaseClient.from('inquiries').select('*').order('created_at', { ascending:false });
+  if (error) { body.innerHTML = `<tr><td colspan="4" class="p-4 text-center text-red-600">${resultEsc(error.message)}</td></tr>`; return; }
+  if (!data?.length) { body.innerHTML = '<tr><td colspan="4" class="p-4 text-center text-gray-500">등록된 문의사항이 없습니다.</td></tr>'; return; }
+  body.innerHTML = data.map(inq => {
+    const statusBadge = inq.status === '답변 완료' ? '<span class="bg-blue-100 text-blue-800 text-xs px-2 py-1 font-bold rounded">답변 완료</span>' : '<span class="bg-orange-100 text-orange-800 text-xs px-2 py-1 font-bold rounded">답변 대기 중</span>';
+    return `<tr class="border-b align-top"><td class="p-3 font-bold text-gray-900">${resultEsc(inq.title || '')}</td><td class="p-3 text-sm text-gray-600">${resultEsc(inq.username || '기존 계정 정보 없음')}</td><td class="p-3">${statusBadge}</td><td class="p-3 space-y-2 min-w-[240px]"><textarea id="admin-ans-${resultEsc(inq.id)}" rows="2" class="std-textarea text-sm" placeholder="답변 내용을 입력하세요">${resultEsc(inq.answer || '')}</textarea><div class="flex flex-wrap gap-2"><button onclick="submitInquiryAnswer('${resultEsc(inq.id)}')" class="bg-blue-800 hover:bg-blue-900 text-white text-xs px-4 py-2 font-bold">답변 등록/수정</button><button onclick="deleteInquiryAdmin('${resultEsc(inq.id)}')" class="bg-red-600 hover:bg-red-700 text-white text-xs px-4 py-2 font-bold">문의 삭제</button></div></td></tr>`;
+  }).join('');
+};
+
+window.submitInquiryAnswer = async function (id) {
+  if (!currentUser || currentUser.role !== 'admin') { alert('관리자 권한이 필요합니다.'); return; }
+  const answerText = document.getElementById(`admin-ans-${id}`)?.value.trim();
+  if (!answerText) { alert('답변 내용을 입력해 주세요.'); return; }
+  const { error } = await supabaseClient.from('inquiries').update({ answer:answerText, status:'답변 완료' }).eq('id', id);
+  if (error) { alert(`답변 등록 실패: ${error.message}`); return; }
+  alert('답변이 등록되었습니다.'); await loadAdminInquiries(); await loadInquiries();
+};
+window.deleteInquiryAdmin = async function (id) {
+  if (!currentUser || currentUser.role !== 'admin') { alert('관리자 권한이 필요합니다.'); return; }
+  if (!confirm('이 채용문의를 삭제하시겠습니까? 삭제한 문의는 복구할 수 없습니다.')) return;
+  const { error } = await supabaseClient.from('inquiries').delete().eq('id', id);
+  if (error) { alert(`문의 삭제 실패: ${error.message}`); return; }
+  if (currentInquiry && String(currentInquiry.id) === String(id)) currentInquiry = null;
+  alert('채용문의가 삭제되었습니다.'); await loadAdminInquiries(); await loadInquiries();
+};
+
+window.handleLogout = function () {
+  myPageVerifiedPassword = null; myPageLoadedAccount = null;
+  closeModal('myPageVerifyModal');
+  if (typeof closeResultReauth === 'function') closeResultReauth();
+  localStorage.removeItem('samsan_user'); currentUser = null;
+  document.getElementById('my-profile-form')?.classList.add('hidden');
+  document.getElementById('my-page-locked')?.classList.remove('hidden');
+  checkLocalSession(); alert('로그아웃 되었습니다.'); switchTab('home');
+};
+
+window.addEventListener('DOMContentLoaded', () => {
+  updateNoticeContentPreview();
+});
 </script>
 
 </body>
