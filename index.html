@@ -45,6 +45,41 @@
         .result-history-item.pass { border-color:#3157b7; }
         .result-history-item.fail { border-color:#c62828; }
 
+        /* 채용공고 마크다운 렌더링 */
+        .job-markdown { color:#252525; font-size:16px; line-height:1.85; overflow-wrap:anywhere; }
+        .job-markdown h1,.job-markdown h2,.job-markdown h3,.job-markdown h4 { color:#25408f; font-weight:800; line-height:1.35; margin:1.15em 0 .55em; }
+        .job-markdown h1 { font-size:1.9rem; } .job-markdown h2 { font-size:1.55rem; } .job-markdown h3 { font-size:1.25rem; }
+        .job-markdown p { margin:.5em 0 .9em; }
+        .job-markdown ul { list-style:disc; padding-left:1.6em; margin:.55em 0 1em; }
+        .job-markdown ol { list-style:decimal; padding-left:1.6em; margin:.55em 0 1em; }
+        .job-markdown blockquote { border-left:4px solid #25408f; background:#f4f6ff; padding:.7em 1em; margin:.8em 0; color:#374151; }
+        .job-markdown hr { border:0; border-top:1px solid #d1d5db; margin:1.2em 0; }
+        .job-markdown table { width:100%; border-collapse:collapse; margin:1em 0; font-size:.96em; }
+        .job-markdown th,.job-markdown td { border:1px solid #cbd5e1; padding:9px 12px; text-align:left; vertical-align:top; }
+        .job-markdown th { background:#eef2ff; color:#233b83; font-weight:800; }
+        .job-markdown tr:nth-child(even) td { background:#fafbff; }
+        .job-markdown a { color:#25408f; text-decoration:underline; }
+        .job-markdown code { background:#f3f4f6; padding:2px 5px; border-radius:4px; font-family:ui-monospace,monospace; }
+        .guide-page-title { background:#354aa0; color:white; width:min(340px,100%); min-height:120px; display:flex; align-items:center; justify-content:center; font-size:2.4rem; font-weight:900; padding:24px; margin-bottom:22px; }
+        .guide-section { padding:28px 0; border-bottom:1px solid #e5e7eb; }
+        .guide-section-heading { display:flex; align-items:center; gap:13px; margin-bottom:20px; }
+        .guide-section-icon { width:34px; height:34px; border-radius:50%; background:#354aa0; display:inline-flex; align-items:center; justify-content:center; flex-shrink:0; }
+        .guide-section-icon span { display:block; width:14px; height:14px; border-radius:50%; background:#fff; }
+        .guide-section-heading h3 { font-size:1.65rem; font-weight:850; color:#222; }
+        .guide-bullet-list { list-style:none; padding:0; margin:0; }
+        .guide-bullet-list li { position:relative; padding-left:1.2rem; margin:.65rem 0; font-size:1.08rem; line-height:1.8; }
+        .guide-bullet-list li::before { content:'-'; position:absolute; left:0; color:#354aa0; font-weight:900; }
+        .rank-track { display:grid; grid-template-columns:repeat(5,minmax(0,1fr)); gap:10px; align-items:stretch; }
+        .rank-card { min-width:0; position:relative; border:1px solid #dbe2f5; background:#f8f9ff; padding:18px 10px; text-align:center; }
+        .rank-card .rank-number { color:#354aa0; font-size:1.55rem; font-weight:900; margin-bottom:8px; }
+        .rank-card .rank-role { color:#242424; font-weight:800; margin-bottom:6px; }
+        .rank-card .rank-note { color:#6b7280; font-size:.87rem; line-height:1.5; }
+        .rank-card:last-child { background:#354aa0; border-color:#354aa0; }
+        .rank-card:last-child .rank-number,.rank-card:last-child .rank-role,.rank-card:last-child .rank-note { color:white; }
+        .rank-arrow { color:#354aa0; font-size:1.4rem; font-weight:900; display:flex; align-items:center; justify-content:center; }
+        .guide-salary { background:#f6f7fb; border-left:5px solid #354aa0; padding:20px 24px; }
+        @media (max-width: 640px) { .rank-track { grid-template-columns:1fr; } .rank-card { padding:13px; } .rank-arrow { transform:rotate(90deg); min-height:20px; } .guide-page-title { min-height:90px; font-size:2rem; } }
+
     </style>
 </head>
 <body class="flex flex-col min-h-screen">
@@ -55,8 +90,9 @@
                 <img src="Logo.png" alt="삼산여객 채용" class="h-10 sm:h-12 w-auto object-contain" onerror="this.onerror=null; this.src='https://via.placeholder.com/260x50?text=SAMSAN+LOGO';">
             </a>
             <div class="flex items-center space-x-8 sm:space-x-12">
-                <nav class="hidden md:flex items-center space-x-10 text-xl font-bold text-gray-800 tracking-tight">
-                    <button onclick="switchTab('my')" class="hover:text-blue-700 transition">나의채용</button>
+                <nav class="hidden md:flex items-center space-x-5 lg:space-x-7 text-lg xl:text-xl font-bold text-gray-800 tracking-tight">
+                    <button onclick="switchTab('guide')" class="hover:text-blue-700 transition whitespace-nowrap">채용안내</button>
+                    <button onclick="switchTab('my')" class="hover:text-blue-700 transition whitespace-nowrap">나의채용</button>
                     <button id="nav-mypage-btn" onclick="switchTab('mypage')" class="hidden hover:text-blue-700 transition">마이페이지</button>
                     <button onclick="switchTab('inquiry')" class="hover:text-blue-700 transition">채용문의</button>
                     <button onclick="switchTab('jobs')" class="hover:text-blue-700 transition">채용공고</button>
@@ -71,6 +107,7 @@
         <div id="mobile-nav" class="hidden bg-white w-full border-b border-gray-300 shadow-xl py-4 px-6 absolute top-20 left-0 z-50">
             <div class="max-w-[1400px] mx-auto flex flex-col space-y-3 font-bold text-gray-800 text-lg">
                 <button onclick="switchTab('home'); toggleMobileNav();" class="text-left py-2 border-b">홈</button>
+                <button onclick="switchTab('guide'); toggleMobileNav();" class="text-left py-2 border-b">채용안내</button>
                 <button onclick="switchTab('my'); toggleMobileNav();" class="text-left py-2 border-b">나의채용</button>
                 <button id="mobile-mypage-btn" onclick="switchTab('mypage'); toggleMobileNav();" class="hidden text-left py-2 border-b text-blue-700">마이페이지</button>
                 <button onclick="switchTab('inquiry'); toggleMobileNav();" class="text-left py-2 border-b">채용문의</button>
@@ -103,6 +140,52 @@
                     <div id="home-jobs-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                         <div class="col-span-4 text-center text-white text-lg py-12">채용 공고를 불러오는 중입니다... 이 현상이 10초 이상 지속될 경우 서버 문제일 수 있으니 관리자에게 문의하십시오.</div>
                     </div>
+                </div>
+            </section>
+        </div>
+
+        <!-- 채용안내 -->
+        <div id="view-guide" class="view-section max-w-6xl mx-auto px-6 py-10">
+            <div class="guide-page-title">채용안내</div>
+            <h2 class="text-2xl sm:text-3xl font-extrabold text-gray-900 pb-4 mb-2 border-b-2 border-gray-500 w-fit min-w-[280px]">근무조건 및 대우</h2>
+
+            <section class="guide-section">
+                <div class="guide-section-heading"><span class="guide-section-icon"><span></span></span><h3>근무지</h3></div>
+                <ul class="guide-bullet-list">
+                    <li><strong>본사:</strong> 경북 울진군 삼산면</li>
+                    <li><strong>기·종착지:</strong> 월송리(월송항, 월송해수욕장), 삼산리(삼산터미널)</li>
+                    <li><strong>메인사업소:</strong> 경북 울진군 삼산면 삼산터미널</li>
+                </ul>
+            </section>
+
+            <section class="guide-section">
+                <div class="guide-section-heading"><span class="guide-section-icon"><span></span></span><h3>승진제도</h3></div>
+                <p class="text-gray-600 mb-5">직급은 5직급에서 1직급 순으로 올라가며, 1직급은 행정 최고 간부 직급으로 추가 승진이 없습니다.</p>
+                <div class="rank-track" aria-label="직급 승진 단계">
+                    <div class="rank-card"><div class="rank-number">5직급</div><div class="rank-role">수습사원 · 사원</div><div class="rank-note">입사 초기 및 일반 사원</div></div>
+                    <div class="rank-card"><div class="rank-number">4직급</div><div class="rank-role">선임</div><div class="rank-note">실무 숙련 직급</div></div>
+                    <div class="rank-card"><div class="rank-number">3직급</div><div class="rank-role">주임</div><div class="rank-note">업무 관리 직급</div></div>
+                    <div class="rank-card"><div class="rank-number">2직급</div><div class="rank-role">반장</div><div class="rank-note">현장 관리 직급</div></div>
+                    <div class="rank-card"><div class="rank-number">1직급</div><div class="rank-role">행정최고간부</div><div class="rank-note">승진 없음</div></div>
+                </div>
+                <div class="flex items-center justify-center gap-2 text-sm text-[#354aa0] font-extrabold mt-4"><i class="fas fa-arrow-right"></i><span>근무 실적 및 내부 승진 기준에 따라 단계별 승진</span><i class="fas fa-arrow-right"></i></div>
+                <p class="mt-5 text-gray-700">※ 수습사원은 약 2주 근무 후 평가를 거쳐 일반 사원으로 전환됩니다.</p>
+            </section>
+
+            <section class="guide-section">
+                <div class="guide-section-heading"><span class="guide-section-icon"><span></span></span><h3>교육제도</h3></div>
+                <ul class="guide-bullet-list">
+                    <li>노선견습</li>
+                    <li>운행실습</li>
+                    <li>기타교육</li>
+                </ul>
+            </section>
+
+            <section class="guide-section">
+                <div class="guide-section-heading"><span class="guide-section-icon"><span></span></span><h3>급여수준</h3></div>
+                <div class="guide-salary">
+                    <p class="text-2xl font-extrabold text-[#354aa0] mb-2">초임 월급 기준 약 18,000원</p>
+                    <p class="text-gray-700 leading-relaxed">직군 및 근무형태에 따라 상이하며, 해당 월에 10회 이상 운행한 경우 지급합니다.</p>
                 </div>
             </section>
         </div>
@@ -530,19 +613,67 @@
     </footer>
 
     <!-- 모달 레이어들 -->
-    <div id="jobWriteModal" class="fixed inset-0 bg-black/50 hidden items-center justify-center p-4 z-50">
-        <div class="bg-white p-8 max-w-xl w-full relative">
-            <button onclick="closeModal('jobWriteModal')" class="absolute top-4 right-4 text-gray-400 text-xl"><i class="fas fa-times"></i></button>
-            <h3 class="text-2xl font-bold mb-4 text-gray-900">📢 새 채용공고 등록</h3>
+    <div id="jobWriteModal" class="fixed inset-0 bg-black/50 hidden items-center justify-center p-3 sm:p-5 z-50">
+        <div class="bg-white p-5 sm:p-8 max-w-6xl w-full max-h-[94vh] overflow-y-auto relative rounded-sm shadow-2xl">
+            <button onclick="closeModal('jobWriteModal')" class="absolute top-4 right-4 text-gray-400 text-xl" aria-label="닫기"><i class="fas fa-times"></i></button>
+            <h3 class="text-2xl font-bold mb-2 text-gray-900">📢 새 채용공고 등록</h3>
+            <p class="text-sm text-gray-600 mb-5">본문은 마크다운 형식을 지원합니다. 표·제목·목록 등을 입력하면 오른쪽 미리보기에 표시됩니다.</p>
             <div class="space-y-3">
-                <input type="text" id="admin-job-cat" class="std-input" placeholder="구분 (예: 신입사원)">
-                <input type="text" id="admin-job-title" class="std-input" placeholder="채용 공고 제목">
-                <input type="text" id="admin-job-count" class="std-input" placeholder="선발예정인원">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+                    <input type="text" id="admin-job-cat" class="std-input" placeholder="구분 (예: 신입사원)">
+                    <input type="text" id="admin-job-title" class="std-input" placeholder="채용 공고 제목">
+                    <input type="text" id="admin-job-count" class="std-input" placeholder="선발예정인원">
+                </div>
                 <div>
                     <label class="block text-xs font-bold text-gray-600 mb-1">모집요강 파일 첨부</label>
                     <input type="file" id="admin-job-file" multiple class="std-input py-2 text-sm">
                 </div>
-                <textarea id="admin-job-content" rows="5" class="std-textarea" placeholder="본문 내용"></textarea>
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                    <div>
+                        <div class="flex flex-wrap items-center justify-between gap-2 mb-2">
+                            <label for="admin-job-content" class="font-extrabold text-gray-800">본문 작성</label>
+                            <div class="flex flex-wrap gap-1">
+                                <button type="button" onclick="insertJobMarkdown('heading')" class="result-secondary-btn text-xs">제목</button>
+                                <button type="button" onclick="insertJobMarkdown('bold')" class="result-secondary-btn text-xs">굵게</button>
+                                <button type="button" onclick="insertJobMarkdown('list')" class="result-secondary-btn text-xs">목록</button>
+                                <button type="button" onclick="insertJobMarkdown('table')" class="result-secondary-btn text-xs">표 삽입</button>
+                            </div>
+                        </div>
+                        <textarea id="admin-job-content" rows="18" class="std-textarea font-mono text-sm" placeholder="## 모집 분야
+
+| 구분 | 인원 | 지원 자격 |
+|---|---:|---|
+| 운전직 | 3명 | 초보 가능 |
+
+- 접수 기간: 11월 5일 ~ 11월 20일
+- **필수 서류**를 확인하세요." oninput="updateJobContentPreview()"></textarea>
+                        <p class="text-xs text-gray-500 mt-2">지원 문법: `# 제목`, `**굵게**`, `- 목록`, `1. 순서`, `| 표 | 칸 |`, `[링크](https://...)`, `---` 구분선</p>
+                    </div>
+                    <div>
+                        <div class="font-extrabold text-gray-800 mb-2">미리보기</div>
+                        <div id="admin-job-content-preview" class="job-markdown border border-gray-200 rounded-sm p-4 min-h-[430px] bg-white overflow-x-auto">작성 내용이 여기에 미리 표시됩니다.</div>
+                    </div>
+                </div>
+                <details class="border border-blue-200 bg-blue-50 p-4 rounded-sm">
+                    <summary class="cursor-pointer font-extrabold text-blue-900">작성 예시 확인</summary>
+                    <pre id="job-markdown-example-source" class="whitespace-pre-wrap text-sm bg-white border p-3 mt-3 overflow-x-auto">## 모집 분야 및 인원
+
+| 모집 분야 | 선발 인원 | 비고 |
+|---|---:|---|
+| 운전직 | 3명 | 초보 가능 |
+| 정비직 | 1명 | 관련 경험 우대 |
+
+### 지원 자격
+- 만 18세 이상
+- **성실하고 책임감 있는 자**
+
+### 접수 안내
+1. 홈페이지 회원가입 및 로그인
+2. 채용공고 확인 후 입사지원
+
+> 접수 기간과 제출 서류를 반드시 확인해 주세요.</pre>
+                    <div id="job-markdown-example-preview" class="job-markdown bg-white border p-4 mt-3 overflow-x-auto"></div>
+                </details>
                 <button onclick="adminAddJob()" class="w-full bg-blue-800 text-white font-bold py-3 hover:bg-blue-900">등록하기</button>
             </div>
         </div>
@@ -1187,7 +1318,7 @@
             document.getElementById('detail-job-cat').innerText = job.category;
             document.getElementById('detail-job-title').innerText = job.title;
             document.getElementById('detail-job-count').innerText = job.headcount;
-            document.getElementById('detail-job-content').innerText = job.content || '채용 세부 내용이 작성되지 않았습니다.';
+            document.getElementById('detail-job-content').innerHTML = renderJobMarkdown(job.content || '채용 세부 내용이 작성되지 않았습니다.');
 
             const fileWrap = document.getElementById('detail-job-file-wrap');
             const fileListContainer = document.getElementById('detail-job-file-list');
@@ -1389,6 +1520,123 @@
             });
         }
 
+        // 마크다운 안전 렌더러: HTML 원문은 이스케이프한 뒤 허용된 서식만 생성합니다.
+        function escapeJobHtml(value) {
+            return String(value ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+        }
+
+        function renderJobInlineMarkdown(value) {
+            let text = escapeJobHtml(value);
+            // 링크는 http/https만 허용하여 임의 스크립트 URL을 막습니다.
+            text = text.replace(/\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer">$1</a>');
+            text = text.replace(/`([^`]+)`/g, '<code>$1</code>');
+            text = text.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+            text = text.replace(/__(.+?)__/g, '<strong>$1</strong>');
+            text = text.replace(/(^|[^*])\*([^*\n]+)\*(?!\*)/g, '$1<em>$2</em>');
+            text = text.replace(/~~(.+?)~~/g, '<del>$1</del>');
+            return text;
+        }
+
+        function renderJobMarkdown(markdown) {
+            const lines = String(markdown ?? '').replace(/\r/g, '').split('\n');
+            const output = [];
+            let i = 0;
+            const isTableDivider = line => /^\s*\|?\s*:?-{3,}:?\s*(\|\s*:?-{3,}:?\s*)+\|?\s*$/.test(line);
+            const splitCells = line => {
+                let trimmed = line.trim();
+                if (trimmed.startsWith('|')) trimmed = trimmed.slice(1);
+                if (trimmed.endsWith('|')) trimmed = trimmed.slice(0, -1);
+                return trimmed.split('|').map(cell => cell.trim());
+            };
+            const isBlockStart = line => /^\s{0,3}(#{1,6}\s|[-*+]\s|\d+\.\s|>\s?|---+\s*$)/.test(line);
+
+            while (i < lines.length) {
+                const line = lines[i];
+                if (!line.trim()) { i++; continue; }
+
+                // GitHub 스타일 마크다운 표: 헤더, 구분행, 본문행
+                if (line.includes('|') && i + 1 < lines.length && isTableDivider(lines[i + 1])) {
+                    const headers = splitCells(line);
+                    i += 2;
+                    const rows = [];
+                    while (i < lines.length && lines[i].trim() && lines[i].includes('|')) {
+                        rows.push(splitCells(lines[i]));
+                        i++;
+                    }
+                    const head = '<thead><tr>' + headers.map(cell => `<th>${renderJobInlineMarkdown(cell)}</th>`).join('') + '</tr></thead>';
+                    const body = '<tbody>' + rows.map(row => '<tr>' + headers.map((_, index) => `<td>${renderJobInlineMarkdown(row[index] ?? '')}</td>`).join('') + '</tr>').join('') + '</tbody>';
+                    output.push(`<div class="overflow-x-auto"><table>${head}${body}</table></div>`);
+                    continue;
+                }
+
+                const heading = line.match(/^\s{0,3}(#{1,6})\s+(.+?)\s*#*\s*$/);
+                if (heading) {
+                    const level = heading[1].length;
+                    output.push(`<h${level}>${renderJobInlineMarkdown(heading[2])}</h${level}>`);
+                    i++; continue;
+                }
+                if (/^\s{0,3}(---+|\*\*\*+|___+)\s*$/.test(line)) { output.push('<hr>'); i++; continue; }
+
+                if (/^\s{0,3}>/.test(line)) {
+                    const quote = [];
+                    while (i < lines.length && /^\s{0,3}>/.test(lines[i])) quote.push(lines[i++].replace(/^\s{0,3}>\s?/, ''));
+                    output.push(`<blockquote>${quote.map(renderJobInlineMarkdown).join('<br>')}</blockquote>`);
+                    continue;
+                }
+
+                const listMatch = line.match(/^\s{0,3}([-*+])\s+(.+)$/);
+                const orderedMatch = line.match(/^\s{0,3}\d+\.\s+(.+)$/);
+                if (listMatch || orderedMatch) {
+                    const ordered = !!orderedMatch;
+                    const items = [];
+                    while (i < lines.length) {
+                        const match = ordered ? lines[i].match(/^\s{0,3}\d+\.\s+(.+)$/) : lines[i].match(/^\s{0,3}[-*+]\s+(.+)$/);
+                        if (!match) break;
+                        items.push(`<li>${renderJobInlineMarkdown(match[1])}</li>`); i++;
+                    }
+                    output.push(`<${ordered ? 'ol' : 'ul'}>${items.join('')}</${ordered ? 'ol' : 'ul'}>`);
+                    continue;
+                }
+
+                const paragraph = [line.trim()]; i++;
+                while (i < lines.length && lines[i].trim() && !isBlockStart(lines[i]) && !(lines[i].includes('|') && i + 1 < lines.length && isTableDivider(lines[i + 1]))) {
+                    paragraph.push(lines[i].trim()); i++;
+                }
+                output.push(`<p>${paragraph.map(renderJobInlineMarkdown).join('<br>')}</p>`);
+            }
+            return output.join('\n');
+        }
+
+        function updateJobContentPreview() {
+            const source = document.getElementById('admin-job-content');
+            const preview = document.getElementById('admin-job-content-preview');
+            if (!source || !preview) return;
+            preview.innerHTML = source.value.trim() ? renderJobMarkdown(source.value) : '<span class="text-gray-400">본문을 입력하면 여기에서 미리 볼 수 있습니다.</span>';
+        }
+
+        function updateJobMarkdownExamplePreview() {
+            const source = document.getElementById('job-markdown-example-source');
+            const preview = document.getElementById('job-markdown-example-preview');
+            if (source && preview) preview.innerHTML = renderJobMarkdown(source.innerText || source.textContent || '');
+        }
+
+        function insertJobMarkdown(kind) {
+            const textarea = document.getElementById('admin-job-content');
+            if (!textarea) return;
+            const snippets = {
+                heading: '## 제목 입력',
+                bold: '**굵게 표시할 내용**',
+                list: '- 첫 번째 항목\n- 두 번째 항목\n- 세 번째 항목',
+                table: '| 항목 | 내용 | 비고 |\n|---|---|---|\n| 예시 1 | 내용 입력 | - |\n| 예시 2 | 내용 입력 | - |'
+            };
+            const text = snippets[kind] || '';
+            const start = textarea.selectionStart ?? textarea.value.length;
+            const end = textarea.selectionEnd ?? textarea.value.length;
+            textarea.setRangeText(text, start, end, 'end');
+            textarea.focus();
+            updateJobContentPreview();
+        }
+
         function switchTab(tabId) {
             const sections = document.querySelectorAll('.view-section');
             sections.forEach(el => el.classList.remove('active'));
@@ -1412,6 +1660,10 @@
         function toggleMobileNav() { document.getElementById('mobile-nav').classList.toggle('hidden'); }
 
         window.addEventListener('DOMContentLoaded', initData);
+        window.addEventListener('DOMContentLoaded', () => {
+            updateJobContentPreview();
+            updateJobMarkdownExamplePreview();
+        });
     </script>
 
 <script>
