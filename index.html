@@ -46,7 +46,16 @@
         .global-loading-label { color:#253b86; font-size:14px; font-weight:800; letter-spacing:.01em; }
         @keyframes globalSpinnerRotate { to { transform:rotate(360deg); } }
         button, a { -webkit-tap-highlight-color: transparent; }
-        @media (prefers-reduced-motion: reduce) { .view-section.active, .view-section.is-leaving { animation-duration:.01ms; } .global-loading-spinner { animation-duration:1.6s; } }
+        /* 화면은 위로 움직이지 않고 중앙 위치에서 천천히 페이드 전환 */
+        .view-section { transform:none !important; }
+        .view-section.active { animation:sectionFadeInCentered .52s cubic-bezier(.2,.65,.25,1) both !important; }
+        .view-section.is-leaving { animation:sectionFadeOutCentered .24s ease both !important; }
+        @keyframes sectionFadeInCentered { from { opacity:0; } to { opacity:1; } }
+        @keyframes sectionFadeOutCentered { from { opacity:1; } to { opacity:0; } }
+        .guide-tab-panel { transform:none !important; }
+        .guide-tab-panel.active { animation:guidePanelFadeCentered .48s cubic-bezier(.2,.65,.25,1) both !important; }
+        @keyframes guidePanelFadeCentered { from { opacity:0; } to { opacity:1; } }
+        @media (prefers-reduced-motion: reduce) { .view-section.active, .view-section.is-leaving, .guide-tab-panel.active { animation-duration:.01ms !important; } .global-loading-spinner { animation-duration:1.6s; } }
 
         .result-modal-overlay { position:fixed; inset:0; z-index:100; background:rgba(12,18,35,.78); display:none; align-items:center; justify-content:center; padding:12px; }
         .result-modal-overlay.show { display:flex; }
@@ -83,21 +92,24 @@
         .guide-bullet-list { list-style:none; padding:0; margin:0; }
         .guide-bullet-list li { position:relative; padding-left:1.2rem; margin:.65rem 0; font-size:1.08rem; line-height:1.8; }
         .guide-bullet-list li::before { content:'-'; position:absolute; left:0; color:#354aa0; font-weight:900; }
-        .rank-track { display:grid; grid-template-columns:repeat(5,minmax(0,1fr)); gap:0; align-items:center; position:relative; padding:10px 0; }
-        .rank-track::before { content:""; position:absolute; left:10%; right:30%; top:50%; height:12px; border-radius:999px; background:#e8e8e8; transform:translateY(-50%); z-index:0; }
-        .rank-card { width:min(100%,190px); aspect-ratio:1/1; min-width:0; position:relative; z-index:1; justify-self:center; border:10px solid #ececec; border-radius:50%; background:#fff; padding:12px; text-align:center; display:flex; flex-direction:column; align-items:center; justify-content:center; }
-        .rank-card .rank-number { color:#354aa0; font-size:clamp(1.15rem,2vw,1.8rem); font-weight:900; margin-bottom:8px; }
-        .rank-card .rank-role { color:#242424; font-weight:800; font-size:clamp(.78rem,1.15vw,1rem); margin-bottom:6px; }
-        .rank-card .rank-note { color:#6b7280; font-size:clamp(.68rem,.95vw,.85rem); line-height:1.45; }
-        .rank-card:nth-child(1) .rank-number { color:#657aa9; }
-        .rank-card:nth-child(2) .rank-number { color:#4eaa60; }
-        .rank-card:nth-child(3) .rank-number { color:#4d9cae; }
-        .rank-card:nth-child(4) .rank-number { color:#477bb4; }
-        .rank-card:last-child { border-color:#ececec; background:#fff; }
-        .rank-card:last-child .rank-number { color:#354aa0; }
-        .rank-card:last-child .rank-role { color:#242424; }
-        .rank-card:last-child .rank-note { color:#b42318; font-weight:800; }
-        .rank-arrow { color:#354aa0; font-size:1.4rem; font-weight:900; display:flex; align-items:center; justify-content:center; }
+        /* 승진제도: 5·4·3·2직급은 연결된 승진 경로, 1직급은 분리된 총괄 직급 */
+        .rank-promotion-layout { display:grid; grid-template-columns:minmax(0,1fr) 176px; gap:clamp(18px,2.4vw,34px); align-items:center; }
+        .rank-track-linked { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:0; align-items:center; position:relative; isolation:isolate; padding:14px 0; }
+        .rank-track-linked::before { content:""; position:absolute; left:12.5%; right:12.5%; top:50%; height:9px; border-radius:999px; background:#e6e8ee; transform:translateY(-50%); z-index:-1; }
+        .rank-card { width:min(100%,174px); aspect-ratio:1/1; min-width:0; position:relative; justify-self:center; border:8px solid #eceef3; border-radius:50%; background:#fff; padding:clamp(8px,1vw,14px); text-align:center; display:flex; flex-direction:column; align-items:center; justify-content:center; box-sizing:border-box; }
+        .rank-card .rank-number { color:#354aa0; font-size:clamp(1.1rem,1.75vw,1.75rem); font-weight:900; margin-bottom:7px; line-height:1.15; white-space:nowrap; }
+        .rank-card .rank-role { color:#242424; font-weight:800; font-size:clamp(.78rem,1.02vw,.98rem); margin-bottom:5px; line-height:1.35; overflow-wrap:anywhere; }
+        .rank-card .rank-note { color:#6b7280; font-size:clamp(.67rem,.88vw,.82rem); line-height:1.45; }
+        .rank-card-5 .rank-number { color:#657aa9; }
+        .rank-card-4 .rank-number { color:#4eaa60; }
+        .rank-card-3 .rank-number { color:#4d9cae; }
+        .rank-card-2 .rank-number { color:#477bb4; }
+        .rank-executive-wrap { display:flex; flex-direction:column; align-items:center; gap:9px; padding-left:clamp(16px,2vw,28px); border-left:1px solid #e5e7eb; }
+        .rank-executive-label { color:#354aa0; font-weight:900; font-size:.95rem; text-align:center; }
+        .rank-executive-card { width:min(100%,166px); border-color:#e1e4ec; background:#f9faff; }
+        .rank-executive-card .rank-number { color:#354aa0; }
+        .rank-executive-card .rank-role { font-size:clamp(.8rem,1vw,1rem); }
+        .rank-path-caption { margin-top:22px; text-align:center; color:#354aa0; font-weight:900; font-size:clamp(.9rem,1.25vw,1.05rem); }
         .guide-salary { background:#f6f7fb; border-left:5px solid #354aa0; padding:20px 24px; }
 
         /* 채용안내 내부 메뉴 */
@@ -136,7 +148,25 @@
         @media (max-width: 800px) { .guide-layout { grid-template-columns:1fr; gap:24px; } .guide-sidebar { position:static; } .guide-page-title { width:100%; min-height:84px; margin-bottom:12px; font-size:2rem; } .guide-sidebar-menu { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; } .guide-sidebar-link { border:1px solid #dfe2e8; border-radius:8px; padding:13px 12px; font-size:.95rem; } .guide-sidebar-link.active { border:1px solid #354aa0; background:#f3f5ff; } .guide-sidebar-link::after { font-size:1.1rem; } .core-values-grid { grid-template-columns:1fr; } .talent-grid { grid-template-columns:1fr; } .talent-card-points { min-height:auto; } .benefits-grid { gap:10px; } .benefit-card { padding:17px 9px; } .benefit-icon { width:66px; height:66px; font-size:1.8rem; } .benefit-title { font-size:.94rem; } }
         @media (max-width: 420px) { .guide-sidebar-menu { grid-template-columns:1fr; } .benefits-grid { grid-template-columns:1fr; } }
 
-        @media (max-width: 760px) { .rank-track { grid-template-columns:1fr; gap:14px; } .rank-track::before { left:calc(50% - 6px); right:auto; top:8%; width:12px; height:60%; transform:none; } .rank-card { width:min(180px,70vw); padding:12px; } .rank-card .rank-number { font-size:1.5rem; } .rank-card .rank-role { font-size:.95rem; } .rank-card .rank-note { font-size:.8rem; } .rank-card:last-child { margin-top:8px; } .rank-arrow { transform:rotate(90deg); min-height:20px; } .guide-page-title { min-height:90px; font-size:2rem; } }
+        @media (max-width: 760px) { .guide-page-title { min-height:90px; font-size:2rem; } }
+        @media (max-width: 900px) {
+            .rank-promotion-layout { grid-template-columns:minmax(0,1fr) 145px; gap:14px; }
+            .rank-card { border-width:6px; }
+            .rank-card .rank-number { font-size:clamp(1rem,2vw,1.35rem); }
+            .rank-card .rank-role { font-size:clamp(.72rem,1.35vw,.9rem); }
+        }
+        @media (max-width: 680px) {
+            .rank-promotion-layout { grid-template-columns:1fr; gap:22px; }
+            .rank-track-linked { grid-template-columns:1fr; gap:12px; padding:0; }
+            .rank-track-linked::before { left:calc(50% - 4px); right:auto; top:8%; bottom:8%; width:8px; height:auto; transform:none; }
+            .rank-card { width:min(176px,62vw); padding:12px; border-width:7px; }
+            .rank-card .rank-number { font-size:1.4rem; }
+            .rank-card .rank-role { font-size:.92rem; }
+            .rank-card .rank-note { font-size:.78rem; }
+            .rank-executive-wrap { border-left:0; border-top:1px solid #e5e7eb; padding:22px 0 0; }
+            .rank-executive-card { width:min(176px,62vw); }
+            .rank-path-caption { margin-top:15px; }
+        }
 
     </style>
 </head>
@@ -286,15 +316,20 @@
 
                         <section class="guide-section">
                             <div class="guide-section-heading"><span class="guide-section-icon"><span></span></span><h3>승진제도</h3></div>
-                            <p class="text-gray-600 mb-5">5직급부터 2직급까지는 승진 경로에 따라 단계적으로 올라갈 수 있습니다. 1직급은 승진으로 올라갈 수 없는 별도 직급입니다.</p>
-                            <div class="rank-track" aria-label="직급 승진 단계">
-                                <div class="rank-card"><div class="rank-number">5직급</div><div class="rank-role">수습사원 · 사원</div><div class="rank-note">입사 초기 및 일반 사원</div></div>
-                                <div class="rank-card"><div class="rank-number">4직급</div><div class="rank-role">선임</div><div class="rank-note">실무 숙련 직급</div></div>
-                                <div class="rank-card"><div class="rank-number">3직급</div><div class="rank-role">주임</div><div class="rank-note">업무 관리 직급</div></div>
-                                <div class="rank-card"><div class="rank-number">2직급</div><div class="rank-role">반장</div><div class="rank-note">현장 관리 직급</div></div>
-                                <div class="rank-card"><div class="rank-number">1직급</div><div class="rank-role">행정최고간부</div><div class="rank-note">승진 불가</div></div>
+                            <p class="text-gray-600 mb-5">5직급에서 2직급까지 연결된 승진 체계로 운영됩니다.</p>
+                            <div class="rank-promotion-layout" aria-label="직급 체계">
+                                <div class="rank-track-linked" aria-label="승진 경로: 5직급에서 2직급">
+                                    <div class="rank-card rank-card-5"><div class="rank-number">5직급</div><div class="rank-role">수습사원 · 사원</div><div class="rank-note">입사 초기 및 일반 사원</div></div>
+                                    <div class="rank-card rank-card-4"><div class="rank-number">4직급</div><div class="rank-role">선임</div><div class="rank-note">실무 숙련 직급</div></div>
+                                    <div class="rank-card rank-card-3"><div class="rank-number">3직급</div><div class="rank-role">주임</div><div class="rank-note">업무 관리 직급</div></div>
+                                    <div class="rank-card rank-card-2"><div class="rank-number">2직급</div><div class="rank-role">반장</div><div class="rank-note">현장 관리 직급</div></div>
+                                </div>
+                                <div class="rank-executive-wrap" aria-label="총괄 직급">
+                                    <div class="rank-executive-label">총괄 직급</div>
+                                    <div class="rank-card rank-executive-card"><div class="rank-number">1직급</div><div class="rank-role">총괄 직급</div></div>
+                                </div>
                             </div>
-                            <div class="flex items-center justify-center gap-2 text-sm text-[#354aa0] font-extrabold mt-4"><i class="fas fa-arrow-right"></i><span>승진 경로: 5직급 → 4직급 → 3직급 → 2직급</span></div>
+                            <div class="rank-path-caption"><i class="fas fa-arrow-right mr-1" aria-hidden="true"></i> 승진 경로: 5직급 → 4직급 → 3직급 → 2직급</div>
                             <p class="mt-5 text-gray-700">※ 수습사원은 약 2주 근무 후 평가를 거쳐 일반 사원으로 전환됩니다.</p>
                         </section>
 
@@ -1896,7 +1931,7 @@
                 if (tabId === 'my') renderMyRecruitment();
                 if (tabId === 'admin') switchAdminMainTab('applicants');
                 if (tabId === 'inquiry') loadInquiries();
-                window.scrollTo({ top: 0, behavior: 'smooth' });
+                window.scrollTo({ top: 0, behavior: 'auto' });
             };
 
             if (active === target) {
@@ -1909,7 +1944,7 @@
 
             if (active) {
                 active.classList.add('is-leaving');
-                sectionTransitionTimer = setTimeout(activateTarget, 145);
+                sectionTransitionTimer = setTimeout(activateTarget, 240);
             } else {
                 activateTarget();
             }
