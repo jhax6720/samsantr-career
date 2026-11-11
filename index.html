@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>삼산여객 채용 홈페이지</title>
+    <title>삼산여객 채용</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Supabase JS CDN -->
@@ -31,8 +31,22 @@
         .hamburger-btn { background-color: #25408f; width: 64px; height: 64px; display: flex; align-items: center; justify-content: center; }
         .std-input { width: 100%; height: 48px; padding: 0 16px; font-size: 16px; border: 2px solid #2b4bb7; background-color: #ffffff !important; color: #000000 !important; outline: none; box-sizing: border-box; }
         .std-textarea { width: 100%; padding: 12px 16px; font-size: 16px; border: 2px solid #2b4bb7; background-color: #ffffff !important; color: #000000 !important; outline: none; box-sizing: border-box; }
-        .view-section { display: none; opacity: 0; transition: opacity 0.3s ease-in-out; }
-        .view-section.active { display: block; opacity: 1; }
+        /* 화면 전환: 짧은 페이드와 살짝 올라오는 모션 */
+        .view-section { display: none; opacity: 0; transform: translateY(8px); }
+        .view-section.active { display: block; opacity: 1; animation: sectionFadeIn .30s cubic-bezier(.22,.61,.36,1) both; }
+        .view-section.is-leaving { display: block; pointer-events: none; animation: sectionFadeOut .15s ease both; }
+        @keyframes sectionFadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes sectionFadeOut { from { opacity: 1; transform: translateY(0); } to { opacity: 0; transform: translateY(-4px); } }
+
+        /* 공통 원형 로딩 오버레이 */
+        #global-loading-overlay { position:fixed; inset:0; z-index:9999; display:flex; align-items:center; justify-content:center; padding:20px; background:rgba(255,255,255,.64); backdrop-filter:blur(3px); -webkit-backdrop-filter:blur(3px); opacity:0; visibility:hidden; pointer-events:none; transition:opacity .18s ease, visibility .18s ease; }
+        #global-loading-overlay.is-visible { opacity:1; visibility:visible; pointer-events:auto; }
+        .global-loading-card { display:flex; flex-direction:column; align-items:center; gap:14px; min-width:150px; padding:25px 30px; background:rgba(255,255,255,.96); border:1px solid #e5e7eb; border-radius:16px; box-shadow:0 16px 45px rgba(31,41,55,.14); }
+        .global-loading-spinner { width:54px; height:54px; border:5px solid #e8eaf2; border-top-color:#354aa0; border-right-color:#7c88ca; border-radius:50%; animation:globalSpinnerRotate .78s linear infinite; }
+        .global-loading-label { color:#253b86; font-size:14px; font-weight:800; letter-spacing:.01em; }
+        @keyframes globalSpinnerRotate { to { transform:rotate(360deg); } }
+        button, a { -webkit-tap-highlight-color: transparent; }
+        @media (prefers-reduced-motion: reduce) { .view-section.active, .view-section.is-leaving { animation-duration:.01ms; } .global-loading-spinner { animation-duration:1.6s; } }
 
         .result-modal-overlay { position:fixed; inset:0; z-index:100; background:rgba(12,18,35,.78); display:none; align-items:center; justify-content:center; padding:12px; }
         .result-modal-overlay.show { display:flex; }
@@ -264,7 +278,6 @@
                 <h1 class="text-3xl font-extrabold text-center text-gray-900 mb-3">
                     삼산여객 주식회사 홈페이지 개인정보 처리방침
                 </h1>
-                <p class="text-center text-base text-gray-600 mb-8 pb-5 border-b">(가상회사 및 채용 홈페이지 운영 기준)</p>
 
                 <p class="mb-8">
                     삼산여객 주식회사(이하 “회사”)는 홈페이지 이용자의 개인정보를 보호하고, 개인정보와 관련한 문의를 원활하게 처리하기 위하여 다음과 같이 개인정보 처리방침을 정하여 공개합니다.
@@ -652,6 +665,15 @@
         <p class="mb-2"><strong>삼산여객 주식회사</strong> | 채용 및 개인정보 문의: ffhhgogbv(채용), this0833(채용), quartey123456(기술)</p>
         <p class="text-xs text-gray-500">&copy; 2026 SAMSAN PASSENGER CORP. ALL RIGHTS RESERVED.</p>
     </footer>
+
+
+    <!-- 전역 로딩 표시: 느린 데이터 요청 중에만 원형 로딩 아이콘을 표시합니다. -->
+    <div id="global-loading-overlay" aria-hidden="true" role="status" aria-live="polite">
+        <div class="global-loading-card">
+            <div class="global-loading-spinner" aria-hidden="true"></div>
+            <div class="global-loading-label">불러오는 중...</div>
+        </div>
+    </div>
 
     <!-- 모달 레이어들 -->
     <div id="jobWriteModal" class="fixed inset-0 bg-black/50 hidden items-center justify-center p-3 sm:p-5 z-50">
@@ -1717,24 +1739,42 @@
             updateJobContentPreview();
         }
 
+        let sectionTransitionTimer = null;
+        let sectionTransitionToken = 0;
         function switchTab(tabId) {
-            const sections = document.querySelectorAll('.view-section');
-            sections.forEach(el => el.classList.remove('active'));
-
-            const skyBanner = document.getElementById('sky-header-banner');
-            if (tabId === 'home') skyBanner.classList.add('hidden');
-            else skyBanner.classList.remove('hidden');
-
             const target = document.getElementById(`view-${tabId}`);
-            if (target) setTimeout(() => target.classList.add('active'), 50);
+            if (!target) return;
+            const sections = Array.from(document.querySelectorAll('.view-section'));
+            const active = document.querySelector('.view-section.active');
+            const token = ++sectionTransitionToken;
+            if (sectionTransitionTimer) { clearTimeout(sectionTransitionTimer); sectionTransitionTimer = null; }
 
-            if (tabId === 'my') renderMyRecruitment();
-            if (tabId === 'admin') {
-                switchAdminMainTab('applicants');
+            const activateTarget = () => {
+                if (token !== sectionTransitionToken) return;
+                sections.forEach(el => el.classList.remove('active', 'is-leaving'));
+                target.classList.add('active');
+                const skyBanner = document.getElementById('sky-header-banner');
+                if (skyBanner) skyBanner.classList.toggle('hidden', tabId === 'home');
+                if (tabId === 'my') renderMyRecruitment();
+                if (tabId === 'admin') switchAdminMainTab('applicants');
+                if (tabId === 'inquiry') loadInquiries();
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            };
+
+            if (active === target) {
+                // 현재 화면을 다시 선택해도 데이터 목록을 새로 고칠 수 있도록 한다.
+                if (tabId === 'my') renderMyRecruitment();
+                if (tabId === 'admin') switchAdminMainTab('applicants');
+                if (tabId === 'inquiry') loadInquiries();
+                return;
             }
-            if (tabId === 'inquiry') loadInquiries();
 
-            window.scrollTo({ top: 0, behavior: 'smooth' });
+            if (active) {
+                active.classList.add('is-leaving');
+                sectionTransitionTimer = setTimeout(activateTarget, 145);
+            } else {
+                activateTarget();
+            }
         }
 
         function toggleMobileNav() { document.getElementById('mobile-nav').classList.toggle('hidden'); }
@@ -2448,6 +2488,74 @@ window.handleLogout = function () {
 window.addEventListener('DOMContentLoaded', () => {
   updateNoticeContentPreview();
 });
+</script>
+
+
+<script>
+// 비동기 데이터 작업에 공통 원형 로딩 표시를 연결합니다.
+(function installGlobalLoadingIndicator() {
+  const overlay = document.getElementById('global-loading-overlay');
+  if (!overlay) return;
+  let activeRequests = 0;
+  let showTimer = null;
+  let hideTimer = null;
+  let shownAt = 0;
+  const SHOW_DELAY_MS = 120;       // 짧은 요청에서는 깜빡이지 않도록 지연 표시
+  const MIN_VISIBLE_MS = 260;      // 표시되면 너무 빨리 사라지지 않도록 유지
+
+  function beginLoading() {
+    activeRequests += 1;
+    if (hideTimer) { clearTimeout(hideTimer); hideTimer = null; }
+    if (!overlay.classList.contains('is-visible') && !showTimer) {
+      showTimer = setTimeout(() => {
+        showTimer = null;
+        if (activeRequests > 0) {
+          overlay.classList.add('is-visible');
+          overlay.setAttribute('aria-hidden', 'false');
+          shownAt = performance.now();
+        }
+      }, SHOW_DELAY_MS);
+    }
+  }
+
+  function endLoading() {
+    activeRequests = Math.max(0, activeRequests - 1);
+    if (activeRequests > 0) return;
+    if (showTimer) { clearTimeout(showTimer); showTimer = null; }
+    const elapsed = overlay.classList.contains('is-visible') ? performance.now() - shownAt : MIN_VISIBLE_MS;
+    const delay = Math.max(0, MIN_VISIBLE_MS - elapsed);
+    if (hideTimer) clearTimeout(hideTimer);
+    hideTimer = setTimeout(() => {
+      if (activeRequests === 0) {
+        overlay.classList.remove('is-visible');
+        overlay.setAttribute('aria-hidden', 'true');
+      }
+      hideTimer = null;
+    }, delay);
+  }
+
+  // 함수는 선언된 순서와 관계없이 실제 실행 시점의 전역 함수를 감쌉니다.
+  const asyncFunctionsToWrap = [
+    'loadJobs', 'loadNotices', 'loadInquiries', 'loadAdminApplications', 'loadAdminInquiries',
+    'renderMyRecruitment', 'resultApi', 'handleLoginSubmit', 'handleCompleteSignup',
+    'finalSubmitApplication', 'adminAddJob', 'adminAddNotice', 'deleteCurrentJob', 'deleteCurrentNotice',
+    'submitInquiry', 'submitInquiryAnswer', 'deleteInquiryAdmin', 'updateAppStatus',
+    'submitMyPageReauth', 'saveMyPageProfile', 'submitResultReauth', 'publishApplicationResult',
+    'startApplyProcess'
+  ];
+  asyncFunctionsToWrap.forEach(name => {
+    const original = window[name];
+    if (typeof original !== 'function' || original.__globalLoadingWrapped) return;
+    const wrapped = async function(...args) {
+      beginLoading();
+      try { return await original.apply(this, args); }
+      finally { endLoading(); }
+    };
+    wrapped.__globalLoadingWrapped = true;
+    wrapped.__originalFunction = original;
+    window[name] = wrapped;
+  });
+})();
 </script>
 
 </body>
