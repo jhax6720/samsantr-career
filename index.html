@@ -46,16 +46,7 @@
         .global-loading-label { color:#253b86; font-size:14px; font-weight:800; letter-spacing:.01em; }
         @keyframes globalSpinnerRotate { to { transform:rotate(360deg); } }
         button, a { -webkit-tap-highlight-color: transparent; }
-        /* 화면은 위로 움직이지 않고 중앙 위치에서 천천히 페이드 전환 */
-        .view-section { transform:none !important; }
-        .view-section.active { animation:sectionFadeInCentered .52s cubic-bezier(.2,.65,.25,1) both !important; }
-        .view-section.is-leaving { animation:sectionFadeOutCentered .24s ease both !important; }
-        @keyframes sectionFadeInCentered { from { opacity:0; } to { opacity:1; } }
-        @keyframes sectionFadeOutCentered { from { opacity:1; } to { opacity:0; } }
-        .guide-tab-panel { transform:none !important; }
-        .guide-tab-panel.active { animation:guidePanelFadeCentered .48s cubic-bezier(.2,.65,.25,1) both !important; }
-        @keyframes guidePanelFadeCentered { from { opacity:0; } to { opacity:1; } }
-        @media (prefers-reduced-motion: reduce) { .view-section.active, .view-section.is-leaving, .guide-tab-panel.active { animation-duration:.01ms !important; } .global-loading-spinner { animation-duration:1.6s; } }
+        @media (prefers-reduced-motion: reduce) { .view-section.active, .view-section.is-leaving { animation-duration:.01ms; } .global-loading-spinner { animation-duration:1.6s; } }
 
         .result-modal-overlay { position:fixed; inset:0; z-index:100; background:rgba(12,18,35,.78); display:none; align-items:center; justify-content:center; padding:12px; }
         .result-modal-overlay.show { display:flex; }
@@ -92,81 +83,100 @@
         .guide-bullet-list { list-style:none; padding:0; margin:0; }
         .guide-bullet-list li { position:relative; padding-left:1.2rem; margin:.65rem 0; font-size:1.08rem; line-height:1.8; }
         .guide-bullet-list li::before { content:'-'; position:absolute; left:0; color:#354aa0; font-weight:900; }
-        /* 승진제도: 5·4·3·2직급은 연결된 승진 경로, 1직급은 분리된 총괄 직급 */
-        .rank-promotion-layout { display:grid; grid-template-columns:minmax(0,1fr) 176px; gap:clamp(18px,2.4vw,34px); align-items:center; }
-        .rank-track-linked { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:0; align-items:center; position:relative; isolation:isolate; padding:14px 0; }
-        .rank-track-linked::before { content:""; position:absolute; left:12.5%; right:12.5%; top:50%; height:9px; border-radius:999px; background:#e6e8ee; transform:translateY(-50%); z-index:-1; }
-        .rank-card { width:min(100%,174px); aspect-ratio:1/1; min-width:0; position:relative; justify-self:center; border:8px solid #eceef3; border-radius:50%; background:#fff; padding:clamp(8px,1vw,14px); text-align:center; display:flex; flex-direction:column; align-items:center; justify-content:center; box-sizing:border-box; }
-        .rank-card .rank-number { color:#354aa0; font-size:clamp(1.1rem,1.75vw,1.75rem); font-weight:900; margin-bottom:7px; line-height:1.15; white-space:nowrap; }
-        .rank-card .rank-role { color:#242424; font-weight:800; font-size:clamp(.78rem,1.02vw,.98rem); margin-bottom:5px; line-height:1.35; overflow-wrap:anywhere; }
-        .rank-card .rank-note { color:#6b7280; font-size:clamp(.67rem,.88vw,.82rem); line-height:1.45; }
-        .rank-card-5 .rank-number { color:#657aa9; }
-        .rank-card-4 .rank-number { color:#4eaa60; }
-        .rank-card-3 .rank-number { color:#4d9cae; }
-        .rank-card-2 .rank-number { color:#477bb4; }
-        .rank-executive-wrap { display:flex; flex-direction:column; align-items:center; gap:9px; padding-left:clamp(16px,2vw,28px); border-left:1px solid #e5e7eb; }
-        .rank-executive-label { color:#354aa0; font-weight:900; font-size:.95rem; text-align:center; }
-        .rank-executive-card { width:min(100%,166px); border-color:#e1e4ec; background:#f9faff; }
-        .rank-executive-card .rank-number { color:#354aa0; }
-        .rank-executive-card .rank-role { font-size:clamp(.8rem,1vw,1rem); }
-        .rank-path-caption { margin-top:22px; text-align:center; color:#354aa0; font-weight:900; font-size:clamp(.9rem,1.25vw,1.05rem); }
+        .rank-track { display:grid; grid-template-columns:repeat(5,minmax(0,1fr)); gap:0; align-items:center; position:relative; padding:10px 0; }
+        .rank-track::before { content:""; position:absolute; left:10%; right:30%; top:50%; height:12px; border-radius:999px; background:#e8e8e8; transform:translateY(-50%); z-index:0; }
+        .rank-card { width:min(100%,190px); aspect-ratio:1/1; min-width:0; position:relative; z-index:1; justify-self:center; border:10px solid #ececec; border-radius:50%; background:#fff; padding:12px; text-align:center; display:flex; flex-direction:column; align-items:center; justify-content:center; }
+        .rank-card .rank-number { color:#354aa0; font-size:clamp(1.15rem,2vw,1.8rem); font-weight:900; margin-bottom:8px; }
+        .rank-card .rank-role { color:#242424; font-weight:800; font-size:clamp(.78rem,1.15vw,1rem); margin-bottom:6px; }
+        .rank-card .rank-note { color:#6b7280; font-size:clamp(.68rem,.95vw,.85rem); line-height:1.45; }
+        .rank-card:nth-child(1) .rank-number { color:#657aa9; }
+        .rank-card:nth-child(2) .rank-number { color:#4eaa60; }
+        .rank-card:nth-child(3) .rank-number { color:#4d9cae; }
+        .rank-card:nth-child(4) .rank-number { color:#477bb4; }
+        .rank-card:last-child { border-color:#ececec; background:#fff; }
+        .rank-card:last-child .rank-number { color:#354aa0; }
+        .rank-card:last-child .rank-role { color:#242424; }
+        .rank-card:last-child .rank-note { color:#b42318; font-weight:800; }
+        .rank-arrow { color:#354aa0; font-size:1.4rem; font-weight:900; display:flex; align-items:center; justify-content:center; }
         .guide-salary { background:#f6f7fb; border-left:5px solid #354aa0; padding:20px 24px; }
+        @media (max-width: 760px) { .rank-track { grid-template-columns:1fr; gap:14px; } .rank-track::before { left:calc(50% - 6px); right:auto; top:8%; width:12px; height:60%; transform:none; } .rank-card { width:min(180px,70vw); padding:12px; } .rank-card .rank-number { font-size:1.5rem; } .rank-card .rank-role { font-size:.95rem; } .rank-card .rank-note { font-size:.8rem; } .rank-card:last-child { margin-top:8px; } .rank-arrow { transform:rotate(90deg); min-height:20px; } .guide-page-title { min-height:90px; font-size:2rem; } }
 
-        /* 채용안내 내부 메뉴 */
-        .guide-layout { display:grid; grid-template-columns:minmax(220px,295px) minmax(0,1fr); gap:clamp(24px,4vw,58px); align-items:start; }
-        .guide-sidebar { position:sticky; top:108px; }
-        .guide-sidebar-link { width:100%; display:flex; align-items:center; justify-content:space-between; gap:12px; padding:18px 2px; text-align:left; color:#3f3f46; font-size:1.08rem; border-bottom:1px solid #dfe2e8; transition:color .2s ease, padding .2s ease, border-color .2s ease; }
-        .guide-sidebar-link::after { content:'+'; color:#9ca3af; font-size:1.3rem; line-height:1; }
-        .guide-sidebar-link:hover { color:#354aa0; padding-left:7px; }
-        .guide-sidebar-link.active { color:#354aa0; font-weight:900; border-bottom:2px solid #354aa0; }
-        .guide-sidebar-link.active::after { content:'−'; color:#354aa0; }
-        .guide-tab-panel { display:none; min-width:0; animation:guidePanelIn .28s ease both; }
-        .guide-tab-panel.active { display:block; }
-        @keyframes guidePanelIn { from {opacity:0; transform:translateY(7px)} to {opacity:1; transform:translateY(0)} }
-        .guide-content-title { font-size:clamp(1.8rem,3vw,2.5rem); line-height:1.3; font-weight:900; color:#151515; padding-bottom:18px; margin-bottom:24px; border-bottom:1px solid #d1d5db; }
-        .guide-overview-box { border:1px solid #e5e7eb; border-radius:14px; padding:24px; margin-bottom:18px; background:#fff; box-shadow:0 5px 20px rgba(31,41,55,.035); }
-        .guide-overview-label { display:flex; align-items:center; justify-content:center; gap:12px; color:#354aa0; font-size:1.3rem; font-weight:900; margin-bottom:12px; }
-        .guide-overview-label::before,.guide-overview-label::after { content:''; height:1px; background:#d7dce8; width:min(14%,70px); }
-        .guide-overview-description { text-align:center; font-size:1.05rem; color:#4b5563; line-height:1.8; }
-        .core-values-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:16px; margin-top:18px; }
-        .core-value-card { min-height:205px; border-radius:15px; padding:25px 22px; color:#fff; display:flex; flex-direction:column; justify-content:center; transition:transform .2s ease, box-shadow .2s ease; }
-        .core-value-card:hover { transform:translateY(-3px); box-shadow:0 13px 26px rgba(31,41,55,.14); }
-        .core-value-card .value-ko { font-size:1.35rem; font-weight:900; margin-bottom:4px; }
-        .core-value-card .value-en { font-size:.83rem; font-weight:700; opacity:.86; margin-bottom:12px; }
-        .core-value-card p { line-height:1.7; font-size:.96rem; }
-        .talent-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:15px; margin-top:20px; }
-        .talent-card { border:1px solid #d9deea; border-radius:13px; overflow:hidden; background:white; display:flex; flex-direction:column; }
-        .talent-card-header { background:#737e90; color:#fff; padding:16px 12px; font-weight:900; text-align:center; line-height:1.5; }
-        .talent-card-points { background:#f1f2f4; padding:17px 20px; color:#374151; line-height:1.9; min-height:145px; }
-        .talent-card-summary { padding:20px 17px; color:#4b5563; line-height:1.8; text-align:center; flex:1; }
-        .benefits-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:18px; margin-top:18px; }
-        .benefit-card { border:1px solid #e5e7eb; border-radius:14px; padding:24px 14px; text-align:center; background:#fff; transition:transform .2s ease, box-shadow .2s ease; }
-        .benefit-card:hover { transform:translateY(-4px); box-shadow:0 12px 28px rgba(37,64,143,.12); }
-        .benefit-icon { width:88px; height:88px; margin:0 auto 16px; display:flex; align-items:center; justify-content:center; border-radius:50%; background:#354aa0; color:#fff; font-size:2.25rem; box-shadow:inset 0 0 0 5px rgba(255,255,255,.12); }
-        .benefit-title { color:#202c68; font-weight:900; font-size:1.06rem; line-height:1.5; }
-        .benefit-note { color:#6b7280; font-size:.88rem; margin-top:6px; line-height:1.6; }
-        @media (max-width: 800px) { .guide-layout { grid-template-columns:1fr; gap:24px; } .guide-sidebar { position:static; } .guide-page-title { width:100%; min-height:84px; margin-bottom:12px; font-size:2rem; } .guide-sidebar-menu { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; } .guide-sidebar-link { border:1px solid #dfe2e8; border-radius:8px; padding:13px 12px; font-size:.95rem; } .guide-sidebar-link.active { border:1px solid #354aa0; background:#f3f5ff; } .guide-sidebar-link::after { font-size:1.1rem; } .core-values-grid { grid-template-columns:1fr; } .talent-grid { grid-template-columns:1fr; } .talent-card-points { min-height:auto; } .benefits-grid { gap:10px; } .benefit-card { padding:17px 9px; } .benefit-icon { width:66px; height:66px; font-size:1.8rem; } .benefit-title { font-size:.94rem; } }
-        @media (max-width: 420px) { .guide-sidebar-menu { grid-template-columns:1fr; } .benefits-grid { grid-template-columns:1fr; } }
+    
+        /* 채용안내 하위 메뉴 및 콘텐츠 레이아웃 */
+        .guide-page-layout { display:grid; grid-template-columns: minmax(230px, 295px) minmax(0,1fr); gap:clamp(32px,5vw,76px); align-items:start; }
+        .guide-sidebar { position:sticky; top:110px; display:flex; flex-direction:column; }
+        .guide-sidebar-link { display:flex; align-items:center; justify-content:space-between; gap:12px; width:100%; padding:20px 0; border-bottom:1px solid #dedede; text-align:left; color:#4b4b4b; font-size:1.08rem; font-weight:600; transition:color .25s ease,border-color .25s ease; }
+        .guide-sidebar-link i { color:#354aa0; font-size:.95rem; transition:transform .25s ease; }
+        .guide-sidebar-link:hover,.guide-sidebar-link.active { color:#354aa0; }
+        .guide-sidebar-link.active { font-weight:850; border-bottom-color:#354aa0; }
+        .guide-sidebar-link.active i { transform:rotate(45deg); }
+        .guide-content-area { min-width:0; }
+        .guide-content-title { font-size:clamp(1.8rem,3vw,2.55rem); line-height:1.25; font-weight:900; color:#111827; border-bottom:1px solid #d1d5db; padding:4px 0 18px; margin-bottom:26px; }
+        .guide-tab-panel[hidden] { display:none !important; }
+        .guide-tab-panel.active { animation:guideSoftFade .48s cubic-bezier(.22,.61,.36,1) both; }
+        @keyframes guideSoftFade { from { opacity:0; } to { opacity:1; } }
+        .guide-purpose-block { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:16px; }
+        .guide-purpose-card { position:relative; overflow:hidden; min-width:0; padding:25px 24px; border-radius:18px; color:#fff; box-shadow:0 12px 28px rgba(37,64,143,.12); }
+        .guide-purpose-card::after { content:""; position:absolute; width:170px; height:170px; border:24px solid rgba(255,255,255,.12); border-radius:50%; right:-62px; bottom:-95px; }
+        .guide-mission-card { background:linear-gradient(135deg,#202b68 0%,#3d55aa 100%); }
+        .guide-vision-card { background:linear-gradient(135deg,#4384bd 0%,#6aaed0 100%); }
+        .guide-purpose-eyebrow { display:block; font-size:.82rem; letter-spacing:.12em; font-weight:900; color:rgba(255,255,255,.8); margin-bottom:12px; }
+        .guide-purpose-card h3 { position:relative; z-index:1; font-size:clamp(1.15rem,1.7vw,1.5rem); font-weight:900; line-height:1.45; margin-bottom:10px; }
+        .guide-purpose-card p { position:relative; z-index:1; font-size:.94rem; line-height:1.75; color:rgba(255,255,255,.9); }
+        .core-values-wheel { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:14px; position:relative; }
+        .core-value-card { position:relative; min-height:190px; border-radius:18px; padding:23px 22px; color:white; overflow:hidden; box-shadow:0 10px 25px rgba(31,41,55,.09); }
+        .core-value-card::after { content:""; position:absolute; right:-28px; bottom:-48px; width:130px; height:130px; border:18px solid rgba(255,255,255,.16); border-radius:50%; }
+        .core-value-card i { font-size:1.55rem; margin-bottom:13px; }
+        .core-value-card h4 { font-size:1.17rem; font-weight:900; margin-bottom:2px; }
+        .core-value-card p { font-size:.75rem; opacity:.85; margin-bottom:12px; }
+        .core-value-card span { position:relative; z-index:1; display:block; max-width:95%; font-size:.91rem; line-height:1.65; }
+        .value-safety { background:linear-gradient(135deg,#20265f,#394899); }
+        .value-trust { background:linear-gradient(135deg,#4c91c6,#66b3d2); }
+        .value-respect { background:linear-gradient(135deg,#4565b4,#647fca); }
+        .value-teamwork { background:linear-gradient(135deg,#7f8b9b,#a8b0bd); }
+        .talent-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:14px; }
+        .talent-card { display:flex; flex-direction:column; overflow:hidden; min-width:0; border:1px solid #e1e5ee; border-radius:14px; background:#fff; box-shadow:0 8px 22px rgba(31,41,55,.05); }
+        .talent-card-header { background:linear-gradient(115deg,#465fAD,#293d88); color:#fff; padding:17px 14px; font-weight:900; line-height:1.5; min-height:68px; display:flex; align-items:center; }
+        .talent-card-points { padding:15px 20px 5px; color:#344b99; font-size:.94rem; font-weight:800; list-style:disc; }
+        .talent-card-points li { margin:5px 0; }
+        .talent-card-summary { padding:12px 17px 20px; color:#5b6472; line-height:1.8; font-size:.9rem; flex:1; }
+        /* 승진 경로: 색상 그라데이션 연결선과 단계별 도형 */
+        .rank-visual-layout { display:grid; grid-template-columns:minmax(0,1fr) 172px; gap:22px; align-items:stretch; }
+        .rank-promotion-area { min-width:0; }
+        .rank-promotion-track { position:relative; display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:0; align-items:stretch; isolation:isolate; padding:16px 0 10px; }
+        .rank-promotion-track::before { content:""; position:absolute; z-index:-1; left:12.5%; right:12.5%; top:89px; height:9px; border-radius:999px; background:linear-gradient(90deg,#8d9bd7 0%,#6e83ca 32%,#4e65b5 68%,#354aa0 100%); box-shadow:0 3px 10px rgba(53,74,160,.18); }
+        .rank-step { position:relative; display:flex; flex-direction:column; align-items:center; justify-content:flex-start; text-align:center; min-width:0; padding:0 5px; }
+        .rank-step::before { content:""; position:absolute; top:65px; left:calc(50% + 58px); width:calc(100% - 116px); height:0; border-top:0; }
+        .rank-step-number { display:flex; align-items:center; justify-content:center; width:clamp(95px,10vw,132px); height:clamp(95px,10vw,132px); flex-shrink:0; border:7px solid transparent; border-radius:50%; background:linear-gradient(#fff,#fff) padding-box,linear-gradient(145deg,#dce2fb,#5168bb) border-box; box-shadow:0 8px 22px rgba(53,74,160,.13); color:#354aa0; font-size:clamp(1rem,1.55vw,1.45rem); font-weight:900; margin-bottom:15px; position:relative; }
+        .rank-step-5 .rank-step-number { background:linear-gradient(#fff,#fff) padding-box,linear-gradient(145deg,#bdc8f5,#7d8bc4) border-box; color:#7280b2; }
+        .rank-step-4 .rank-step-number { background:linear-gradient(#fff,#fff) padding-box,linear-gradient(145deg,#bce5c2,#53a564) border-box; color:#53a564; }
+        .rank-step-3 .rank-step-number { background:linear-gradient(#fff,#fff) padding-box,linear-gradient(145deg,#c5e5ef,#539cb5) border-box; color:#539cb5; }
+        .rank-step-2 .rank-step-number { background:linear-gradient(#fff,#fff) padding-box,linear-gradient(145deg,#c0d1fa,#4365b5) border-box; color:#4365b5; }
+        .rank-step strong { display:block; color:#232733; font-size:clamp(.82rem,1.03vw,.98rem); font-weight:900; line-height:1.45; margin-bottom:6px; overflow-wrap:anywhere; }
+        .rank-step small { color:#707789; line-height:1.55; font-size:clamp(.7rem,.85vw,.82rem); }
+        .rank-path-caption { display:flex; justify-content:center; align-items:center; gap:9px; margin-top:15px; color:#354aa0; font-size:.95rem; font-weight:900; flex-wrap:wrap; }
+        .rank-executive-card { display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; align-self:stretch; border-radius:18px; border:1px solid #dce2f5; padding:20px 13px; background:linear-gradient(155deg,#f8faff 0%,#e8edff 50%,#f5f7ff 100%); box-shadow:0 12px 28px rgba(53,74,160,.1); }
+        .rank-executive-icon { width:54px; height:54px; display:flex; align-items:center; justify-content:center; border-radius:17px; color:white; background:linear-gradient(145deg,#5e73c3,#263b89); box-shadow:0 8px 18px rgba(53,74,160,.24); margin-bottom:14px; font-size:1.25rem; }
+        .rank-executive-card .rank-step-number { display:block; width:auto; height:auto; border:0; border-radius:0; background:none; box-shadow:none; color:#283f91; font-size:1.65rem; margin:0 0 8px; }
+        .rank-executive-card strong { color:#2e3d73; font-size:1rem; font-weight:900; line-height:1.5; }
+        .benefits-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:18px; }
+        .benefit-card { display:flex; flex-direction:column; align-items:center; text-align:center; padding:24px 14px 20px; border:1px solid #e5e7eb; border-radius:16px; background:linear-gradient(180deg,#fff 0%,#f8f9ff 100%); transition:transform .25s ease,box-shadow .25s ease,border-color .25s ease; }
+        .benefit-card:hover { transform:translateY(-4px); border-color:#c8d0f0; box-shadow:0 12px 26px rgba(53,74,160,.1); }
+        .benefit-icon { width:82px; height:82px; border-radius:50%; display:flex; align-items:center; justify-content:center; color:#fff; background:linear-gradient(145deg,#4d63b0 0%,#263a88 100%); box-shadow:0 9px 22px rgba(53,74,160,.22),inset 0 2px 3px rgba(255,255,255,.28); margin-bottom:15px; }
+        .benefit-icon span { font-size:2rem; line-height:1; filter:drop-shadow(0 2px 2px rgba(0,0,0,.1)); }
+        .benefit-card h4 { color:#273b83; font-weight:900; font-size:1rem; margin-bottom:6px; }
+        .benefit-card p { color:#6b7280; font-size:.85rem; line-height:1.55; }
+        @media(max-width:1000px) { .guide-page-layout { grid-template-columns:220px minmax(0,1fr); gap:28px; } .rank-visual-layout { grid-template-columns:minmax(0,1fr) 145px; gap:12px; } .rank-promotion-track::before { top:78px; } .rank-step-number { width:104px; height:104px; } .rank-step strong { font-size:.82rem; } .rank-step small { font-size:.7rem; } }
+        @media(max-width:760px) { .guide-page-layout { grid-template-columns:1fr; gap:22px; } .guide-sidebar { position:static; display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:14px; } .guide-sidebar-link { padding:13px 0; font-size:.94rem; } .guide-sidebar-link i { display:none; } .guide-content-title { font-size:1.8rem; } .guide-purpose-block { grid-template-columns:1fr; } .core-values-wheel { gap:10px; } .core-value-card { padding:17px 15px; min-height:175px; } .core-value-card h4 { font-size:1rem; } .core-value-card span { font-size:.82rem; } .talent-grid { grid-template-columns:1fr; } .talent-card-header { min-height:0; } .rank-visual-layout { grid-template-columns:1fr; } .rank-promotion-track { grid-template-columns:1fr; gap:15px; padding:8px 0; } .rank-promotion-track::before { left:calc(50% - 4px); right:auto; top:55px; bottom:55px; width:8px; height:auto; background:linear-gradient(180deg,#8d9bd7 0%,#6e83ca 32%,#4e65b5 68%,#354aa0 100%); } .rank-step { padding:0; display:grid; grid-template-columns:112px minmax(0,1fr); grid-template-rows:auto auto; align-items:center; column-gap:15px; text-align:left; } .rank-step-number { grid-row:1 / span 2; width:100px; height:100px; font-size:1.15rem; margin:0; } .rank-step strong { font-size:1rem; margin:0 0 4px; } .rank-step small { font-size:.84rem; } .rank-executive-card { min-height:155px; } .benefits-grid { gap:10px; } .benefit-card { padding:17px 8px; } .benefit-icon { width:62px; height:62px; } .benefit-icon span { font-size:1.65rem; } .benefit-card h4 { font-size:.86rem; } .benefit-card p { font-size:.75rem; } }
+        @media(prefers-reduced-motion:reduce) { .guide-tab-panel.active,.benefit-card { animation:none !important; transition:none !important; } }
 
-        @media (max-width: 760px) { .guide-page-title { min-height:90px; font-size:2rem; } }
-        @media (max-width: 900px) {
-            .rank-promotion-layout { grid-template-columns:minmax(0,1fr) 145px; gap:14px; }
-            .rank-card { border-width:6px; }
-            .rank-card .rank-number { font-size:clamp(1rem,2vw,1.35rem); }
-            .rank-card .rank-role { font-size:clamp(.72rem,1.35vw,.9rem); }
-        }
-        @media (max-width: 680px) {
-            .rank-promotion-layout { grid-template-columns:1fr; gap:22px; }
-            .rank-track-linked { grid-template-columns:1fr; gap:12px; padding:0; }
-            .rank-track-linked::before { left:calc(50% - 4px); right:auto; top:8%; bottom:8%; width:8px; height:auto; transform:none; }
-            .rank-card { width:min(176px,62vw); padding:12px; border-width:7px; }
-            .rank-card .rank-number { font-size:1.4rem; }
-            .rank-card .rank-role { font-size:.92rem; }
-            .rank-card .rank-note { font-size:.78rem; }
-            .rank-executive-wrap { border-left:0; border-top:1px solid #e5e7eb; padding:22px 0 0; }
-            .rank-executive-card { width:min(176px,62vw); }
-            .rank-path-caption { margin-top:15px; }
-        }
+        /* 자연스러운 중앙 페이드: 위치 이동 없이 화면 자체가 천천히 교차됩니다. */
+        .view-section { transform:none !important; }
+        .view-section.active { animation:pageFadeInSmooth .48s cubic-bezier(.22,.61,.36,1) both !important; }
+        .view-section.is-leaving,.view-section.active.is-leaving { animation:pageFadeOutSmooth .27s cubic-bezier(.4,0,.2,1) both !important; }
+        @keyframes pageFadeInSmooth { from { opacity:0; } to { opacity:1; } }
+        @keyframes pageFadeOutSmooth { from { opacity:1; } to { opacity:0; } }
+        @media(prefers-reduced-motion:reduce) { .view-section.active,.view-section.is-leaving { animation-duration:.01ms !important; } }
 
     </style>
 </head>
@@ -232,74 +242,67 @@
             </section>
         </div>
 
-        <!-- 채용안내: 좌측 메뉴로 핵심가치·인재상과 근무조건·대우를 전환합니다. -->
-        <div id="view-guide" class="view-section max-w-7xl mx-auto px-5 lg:px-8 py-8 sm:py-10">
-            <div class="guide-layout">
-                <aside class="guide-sidebar">
-                    <div class="guide-page-title">채용안내</div>
-                    <nav class="guide-sidebar-menu" aria-label="채용안내 세부 메뉴">
-                        <button type="button" id="guide-link-values" class="guide-sidebar-link" aria-controls="guide-panel-values" aria-selected="false" onclick="switchGuideSection('values')">핵심가치와 인재상</button>
-                        <button type="button" id="guide-link-conditions" class="guide-sidebar-link active" aria-controls="guide-panel-conditions" aria-selected="true" onclick="switchGuideSection('conditions')">근무조건 및 대우</button>
-                    </nav>
+        <!-- 채용안내: 좌측 메뉴에서 두 콘텐츠를 전환합니다. -->
+        <div id="view-guide" class="view-section max-w-7xl mx-auto px-4 sm:px-6 py-8 sm:py-10">
+            <div class="guide-page-title">채용안내</div>
+            <div class="guide-page-layout">
+                <aside class="guide-sidebar" aria-label="채용안내 메뉴">
+                    <button id="guide-link-values" type="button" class="guide-sidebar-link" onclick="switchGuideSection('values')" aria-controls="guide-panel-values" aria-selected="false">
+                        <span>핵심가치와 인재상</span><i class="fas fa-plus" aria-hidden="true"></i>
+                    </button>
+                    <button id="guide-link-conditions" type="button" class="guide-sidebar-link active" onclick="switchGuideSection('conditions')" aria-controls="guide-panel-conditions" aria-selected="true">
+                        <span>근무조건 및 대우</span><i class="fas fa-plus" aria-hidden="true"></i>
+                    </button>
                 </aside>
 
-                <div class="min-w-0">
+                <div class="guide-content-area">
                     <!-- 핵심가치와 인재상 -->
-                    <section id="guide-panel-values" class="guide-tab-panel" aria-labelledby="guide-link-values">
+                    <section id="guide-panel-values" class="guide-tab-panel" aria-labelledby="guide-link-values" hidden>
                         <h2 class="guide-content-title">핵심가치와 인재상</h2>
-                        <div class="guide-overview-box">
-                            <div class="guide-overview-label">미션</div>
-                            <p class="guide-overview-description font-bold text-xl text-gray-800">사람과 지역을 잇는 안전한 이동</p>
-                            <p class="guide-overview-description mt-2">승객의 일상과 지역사회를 연결하는 믿음직한 교통 서비스를 제공합니다.</p>
-                        </div>
-                        <div class="guide-overview-box">
-                            <div class="guide-overview-label">비전</div>
-                            <p class="guide-overview-description font-bold text-xl text-gray-800">지역에서 가장 신뢰받는 교통 파트너</p>
-                            <p class="guide-overview-description mt-2">안전과 정시성, 친절한 서비스를 바탕으로 지역의 이동을 책임집니다.</p>
-                        </div>
-
-                        <div class="guide-overview-box">
-                            <div class="guide-overview-label">핵심가치</div>
-                            <div class="core-values-grid">
-                                <article class="core-value-card" style="background:#202c68">
-                                    <div class="value-ko">안전 최우선</div><div class="value-en">Safety First</div>
-                                    <p>승객과 직원의 안전을 모든 판단과 운행의 가장 중요한 기준으로 삼습니다.</p>
-                                </article>
-                                <article class="core-value-card" style="background:#5798d0">
-                                    <div class="value-ko">신뢰와 정시</div><div class="value-en">Trust &amp; Punctuality</div>
-                                    <p>운행 시간과 약속을 지키고, 책임감 있는 업무 수행으로 신뢰를 쌓습니다.</p>
-                                </article>
-                                <article class="core-value-card" style="background:#4e6fbb">
-                                    <div class="value-ko">친절과 존중</div><div class="value-en">Kindness &amp; Respect</div>
-                                    <p>승객과 동료를 존중하며 누구나 편안하게 이용할 수 있는 서비스를 실천합니다.</p>
-                                </article>
-                                <article class="core-value-card" style="background:#e3e6ec;color:#202c68">
-                                    <div class="value-ko">협력과 책임</div><div class="value-en">Teamwork &amp; Responsibility</div>
-                                    <p>서로 협력하고 맡은 역할을 끝까지 책임지며 함께 더 나은 회사를 만들어 갑니다.</p>
-                                </article>
+                        <section class="guide-section guide-purpose-block">
+                            <div class="guide-purpose-card guide-mission-card">
+                                <span class="guide-purpose-eyebrow">MISSION · 미션</span>
+                                <h3>사람과 지역을 잇는 안전한 이동</h3>
+                                <p>모든 승객이 안심하고 이동할 수 있도록 안전하고 믿을 수 있는 교통 서비스를 제공합니다.</p>
                             </div>
-                        </div>
+                            <div class="guide-purpose-card guide-vision-card">
+                                <span class="guide-purpose-eyebrow">VISION · 비전</span>
+                                <h3>지역에서 가장 신뢰받는 교통 파트너</h3>
+                                <p>정직한 운행과 친절한 서비스로 지역사회의 일상을 든든하게 연결합니다.</p>
+                            </div>
+                        </section>
 
-                        <div class="guide-overview-box">
-                            <div class="guide-overview-label">인재상</div>
+                        <section class="guide-section">
+                            <div class="guide-section-heading"><span class="guide-section-icon"><span></span></span><h3>핵심가치</h3></div>
+                            <div class="core-values-wheel" aria-label="삼산여객 핵심가치 네 가지">
+                                <article class="core-value-card value-safety"><i class="fas fa-shield-alt" aria-hidden="true"></i><h4>안전 최우선</h4><p>Safety First</p><span>승객과 직원의 안전을 모든 판단의 기준으로 삼습니다.</span></article>
+                                <article class="core-value-card value-trust"><i class="fas fa-clock" aria-hidden="true"></i><h4>신뢰와 정시</h4><p>Trust &amp; Punctuality</p><span>약속한 운행과 책임 있는 업무 수행을 중요하게 생각합니다.</span></article>
+                                <article class="core-value-card value-respect"><i class="fas fa-handshake" aria-hidden="true"></i><h4>친절과 존중</h4><p>Kindness &amp; Respect</p><span>승객과 동료를 존중하며 친절한 서비스를 실천합니다.</span></article>
+                                <article class="core-value-card value-teamwork"><i class="fas fa-people-group" aria-hidden="true"></i><h4>협력과 책임</h4><p>Teamwork &amp; Responsibility</p><span>서로 협력하고 맡은 업무를 끝까지 책임집니다.</span></article>
+                                <div class="core-values-center"><strong>삼산여객</strong><span>CORE VALUES</span></div>
+                            </div>
+                        </section>
+
+                        <section class="guide-section">
+                            <div class="guide-section-heading"><span class="guide-section-icon"><span></span></span><h3>인재상</h3></div>
                             <div class="talent-grid">
                                 <article class="talent-card">
                                     <div class="talent-card-header">01. 기본을 지키는 인재</div>
-                                    <ul class="talent-card-points"><li>· 윤리의식</li><li>· 책임감</li><li>· 안전의식</li></ul>
+                                    <ul class="talent-card-points"><li>윤리의식</li><li>책임감</li><li>안전의식</li></ul>
                                     <p class="talent-card-summary">회사 규정과 운행 절차를 준수하고, 맡은 업무를 성실하게 수행하며 안전을 최우선으로 생각하는 인재</p>
                                 </article>
                                 <article class="talent-card">
                                     <div class="talent-card-header">02. 승객을 배려하는 인재</div>
-                                    <ul class="talent-card-points"><li>· 친절한 응대</li><li>· 원활한 소통</li><li>· 상호 존중</li></ul>
+                                    <ul class="talent-card-points"><li>친절한 응대</li><li>원활한 소통</li><li>상호 존중</li></ul>
                                     <p class="talent-card-summary">승객의 입장에서 생각하고 동료와 적극적으로 소통하며, 서로를 존중하는 인재</p>
                                 </article>
                                 <article class="talent-card">
                                     <div class="talent-card-header">03. 함께 성장하는 인재</div>
-                                    <ul class="talent-card-points"><li>· 배우려는 자세</li><li>· 문제 해결</li><li>· 조직 기여</li></ul>
-                                    <p class="talent-card-summary">새로운 업무를 꾸준히 배우고 개선점을 찾아, 개인의 성장과 회사의 발전을 함께 추구하는 인재</p>
+                                    <ul class="talent-card-points"><li>배우려는 자세</li><li>문제 해결</li><li>조직 기여</li></ul>
+                                    <p class="talent-card-summary">새로운 업무를 꾸준히 배우고 개선점을 찾아 개인의 성장과 회사의 발전을 함께 추구하는 인재</p>
                                 </article>
                             </div>
-                        </div>
+                        </section>
                     </section>
 
                     <!-- 근무조건 및 대우 -->
@@ -317,19 +320,22 @@
                         <section class="guide-section">
                             <div class="guide-section-heading"><span class="guide-section-icon"><span></span></span><h3>승진제도</h3></div>
                             <p class="text-gray-600 mb-5">5직급에서 2직급까지 연결된 승진 체계로 운영됩니다.</p>
-                            <div class="rank-promotion-layout" aria-label="직급 체계">
-                                <div class="rank-track-linked" aria-label="승진 경로: 5직급에서 2직급">
-                                    <div class="rank-card rank-card-5"><div class="rank-number">5직급</div><div class="rank-role">수습사원 · 사원</div><div class="rank-note">입사 초기 및 일반 사원</div></div>
-                                    <div class="rank-card rank-card-4"><div class="rank-number">4직급</div><div class="rank-role">선임</div><div class="rank-note">실무 숙련 직급</div></div>
-                                    <div class="rank-card rank-card-3"><div class="rank-number">3직급</div><div class="rank-role">주임</div><div class="rank-note">업무 관리 직급</div></div>
-                                    <div class="rank-card rank-card-2"><div class="rank-number">2직급</div><div class="rank-role">반장</div><div class="rank-note">현장 관리 직급</div></div>
+                            <div class="rank-visual-layout" aria-label="직급 체계">
+                                <div class="rank-promotion-area">
+                                    <div class="rank-promotion-track" aria-label="승진 경로: 5직급에서 2직급">
+                                        <article class="rank-step rank-step-5"><span class="rank-step-number">5직급</span><strong>수습사원 · 사원</strong><small>입사 초기 및 일반 사원</small></article>
+                                        <article class="rank-step rank-step-4"><span class="rank-step-number">4직급</span><strong>선임</strong><small>실무 숙련 직급</small></article>
+                                        <article class="rank-step rank-step-3"><span class="rank-step-number">3직급</span><strong>주임</strong><small>업무 관리 직급</small></article>
+                                        <article class="rank-step rank-step-2"><span class="rank-step-number">2직급</span><strong>반장</strong><small>현장 관리 직급</small></article>
+                                    </div>
+                                    <div class="rank-path-caption"><i class="fas fa-arrow-right" aria-hidden="true"></i> 승진 경로: 5직급 → 4직급 → 3직급 → 2직급</div>
                                 </div>
-                                <div class="rank-executive-wrap" aria-label="총괄 직급">
-                                    <div class="rank-executive-label">총괄 직급</div>
-                                    <div class="rank-card rank-executive-card"><div class="rank-number">1직급</div><div class="rank-role">총괄 직급</div></div>
-                                </div>
+                                <aside class="rank-executive-card" aria-label="총괄 직급">
+                                    <div class="rank-executive-icon"><i class="fas fa-crown" aria-hidden="true"></i></div>
+                                    <span class="rank-step-number">1직급</span>
+                                    <strong>총괄 직급</strong>
+                                </aside>
                             </div>
-                            <div class="rank-path-caption"><i class="fas fa-arrow-right mr-1" aria-hidden="true"></i> 승진 경로: 5직급 → 4직급 → 3직급 → 2직급</div>
                             <p class="mt-5 text-gray-700">※ 수습사원은 약 2주 근무 후 평가를 거쳐 일반 사원으로 전환됩니다.</p>
                         </section>
 
@@ -349,21 +355,9 @@
                         <section class="guide-section">
                             <div class="guide-section-heading"><span class="guide-section-icon"><span></span></span><h3>복리후생</h3></div>
                             <div class="benefits-grid">
-                                <article class="benefit-card">
-                                    <div class="benefit-icon" role="img" aria-label="식사"><span aria-hidden="true">🍚</span></div>
-                                    <h4 class="benefit-title">식사 무료 제공</h4>
-                                    <p class="benefit-note">부정기적으로 제공</p>
-                                </article>
-                                <article class="benefit-card">
-                                    <div class="benefit-icon" role="img" aria-label="배낚시"><span aria-hidden="true">🎣</span></div>
-                                    <h4 class="benefit-title">배낚시 제공</h4>
-                                    <p class="benefit-note">운영 여건에 따라 제공</p>
-                                </article>
-                                <article class="benefit-card">
-                                    <div class="benefit-icon" role="img" aria-label="농사"><span aria-hidden="true">🌾</span></div>
-                                    <h4 class="benefit-title">농사 체험 제공</h4>
-                                    <p class="benefit-note">운영 여건에 따라 제공</p>
-                                </article>
+                                <article class="benefit-card"><div class="benefit-icon" role="img" aria-label="식사"><span aria-hidden="true">🍚</span></div><h4>식사 무료 제공</h4><p>부정기적으로 제공</p></article>
+                                <article class="benefit-card"><div class="benefit-icon" role="img" aria-label="배낚시"><span aria-hidden="true">🎣</span></div><h4>배낚시 제공</h4><p>운영 여건에 따라 제공</p></article>
+                                <article class="benefit-card"><div class="benefit-icon" role="img" aria-label="농사"><span aria-hidden="true">🌾</span></div><h4>농사 체험 제공</h4><p>운영 여건에 따라 제공</p></article>
                             </div>
                         </section>
                     </section>
@@ -1902,8 +1896,12 @@
         function switchGuideSection(sectionName) {
             const allowed = ['values', 'conditions'];
             if (!allowed.includes(sectionName)) return;
+            const nextPanel = document.getElementById(`guide-panel-${sectionName}`);
+            if (!nextPanel) return;
             document.querySelectorAll('.guide-tab-panel').forEach(panel => {
-                panel.classList.toggle('active', panel.id === `guide-panel-${sectionName}`);
+                const active = panel === nextPanel;
+                panel.hidden = !active;
+                panel.classList.toggle('active', active);
             });
             document.querySelectorAll('.guide-sidebar-link').forEach(button => {
                 const active = button.id === `guide-link-${sectionName}`;
@@ -1925,13 +1923,13 @@
             const activateTarget = () => {
                 if (token !== sectionTransitionToken) return;
                 sections.forEach(el => el.classList.remove('active', 'is-leaving'));
+                window.scrollTo({ top: 0, behavior: 'auto' });
                 target.classList.add('active');
                 const skyBanner = document.getElementById('sky-header-banner');
                 if (skyBanner) skyBanner.classList.toggle('hidden', tabId === 'home');
                 if (tabId === 'my') renderMyRecruitment();
                 if (tabId === 'admin') switchAdminMainTab('applicants');
                 if (tabId === 'inquiry') loadInquiries();
-                window.scrollTo({ top: 0, behavior: 'auto' });
             };
 
             if (active === target) {
@@ -1944,7 +1942,7 @@
 
             if (active) {
                 active.classList.add('is-leaving');
-                sectionTransitionTimer = setTimeout(activateTarget, 240);
+                sectionTransitionTimer = setTimeout(activateTarget, 275);
             } else {
                 activateTarget();
             }
