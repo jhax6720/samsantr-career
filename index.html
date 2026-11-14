@@ -79,6 +79,9 @@
         .job-markdown tr:nth-child(even) td { background:#fafbff; }
         .job-markdown a { color:#25408f; text-decoration:underline; }
         .job-markdown code { background:#f3f4f6; padding:2px 5px; border-radius:4px; font-family:ui-monospace,monospace; }
+        .job-status-pill { display:inline-flex; align-items:center; justify-content:center; border-radius:999px; padding:4px 10px; font-size:.72rem; line-height:1.35; font-weight:800; white-space:nowrap; }
+        .job-status-pill.open { background:#e7f6ec; color:#18733b; }
+        .job-status-pill.closed { background:#fce8e8; color:#b42318; }
         .guide-page-title { background:#354aa0; color:white; width:min(340px,100%); min-height:120px; display:flex; align-items:center; justify-content:center; font-size:2.4rem; font-weight:900; padding:24px; margin-bottom:22px; }
         .guide-section { padding:28px 0; border-bottom:1px solid #e5e7eb; }
         .guide-section-heading { display:flex; align-items:center; gap:13px; margin-bottom:20px; }
@@ -660,15 +663,20 @@
             <div class="bg-white border p-8 shadow-sm">
                 <span id="detail-job-cat" class="text-orange-600 font-extrabold text-lg block mb-2"></span>
                 <h1 id="detail-job-title" class="text-3xl font-bold text-gray-900 mb-4"></h1>
-                <p id="detail-job-count" class="text-gray-500 mb-4 font-semibold"></p>
+                <p id="detail-job-count" class="text-gray-500 mb-2 font-semibold"></p>
+                <div id="detail-job-status" class="mb-5"></div>
                 <div id="detail-job-file-wrap" class="mb-6 pb-4 border-b hidden">
                     <span class="block font-bold text-sm text-gray-700 mb-2">첨부 파일:</span>
                     <div id="detail-job-file-list" class="flex flex-wrap gap-2"></div>
                 </div>
                 <div id="detail-job-content" class="text-gray-800 text-lg whitespace-pre-wrap leading-relaxed min-h-[200px] mb-8"></div>
-                <div class="border-t pt-6 flex justify-between items-center">
-                    <button id="admin-delete-job-btn" onclick="deleteCurrentJob()" class="hidden bg-red-600 text-white px-4 py-2 font-bold hover:bg-red-700">공고 삭제 (관리자)</button>
-                    <button onclick="startApplyProcess()" class="bg-[#25408f] text-white px-8 py-3 font-bold text-lg hover:bg-blue-900 ml-auto">입사지원하기</button>
+                <div class="border-t pt-6 flex flex-wrap gap-3 justify-between items-center">
+                    <div id="admin-job-actions" class="hidden flex-wrap gap-2">
+                        <button id="admin-edit-job-btn" type="button" onclick="openEditJobModal()" class="bg-amber-500 hover:bg-amber-600 text-white px-4 py-2 font-bold">공고 수정</button>
+                        <button id="admin-toggle-job-closed-btn" type="button" onclick="toggleCurrentJobClosed()" class="bg-gray-700 hover:bg-gray-800 text-white px-4 py-2 font-bold">지원 마감</button>
+                        <button id="admin-delete-job-btn" type="button" onclick="deleteCurrentJob()" class="bg-red-600 text-white px-4 py-2 font-bold hover:bg-red-700">공고 삭제</button>
+                    </div>
+                    <button id="apply-job-btn" type="button" onclick="startApplyProcess()" class="bg-[#25408f] text-white px-8 py-3 font-bold text-lg hover:bg-blue-900 ml-auto">입사지원하기</button>
                 </div>
             </div>
         </div>
@@ -838,7 +846,7 @@
     <div id="jobWriteModal" class="fixed inset-0 bg-black/50 hidden items-center justify-center p-3 sm:p-5 z-50">
         <div class="bg-white p-5 sm:p-8 max-w-6xl w-full max-h-[94vh] overflow-y-auto relative rounded-sm shadow-2xl">
             <button onclick="closeModal('jobWriteModal')" class="absolute top-4 right-4 text-gray-400 text-xl" aria-label="닫기"><i class="fas fa-times"></i></button>
-            <h3 class="text-2xl font-bold mb-2 text-gray-900">📢 새 채용공고 등록</h3>
+            <h3 id="job-write-modal-title" class="text-2xl font-bold mb-2 text-gray-900">📢 새 채용공고 등록</h3>
             <p class="text-sm text-gray-600 mb-5">본문은 마크다운 형식을 지원합니다. 표·제목·목록 등을 입력하면 오른쪽 미리보기에 표시됩니다.</p>
             <div class="space-y-3">
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
@@ -847,8 +855,9 @@
                     <input type="text" id="admin-job-count" class="std-input" placeholder="선발예정인원">
                 </div>
                 <div>
-                    <label class="block text-xs font-bold text-gray-600 mb-1">모집요강 파일 첨부</label>
+                    <label class="block text-xs font-bold text-gray-600 mb-1">모집요강 파일 첨부 (수정 시 기존 파일 유지 + 새 파일 추가)</label>
                     <input type="file" id="admin-job-file" multiple class="std-input py-2 text-sm">
+                    <div id="admin-job-existing-files" class="hidden mt-3 space-y-2"></div>
                 </div>
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
                     <div>
@@ -896,7 +905,7 @@
 > 접수 기간과 제출 서류를 반드시 확인해 주세요.</pre>
                     <div id="job-markdown-example-preview" class="job-markdown bg-white border p-4 mt-3 overflow-x-auto"></div>
                 </details>
-                <button onclick="adminAddJob()" class="w-full bg-blue-800 text-white font-bold py-3 hover:bg-blue-900">등록하기</button>
+                <button id="admin-job-save-btn" type="button" onclick="adminAddJob()" class="w-full bg-blue-800 text-white font-bold py-3 hover:bg-blue-900">등록하기</button>
             </div>
         </div>
     </div>
@@ -998,6 +1007,8 @@
         
         let currentUser = null;
         let currentJob = null;
+        let currentEditingJobId = null;
+        let currentEditingJobFiles = [];
         let currentNotice = null;
         let currentInquiry = null;
         let selectedApplyFile = null;
@@ -1013,8 +1024,82 @@
 
         function openModal(id) { const m = document.getElementById(id); if(m) { m.classList.remove('hidden'); m.classList.add('flex'); } }
         function closeModal(id) { const m = document.getElementById(id); if(m) { m.classList.add('hidden'); m.classList.remove('flex'); } }
-        function openJobWriteModal() { openModal('jobWriteModal'); }
+
+        function isCurrentUserAdmin() { return !!currentUser && currentUser.role === 'admin'; }
+        function isJobClosed(job) { return job?.is_closed === true || job?.is_closed === 'true' || job?.is_closed === 1; }
+        function parseJobFiles(job) {
+            if (!job?.file_name) return [];
+            try {
+                const parsed = JSON.parse(job.file_name);
+                if (Array.isArray(parsed)) return parsed.filter(f => f && f.name && f.url);
+                if (parsed && typeof parsed === 'object' && parsed.name && parsed.url) return [parsed];
+            } catch (_) {}
+            return [];
+        }
+        function clearJobWriteForm() {
+            currentEditingJobId = null;
+            currentEditingJobFiles = [];
+            ['admin-job-cat','admin-job-title','admin-job-count','admin-job-content'].forEach(id => { const el=document.getElementById(id); if(el) el.value=''; });
+            const input = document.getElementById('admin-job-file'); if (input) input.value='';
+            const title = document.getElementById('job-write-modal-title'); if (title) title.innerText='📢 새 채용공고 등록';
+            const save = document.getElementById('admin-job-save-btn'); if (save) save.innerText='등록하기';
+            renderJobExistingFileEditor();
+            updateJobContentPreview();
+        }
+        function openJobWriteModal() {
+            if (!isCurrentUserAdmin()) { alert('관리자만 채용공고를 작성할 수 있습니다.'); return; }
+            clearJobWriteForm();
+            openModal('jobWriteModal');
+        }
         function openNoticeWriteModal() { openModal('noticeWriteModal'); }
+
+        function renderJobExistingFileEditor() {
+            const wrap = document.getElementById('admin-job-existing-files');
+            if (!wrap) return;
+            wrap.innerHTML = '';
+            if (!currentEditingJobId || !currentEditingJobFiles.length) { wrap.classList.add('hidden'); return; }
+            wrap.classList.remove('hidden');
+            const heading = document.createElement('p');
+            heading.className = 'text-sm font-bold text-gray-700';
+            heading.textContent = '기존 첨부파일 (체크한 파일은 저장 시 제거)';
+            wrap.appendChild(heading);
+            currentEditingJobFiles.forEach((file, index) => {
+                const label = document.createElement('label');
+                label.className = 'flex items-center gap-2 text-sm border rounded px-3 py-2 bg-gray-50';
+                const checkbox = document.createElement('input');
+                checkbox.type = 'checkbox';
+                checkbox.className = 'job-existing-file-remove';
+                checkbox.value = String(index);
+                const name = document.createElement('span');
+                name.className = 'flex-1 break-all';
+                name.textContent = file.name;
+                const link = document.createElement('a');
+                link.href = file.url;
+                link.target = '_blank';
+                link.rel = 'noopener noreferrer';
+                link.className = 'text-blue-700 underline shrink-0';
+                link.textContent = '열기';
+                label.append(checkbox, name, link);
+                wrap.appendChild(label);
+            });
+        }
+
+        function openEditJobModal() {
+            if (!isCurrentUserAdmin()) { alert('관리자만 채용공고를 수정할 수 있습니다.'); return; }
+            if (!currentJob?.id) { alert('수정할 채용공고를 선택해 주세요.'); return; }
+            currentEditingJobId = currentJob.id;
+            currentEditingJobFiles = parseJobFiles(currentJob);
+            document.getElementById('admin-job-cat').value = currentJob.category || '';
+            document.getElementById('admin-job-title').value = currentJob.title || '';
+            document.getElementById('admin-job-count').value = currentJob.headcount || '';
+            document.getElementById('admin-job-content').value = currentJob.content || '';
+            document.getElementById('admin-job-file').value = '';
+            document.getElementById('job-write-modal-title').innerText = '✏️ 채용공고 수정';
+            document.getElementById('admin-job-save-btn').innerText = '수정사항 저장';
+            renderJobExistingFileEditor();
+            updateJobContentPreview();
+            openModal('jobWriteModal');
+        }
 
         function checkLocalSession() {
             const saved = localStorage.getItem('samsan_user');
@@ -1161,6 +1246,10 @@
         async function startApplyProcess() {
             if (!currentUser) { alert('로그인 후 입사지원이 가능합니다.'); switchTab('login'); return; }
             if (!currentJob) { alert('지원할 채용공고를 먼저 선택해 주세요.'); return; }
+            if (isJobClosed(currentJob)) { alert('지원이 마감된 채용공고입니다.'); return; }
+            const { data: latestJob, error: latestJobError } = await supabaseClient.from('jobs').select('id,is_closed').eq('id', currentJob.id).single();
+            if (latestJobError) { alert(`공고 상태를 확인하지 못했습니다: ${latestJobError.message}`); return; }
+            if (isJobClosed(latestJob)) { currentJob.is_closed = true; openJobDetail(currentJob); alert('지원이 마감된 채용공고입니다.'); return; }
 
             // 중복 지원은 같은 공고에만 금지합니다. 다른 공고 지원은 허용합니다.
             const { data: existingApps, error } = await supabaseClient
@@ -1234,6 +1323,11 @@
             if (submitButton) { submitButton.disabled = true; submitButton.innerText = '제출 처리 중...'; }
 
             try {
+                // 지원서 제출 직전 공고의 마감 여부를 다시 확인합니다.
+                const { data: latestJob, error: latestJobError } = await supabaseClient.from('jobs').select('id,is_closed').eq('id', currentJob.id).single();
+                if (latestJobError) throw new Error(`공고 상태 확인 실패: ${latestJobError.message}`);
+                if (isJobClosed(latestJob)) throw new Error('지원이 마감된 채용공고입니다. 지원서가 제출되지 않았습니다.');
+
                 // 제출 직전에도 동일 공고의 중복 여부를 다시 확인합니다.
                 // 기존에 A 공고에서 불합격/합격했더라도 B 공고 제출은 허용합니다.
                 const { data: existingApps, error: existingError } = await supabaseClient
@@ -1283,44 +1377,63 @@
         }
 
         async function adminAddJob() {
+            if (!isCurrentUserAdmin()) { alert('관리자만 채용공고를 등록하거나 수정할 수 있습니다.'); return; }
             const category = document.getElementById('admin-job-cat').value.trim();
             const title = document.getElementById('admin-job-title').value.trim();
             const headcount = document.getElementById('admin-job-count').value.trim();
             const content = document.getElementById('admin-job-content').value.trim();
             const fileInput = document.getElementById('admin-job-file');
-            
+            const saveButton = document.getElementById('admin-job-save-btn');
             if (!category || !title || !headcount) { alert('구분, 제목, 선발인원은 필수 입력사항입니다.'); return; }
 
-            let fileDataArray = [];
+            const isEditing = currentEditingJobId !== null;
+            const originalLabel = saveButton?.innerText || (isEditing ? '수정사항 저장' : '등록하기');
+            if (saveButton) { saveButton.disabled = true; saveButton.innerText = '저장 중...'; }
 
-            if (fileInput.files && fileInput.files.length > 0) {
-                for (let i = 0; i < fileInput.files.length; i++) {
-                    const file = fileInput.files[i];
-                    const fileExt = file.name.split('.').pop();
-                    const fileNameOnly = `job_${Date.now()}_${Math.random().toString(36).substring(7)}.${fileExt}`;
+            try {
+                const removeIndexes = new Set(Array.from(document.querySelectorAll('.job-existing-file-remove:checked')).map(el => Number(el.value)));
+                let fileDataArray = currentEditingJobFiles.filter((_, index) => !removeIndexes.has(index));
 
-                    const { error: uploadError } = await supabaseClient
-                        .storage
-                        .from('recruitment-files')
-                        .upload(fileNameOnly, file);
-
-                    if (!uploadError) {
+                if (fileInput.files && fileInput.files.length > 0) {
+                    for (let i = 0; i < fileInput.files.length; i++) {
+                        const file = fileInput.files[i];
+                        const fileExt = file.name.includes('.') ? file.name.split('.').pop() : 'bin';
+                        const fileNameOnly = `job_${Date.now()}_${Math.random().toString(36).substring(7)}.${fileExt}`;
+                        const { error: uploadError } = await supabaseClient.storage.from('recruitment-files').upload(fileNameOnly, file);
+                        if (uploadError) throw new Error(`첨부파일 업로드 실패 (${file.name}): ${uploadError.message}`);
                         const { data: urlData } = supabaseClient.storage.from('recruitment-files').getPublicUrl(fileNameOnly);
                         fileDataArray.push({ name: file.name, url: urlData.publicUrl });
                     }
                 }
-            }
 
-            const { error } = await supabaseClient.from('jobs').insert([{ 
-                category, title, headcount, content, file_name: JSON.stringify(fileDataArray)
-            }]);
+                const jobData = { category, title, headcount, content, file_name: JSON.stringify(fileDataArray) };
+                let error = null;
+                if (isEditing) {
+                    const result = await supabaseClient.from('jobs').update(jobData).eq('id', currentEditingJobId);
+                    error = result.error;
+                } else {
+                    const result = await supabaseClient.from('jobs').insert([{ ...jobData, is_closed: false }]);
+                    error = result.error;
+                }
+                if (error) throw new Error(`${isEditing ? '채용공고 수정' : '채용공고 등록'} 실패: ${error.message}`);
 
-            if (error) alert(`채용공고 등록 실패: ${error.message}`);
-            else {
-                alert('새 채용공고가 게시되었습니다.');
+                const savedId = currentEditingJobId;
+                alert(isEditing ? '채용공고가 수정되었습니다.' : '새 채용공고가 게시되었습니다.');
                 closeModal('jobWriteModal');
+                clearJobWriteForm();
                 await loadJobs();
-                switchTab('jobs');
+
+                if (isEditing && savedId !== null) {
+                    const { data: updatedJob, error: reloadError } = await supabaseClient.from('jobs').select('*').eq('id', savedId).single();
+                    if (!reloadError && updatedJob) openJobDetail(updatedJob);
+                    else switchTab('jobs');
+                } else {
+                    switchTab('jobs');
+                }
+            } catch (error) {
+                alert(error.message || '채용공고 저장 중 오류가 발생했습니다.');
+            } finally {
+                if (saveButton) { saveButton.disabled = false; saveButton.innerText = originalLabel; }
             }
         }
 
@@ -1370,13 +1483,37 @@
             }
         }
 
+        async function toggleCurrentJobClosed() {
+            if (!isCurrentUserAdmin()) { alert('관리자만 지원 마감 상태를 변경할 수 있습니다.'); return; }
+            if (!currentJob?.id) return;
+            const nextClosed = !isJobClosed(currentJob);
+            const action = nextClosed ? '지원 마감' : '지원 재개';
+            if (!confirm(`'${currentJob.title}' 공고를 ${action} 처리할까요?`)) return;
+            const { error } = await supabaseClient.from('jobs').update({ is_closed: nextClosed }).eq('id', currentJob.id);
+            if (error) {
+                alert(`상태 변경 실패: ${error.message}
+
+데이터베이스에 is_closed 컬럼이 있는지 확인하고 제공된 SQL을 실행해 주세요.`);
+                return;
+            }
+            const { data: updatedJob, error: reloadError } = await supabaseClient.from('jobs').select('*').eq('id', currentJob.id).single();
+            if (reloadError || !updatedJob) { alert('상태는 변경했지만 최신 공고를 다시 불러오지 못했습니다.'); await loadJobs(); return; }
+            currentJob = updatedJob;
+            await loadJobs();
+            openJobDetail(updatedJob);
+            alert(nextClosed ? '지원이 마감되었습니다.' : '지원이 다시 열렸습니다.');
+        }
+
         async function deleteCurrentJob() {
+            if (!isCurrentUserAdmin()) { alert('관리자만 채용공고를 삭제할 수 있습니다.'); return; }
             if (!currentJob || !currentJob.id) return;
-            if (!confirm(`'${currentJob.title}' 채용공고를 정말 삭제하시겠습니까?`)) return;
+            if (!confirm(`'${currentJob.title}' 채용공고를 정말 삭제하시겠습니까?
+이미 접수된 지원서가 있다면 관련 데이터 제약으로 삭제가 거부될 수 있습니다.`)) return;
 
             const { error } = await supabaseClient.from('jobs').delete().eq('id', currentJob.id);
             if (error) alert(`삭제 실패: ${error.message}`);
             else {
+                currentJob = null;
                 alert('채용공고가 삭제되었습니다.');
                 await loadJobs();
                 switchTab('jobs');
@@ -1549,12 +1686,13 @@
                 const card = document.createElement('div');
                 card.className = "exact-job-card cursor-pointer";
                 card.onclick = () => openJobDetail(job);
+                const closed = isJobClosed(job);
                 card.innerHTML = `
                     <div>
-                        <span class="${job.category_color || 'text-orange-600'} font-extrabold text-xl tracking-tight block mb-2">${job.category}</span>
-                        <h3 class="text-xl font-bold text-gray-900 leading-snug tracking-tight">${job.title}</h3>
+                        <div class="flex items-center justify-between gap-2 mb-2"><span class="${job.category_color || 'text-orange-600'} font-extrabold text-xl tracking-tight">${resultEsc(job.category)}</span><span class="job-status-pill ${closed ? 'closed' : 'open'}">${closed ? '지원 마감' : '지원 가능'}</span></div>
+                        <h3 class="text-xl font-bold text-gray-900 leading-snug tracking-tight">${resultEsc(job.title)}</h3>
                     </div>
-                    <div class="text-xs font-semibold text-gray-400">${job.headcount}</div>
+                    <div class="text-xs font-semibold text-gray-400">${resultEsc(job.headcount)}</div>
                 `;
                 homeGrid.appendChild(card);
             });
@@ -1564,11 +1702,12 @@
                 const tr = document.createElement('tr');
                 tr.className = "border-b hover:bg-gray-50 cursor-pointer";
                 tr.onclick = () => openJobDetail(job);
+                const closed = isJobClosed(job);
                 tr.innerHTML = `
-                    <td class="p-4 text-center font-bold text-blue-800">${job.category}</td>
-                    <td class="p-4 font-bold text-gray-900">${job.title}</td>
-                    <td class="p-4 text-center text-sm text-gray-600">${job.headcount}</td>
-                    <td class="p-4 text-center text-gray-400 text-sm">${new Date(job.created_at).toLocaleDateString()}</td>
+                    <td class="p-4 text-center font-bold text-blue-800">${resultEsc(job.category)}</td>
+                    <td class="p-4 font-bold text-gray-900"><div class="flex flex-wrap items-center gap-2"><span>${resultEsc(job.title)}</span><span class="job-status-pill ${closed ? 'closed' : 'open'}">${closed ? '지원 마감' : '지원 가능'}</span></div></td>
+                    <td class="p-4 text-center text-sm text-gray-600">${resultEsc(job.headcount)}</td>
+                    <td class="p-4 text-center text-gray-400 text-sm">${job.created_at ? new Date(job.created_at).toLocaleDateString() : '-'}</td>
                 `;
                 jobsTable.appendChild(tr);
             });
@@ -1580,6 +1719,25 @@
             document.getElementById('detail-job-title').innerText = job.title;
             document.getElementById('detail-job-count').innerText = job.headcount;
             document.getElementById('detail-job-content').innerHTML = renderJobMarkdown(job.content || '채용 세부 내용이 작성되지 않았습니다.');
+            const closed = isJobClosed(job);
+            const statusElement = document.getElementById('detail-job-status');
+            statusElement.innerHTML = `<span class="job-status-pill ${closed ? 'closed' : 'open'}">${closed ? '지원 마감' : '지원 가능'}</span>`;
+            const adminActions = document.getElementById('admin-job-actions');
+            const toggleButton = document.getElementById('admin-toggle-job-closed-btn');
+            const applyButton = document.getElementById('apply-job-btn');
+            if (isCurrentUserAdmin()) {
+                adminActions.classList.remove('hidden');
+                adminActions.classList.add('flex');
+                toggleButton.innerText = closed ? '지원 재개' : '지원 마감';
+            } else {
+                adminActions.classList.add('hidden');
+                adminActions.classList.remove('flex');
+            }
+            applyButton.disabled = closed;
+            applyButton.innerText = closed ? '지원 마감' : '입사지원하기';
+            applyButton.classList.toggle('opacity-50', closed);
+            applyButton.classList.toggle('cursor-not-allowed', closed);
+            applyButton.classList.toggle('hover:bg-blue-900', !closed);
 
             const fileWrap = document.getElementById('detail-job-file-wrap');
             const fileListContainer = document.getElementById('detail-job-file-list');
@@ -1602,10 +1760,6 @@
                     } else { fileWrap.classList.add('hidden'); }
                 } catch(e) { fileWrap.classList.add('hidden'); }
             } else { fileWrap.classList.add('hidden'); }
-
-            const delBtn = document.getElementById('admin-delete-job-btn');
-            if (currentUser && currentUser.role === 'admin') delBtn.classList.remove('hidden');
-            else delBtn.classList.add('hidden');
 
             switchTab('job-detail');
         }
